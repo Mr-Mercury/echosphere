@@ -6,6 +6,8 @@
 .pnp.js
 .yarn/install-state.gz
 
+# rust garbage
+/target
 # testing
 /coverage
 
