@@ -1,6 +1,6 @@
 import { Activity } from './activity';
 
-enum ChannelTypes {
+export enum ChannelTypes {
     Public = 'public',
     Private = 'private',
 }
@@ -15,6 +15,5 @@ export type Channel = {
     multipleHumans?: boolean | null;
     aliveWithoutHumans?: boolean | null;
     dm: boolean;
-    activity?: Activity;
-    avatar?: string | null;
+    activity?: Activity | null;
 }

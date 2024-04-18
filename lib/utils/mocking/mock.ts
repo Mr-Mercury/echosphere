@@ -1,9 +1,7 @@
 import { UserType, UserStatus } from '@/lib/entities/user';
-import { Channel } from '@/lib/entities/channel';
+import { Channel, ChannelTypes } from '@/lib/entities/channel';
 import { Server } from '@/lib/entities/server';
 import { Activity } from '@/lib/entities/activity';
-
-
 
 export const mockDelay = 500;
 export const mockFriends = 10;
@@ -21,6 +19,10 @@ export const FakeUser:UserType = {
 function generateRandomId() {
     const id = Math.random()*10000000000000000;
     return id.toString();
+}
+
+function randomBool() {
+    return Math.floor(Math.random() * 2) === 1;
 }
 
 function generateRandomString(num: number) {
@@ -99,8 +101,25 @@ export const generateRandomServer = (quantity: number): Server[] => {
             entities: Math.random()*100,
             multipleHumans: false,
             aliveWithoutHumans: false,
-            contents: null,
+            contents: undefined,
         }))
+    return serverArray;
+}
+
+export const generateRandomChannels = (quantity: number): Channel[] => {
+    const channelArray = Array.from({length: quantity}, 
+        (undef, i) => ({
+            id: generateRandomId(),
+            name: generateRandomString(15),
+            type: ChannelTypes.Public,
+            allowedUser: null,
+            newActivity: false,
+            multipleHumans: false,
+            aliveWithoutHumans: false,
+            dm: randomBool(),
+            activity: null,
+        }))
+    return channelArray;
 }
 
 export const getRandomBot = (id: string) => {
