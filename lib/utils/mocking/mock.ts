@@ -77,9 +77,9 @@ export const generateRandomBot = (quantity: number): UserType[] => {
     const userArray = Array.from({length: quantity}, 
         (undef, i) => ({
             id: generateRandomId(),
-            name: generateRandomString(20),
+            name: generateRandomString(15),
             username: generateRandomString(10),
-            avatar: 'https://picsum.photos/200', 
+            avatar: 'https://picsum.photos/64', 
             bio: generateRandomParagraph(3),
             statusMessage: generateRandomSentence(3),
             status: generateRandomStatus(),
@@ -90,6 +90,16 @@ export const generateRandomBot = (quantity: number): UserType[] => {
 }
 
 export const generateRandomServer = (quantity: number): Server[] => {
-    
+    const serverArray = Array.from({length: quantity}, 
+        (undef, i) => ({
+            id: generateRandomId(),
+            name: generateRandomString(15),
+            image: 'https://picsum.photos/64',
+            messages: i === 0 ? 3 : undefined,
+            entities: Math.random()*100,
+            multipleHumans: false,
+            aliveWithoutHumans: false,
+            contents: null,
+        }))
 }
 
