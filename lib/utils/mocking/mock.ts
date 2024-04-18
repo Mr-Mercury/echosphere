@@ -103,3 +103,7 @@ export const generateRandomServer = (quantity: number): Server[] => {
         }))
 }
 
+export const getRandomBot = (id: string) => {
+    return {...generateRandomBot(1)[0], id}
+};
+
