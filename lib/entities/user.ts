@@ -1,4 +1,4 @@
-import {Activity} from './activity'
+import { Activity } from './activity'
 
 // Bot DMs, if enabled, will react to user status
 // Away will send one message, then nothing til response
@@ -7,7 +7,7 @@ import {Activity} from './activity'
 // events simulating real relationships? e.g. marriage etc.)
 // Mobile prefers sending short, shallow messages?  
 
-enum UserStatus {
+export enum UserStatus {
     Away = 'away',
     Online = 'online',
     Offline = 'offline',
@@ -15,14 +15,14 @@ enum UserStatus {
 }
 
 // May not end up using bio, but have bot react to it somehow
-export interface User {
-    id: String;
-    name: String;
-    username: String;
-    avatar?: String | null;
-    bio?: String | null;
-    statusMessage?: String | null;
+export interface UserType {
+    id: string;
+    name: string;
+    username: string;
+    avatar?: string | null;
+    bio?: string | null;
+    statusMessage?: string | null;
     status: UserStatus;
-    activity?: Activity;
-    human?: Boolean;
+    activity?: Activity | null;
+    human?: boolean;
 }

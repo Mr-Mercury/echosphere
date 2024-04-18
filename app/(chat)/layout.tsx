@@ -1,10 +1,12 @@
 import React from "react";
+import { Suspense } from "react";
 
-import {NavSidebar} from '../(components)/(nav-components)/nav-sidebar';
+import { NavSidebar } from '../(components)/(nav-components)/nav-sidebar';
+import { UserType } from '@/lib/entities/user';
 
 interface ChatLayoutProps {
-    children: React.ReactNode;
-    currentUser: any;
+    children?: React.ReactNode;
+    currentUser: UserType;
 }
 
 export default function ChatLayout({
@@ -13,7 +15,8 @@ export default function ChatLayout({
 }: ChatLayoutProps): JSX.Element{
     return (
         <div>
-            <NavSidebar currentUser={currentUser}></NavSidebar>
+            <Suspense fallback=
+            <NavSidebar currentUser={currentUser} />
         </div>
     )
 }

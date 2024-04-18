@@ -1,11 +1,11 @@
 export type Server = {
-    id: String;
-    name: String;
-    image: String;
-    messages?: Number;
-    entities?: Number;
-    multipleHumans?: Boolean | null;
-    aliveWithoutHumans?: Boolean | null;
+    id: string;
+    name: string;
+    image: string;
+    messages?: number;
+    entities?: number;
+    multipleHumans?: boolean | null;
+    aliveWithoutHumans?: boolean | null;
     // CHANGE THIS LATER ~~
     contents?: object;
 }

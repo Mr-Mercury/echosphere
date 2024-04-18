@@ -1,4 +1,4 @@
 export type Activity = {
-    name: String;
+    name: string;
     time: Date;
 }

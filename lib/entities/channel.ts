@@ -8,13 +8,13 @@ enum ChannelTypes {
 // will be handled like private servers. 
 export type Channel = {
     type: ChannelTypes;
-    id: String;
-    name: String;
-    allowedUsers?: Array<String> | null; 
-    newActivity?: Boolean;
-    multipleHumans?: Boolean | null;
-    aliveWithoutHumans?: Boolean | null;
-    dm: Boolean;
+    id: string;
+    name: string;
+    allowedUsers?: Array<string> | null; 
+    newActivity?: boolean;
+    multipleHumans?: boolean | null;
+    aliveWithoutHumans?: boolean | null;
+    dm: boolean;
     activity?: Activity;
     avatar?: string | null;
 }
