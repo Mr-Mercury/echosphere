@@ -23,7 +23,7 @@ const Personal = async () => {
     return (
         <section className="flex h-screen">
             <FriendSidebar />
-            <main className="flex-1 p-6 overflow-y-auto"> Chat Window </main>
+            <main className="flex-1 p-6 overflow-y-auto"> Friend Chat Window </main>
         </section>
     )
 
