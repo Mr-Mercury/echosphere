@@ -4,7 +4,7 @@ import { ServerType } from "@/lib/entities/server";
 import { generateRandomBot, 
     generateRandomChannels, 
     generateRandomServer } from "@/lib/utils/mocking/mock";
-import { FriendSidebar }
+import { FriendSidebar } from "@/components/contents-sidebar-components/friend-sidebar/friend-sidebar"
 
 async function fetchData(): Promise<FetchedData>{
     const friends: UserType[] = generateRandomBot(5);
@@ -21,7 +21,10 @@ interface FetchedData {
 const Personal = async () => {
     const data = fetchData();
     return (
-        <div>DATA</div>
+        <section className="flex h-screen">
+            <FriendSidebar />
+            <main className="flex-1 p-6 overflow-y-auto"> Chat Window </main>
+        </section>
     )
 
 }

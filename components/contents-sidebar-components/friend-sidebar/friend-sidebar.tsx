@@ -1,6 +1,6 @@
 import { UserType } from "@/lib/entities/user";
 
-const FriendSidebar = () => {
+export const FriendSidebar = () => {
     return (
         <section>
             <nav>Friend1</nav>

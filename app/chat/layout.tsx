@@ -16,9 +16,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         //Styling wrapper needs to ensure they're rendering side by side
         <div className="flex h-screen">
             <ChatMainSidebar currentUser={currentUser} />
-            <main className="flex-1 p-6 overflow-y-auto">
+            <section className="flex-1 p-6 overflow-y-auto">
             {children}
-            </main>
+            </section>
         </div>
 
         
