@@ -2,6 +2,12 @@ import { UserType } from '@/lib/entities/user';
 
 export const ChatSidebar = async (currentUser: UserType | undefined ) => {
     return (
-        <div>Sidebar</div>
+        <div>
+            <nav>Sidebar</nav>
+            <nav>Chat1</nav>
+            <nav>Chat2</nav>
+            <nav>Chat3</nav>
+            <nav>Chat4</nav>
+        </div>
     )
 }

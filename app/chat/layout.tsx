@@ -16,7 +16,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         //Styling wrapper needs to ensure they're rendering side by side
         <section>
             <ChatSidebar currentUser={currentUser} />
-            <nav></nav>
             {children}
         </section>
 
