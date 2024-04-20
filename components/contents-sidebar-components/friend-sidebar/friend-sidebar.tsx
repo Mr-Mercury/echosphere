@@ -11,3 +11,5 @@ const FriendSidebar = () => {
         </section>
     )
 }
+
+export default FriendSidebar;

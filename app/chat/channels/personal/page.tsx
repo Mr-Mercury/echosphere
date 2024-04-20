@@ -4,6 +4,7 @@ import { ServerType } from "@/lib/entities/server";
 import { generateRandomBot, 
     generateRandomChannels, 
     generateRandomServer } from "@/lib/utils/mocking/mock";
+import { FriendSidebar }
 
 async function fetchData(): Promise<FetchedData>{
     const friends: UserType[] = generateRandomBot(5);
