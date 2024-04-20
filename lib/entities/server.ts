@@ -1,4 +1,4 @@
-export type Server = {
+export type ServerType = {
     id: string;
     name: string;
     image: string;
@@ -7,5 +7,5 @@ export type Server = {
     multipleHumans?: boolean | null;
     aliveWithoutHumans?: boolean | null;
     // CHANGE THIS LATER ~~
-    contents?: object;
+    channels?: object;
 }
