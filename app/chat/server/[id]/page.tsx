@@ -2,6 +2,7 @@ import { ServerType } from "@/lib/entities/server"
 import { generateRandomServer } from "@/lib/utils/mocking/mock"
 import { getServerById } from "@/lib/utils/data/fetching/serverData"
 import { PageContainer } from "@/components/page-container"
+import ServerDetails from "@/components/islet/chat-window/index";
 
 function ServerPage(server: ServerType) {
     return (<div>
