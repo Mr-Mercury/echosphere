@@ -1,6 +1,6 @@
 import { UserType } from '@/lib/entities/user';
 
-export const ChatSidebar = async (currentUser: UserType | undefined ) => {
+export const ChatMainSidebar = async (currentUser: UserType | undefined ) => {
     return (
         <div>
             <nav>Sidebar</nav>

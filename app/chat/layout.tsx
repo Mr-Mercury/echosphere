@@ -1,7 +1,7 @@
 import React from "react";
 import { Suspense } from "react";
 
-import { ChatSidebar } from "@/components/chat-sidebar-components/chat-sidebar";
+import { ChatMainSidebar } from "@/components/chat-sidebar-components/chat-sidebar";
 import { UserType } from '@/lib/entities/user';
 
 interface ChatLayoutProps {
@@ -14,10 +14,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
 }: ChatLayoutProps) => {
     return(
         //Styling wrapper needs to ensure they're rendering side by side
-        <section>
-            <ChatSidebar currentUser={currentUser} />
+        <div className="flex h-screen">
+            <ChatMainSidebar currentUser={currentUser} />
+            <main className="flex-1 p-6 overflow-y-auto">
             {children}
-        </section>
+            </main>
+        </div>
 
         
     )
