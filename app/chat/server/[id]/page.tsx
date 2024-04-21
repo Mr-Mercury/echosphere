@@ -6,8 +6,8 @@ import ServerChat from "@/components/islet/chat-window"
 
 async function ServerPage({ params, }: {params:{id:string}}) {
 
-    const server = await getServerById(params.id)
-
+    const server: ServerType = await getServerById(params.id)
+    
     return (<div>
         <PageContainer>
             <ServerChat server={server}/>
