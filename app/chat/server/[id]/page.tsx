@@ -7,8 +7,10 @@ import { ChannelSideBar } from "@/components/contents-sidebar-components/channel
 
 async function ServerPage({ params, }: {params:{id:string}}) {
 
-    const server = getServerById(params.id);
-    console.log(server);
+    const server = await getServerById(params.id);
+    // TODO: Pass channels to ChannelSideBar, 
+    // Pass server content to serverChat
+    // Fuck it I'll store everything in state. 
     return (<div>
         <section>
             <ChannelSideBar />
