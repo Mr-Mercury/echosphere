@@ -1,20 +1,12 @@
 import { UserType, UserStatus } from '@/lib/entities/user';
 import { Channel, ChannelTypes } from '@/lib/entities/channel';
-import { Server } from '@/lib/entities/server';
+import { ServerType } from '@/lib/entities/server';
 import { Activity } from '@/lib/entities/activity';
 
 export const mockDelay = 500;
 export const mockFriends = 10;
 export const mockChannels = 8;
 export const mockServers = 15;
-
-export const FakeUser:UserType = {
-    id: generateRandomId(),
-    name: "Hobbo Bobbo",
-    username: "TestGoblin",
-    status: UserStatus.Online,
-}
-
 
 function generateRandomId() {
     const id = Math.random()*10000000000000000;
@@ -87,11 +79,12 @@ export const generateRandomBot = (quantity: number): UserType[] => {
             status: generateRandomStatus(),
             activity: null,
             human: false,
+            servers: [],
         }));
     return userArray;
 }
 
-export const generateRandomServer = (quantity: number): Server[] => {
+export const generateRandomServer = (quantity: number): ServerType[] => {
     const serverArray = Array.from({length: quantity}, 
         (undef, i) => ({
             id: generateRandomId(),
@@ -122,7 +115,15 @@ export const generateRandomChannels = (quantity: number): Channel[] => {
     return channelArray;
 }
 
+
 export const getRandomBot = (id: string) => {
     return {...generateRandomBot(1)[0], id}
 };
 
+export const fakeUser: UserType = {
+    id: generateRandomId(),
+    name: "Hobbo Bobbo",
+    username: "TestGoblin",
+    status: UserStatus.Online,
+    servers: generateRandomServer(8),
+}

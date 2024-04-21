@@ -1,14 +1,15 @@
 import { UserType } from '@/lib/entities/user';
+import Link from 'next/link';
 
-export const ChatMainSidebar = async (currentUser: UserType | undefined ) => {
+// Later on, pass with button component
+export default function ChatMainSidebar(currentUser: UserType) {
     return (
-        <div>
-            <nav>Sidebar</nav>
-            <nav>Me</nav>
-            <nav>Server1</nav>
-            <nav>Server2</nav>
-            <nav>Server3</nav>
-            <nav>Server4</nav>
-        </div>
-    )
+        <ul>
+            {Array.from(currentUser.servers).map(server => (
+                <li key={server.id}>
+                    <Link href={`/chat/server/${server.id}`}>{server.name}</Link>
+                </li>
+            ))}
+        </ul>
+    );
 }

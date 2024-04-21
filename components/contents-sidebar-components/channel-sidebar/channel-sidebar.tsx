@@ -1,6 +1,6 @@
 import { ChannelTypes } from "@/lib/entities/channel";
 
-export const ChannelBar = () => {
+export const ChannelSideBar = () => {
     return (
         <section>
             <nav>Channel1</nav>

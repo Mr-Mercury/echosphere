@@ -1,4 +1,5 @@
 import { Activity } from './activity'
+import { ServerType } from './server';
 
 // Bot DMs, if enabled, will react to user status
 // Away will send one message, then nothing til response
@@ -19,6 +20,7 @@ export interface UserType {
     id: string;
     name: string;
     username: string;
+    servers: ServerType[];
     avatar?: string | null;
     bio?: string | null;
     statusMessage?: string | null;

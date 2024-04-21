@@ -2,12 +2,10 @@ import { ServerType } from "@/lib/entities/server"
 
 const ServerChat = (server: ServerType) => {
     
-    const data = server.server;
-
     return (
         <div>
-            <h1>{data.name}</h1>
-            <p>{data.id}</p>
+            <h1>{server.name}</h1>
+            <p>{server.id}</p>
         </div>
     )
 }
