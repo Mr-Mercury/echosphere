@@ -4,18 +4,15 @@ import { getServerById } from "@/lib/utils/data/fetching/serverData"
 import { PageContainer } from "@/components/page-container"
 import ServerDetails from "@/components/islet/chat-window/index";
 
-function ServerPage(server: ServerType) {
+async function ServerPage({ params, }: {params:{id:string}}) {
+
+    const server = await getServerById(params.id)
+    console.log(server);
     return (<div>
         <PageContainer>
             <ServerDetails server={server}/>
         </PageContainer>
     </div>)
-}
-
-export async function getServerSideProps({ params }: {params: {id:string}}) {
-    const server = await getServerById(params.id);
-
-    return { props: { server} };
 }
 
 export default ServerPage; 
