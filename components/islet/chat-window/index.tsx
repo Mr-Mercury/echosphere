@@ -1,6 +1,7 @@
 import { ServerType } from "@/lib/entities/server"
 
-const ChatWindow = (server: ServerType) => {
+const ServerChat = (server: ServerType) => {
+
     return (
         <div>
             <h1>{server.name}</h1>
@@ -9,4 +10,4 @@ const ChatWindow = (server: ServerType) => {
     )
 }
 
-export default ChatWindow;
+export default ServerChat;
