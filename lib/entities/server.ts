@@ -1,3 +1,6 @@
+import { SingleChannel } from "./channel";
+
+
 export type ServerType = {
     id: string;
     name: string;
@@ -7,5 +10,5 @@ export type ServerType = {
     multipleHumans?: boolean | null;
     aliveWithoutHumans?: boolean | null;
     // CHANGE THIS LATER ~~
-    channels?: object;
+    channels?: SingleChannel[];
 }

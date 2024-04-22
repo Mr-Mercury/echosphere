@@ -6,7 +6,7 @@ export enum ChannelTypes {
 }
 // Multiple humans boolean or null to handle DMs - dms 
 // will be handled like private servers. 
-export type Channel = {
+export type SingleChannel = {
     type: ChannelTypes;
     id: string;
     name: string;

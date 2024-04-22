@@ -1,5 +1,5 @@
 import { UserType, UserStatus } from '@/lib/entities/user';
-import { Channel, ChannelTypes } from '@/lib/entities/channel';
+import { SingleChannel, ChannelTypes } from '@/lib/entities/channel';
 import { ServerType } from '@/lib/entities/server';
 import { Activity } from '@/lib/entities/activity';
 
@@ -95,6 +95,7 @@ export const generateRandomServer = (quantity: number): ServerType[] => {
             multipleHumans: false,
             aliveWithoutHumans: false,
             contents: undefined,
+            channels: generateRandomChannels(10)
         }))
     return serverArray;
 }

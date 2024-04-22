@@ -1,6 +1,7 @@
 import { UserType } from "@/lib/entities/user";
+import { FetchedData } from "@/app/chat/server/personal/page";
 
-export const FriendSidebar = () => {
+export const FriendSidebar = (data: FetchedData) => {
     return (
         <section>
             <nav>Friend1</nav>

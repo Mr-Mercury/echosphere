@@ -13,16 +13,17 @@ async function fetchData(): Promise<FetchedData>{
 
 }
 
-interface FetchedData {
+export interface FetchedData {
     friends: UserType[];
     servers: ServerType[];
 }
 
 const Personal = async () => {
     const data = fetchData();
+
     return (
         <section className="flex h-screen">
-            <FriendSidebar />
+            <FriendSidebar {...data}/>
             <main className="flex-1 p-6 overflow-y-auto"> Friend Chat Window </main>
         </section>
     )
