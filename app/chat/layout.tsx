@@ -3,9 +3,7 @@ import { Suspense } from "react";
 
 import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar";
 import { UserType } from '@/lib/entities/user';
-import { userDataAtom } from "@/lib/entities/atoms/userDataAtom";
 import { getUser } from "@/lib/utils/data/fetching/userData";
-import { atom, useAtom } from "jotai";
 
 interface ChatLayoutProps {
     children?: React.ReactNode;
