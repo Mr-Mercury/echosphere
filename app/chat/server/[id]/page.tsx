@@ -13,12 +13,13 @@ async function ServerPage({ params, }: {params:{id:string}}) {
     // Fuck it I'll store everything in state. 
     return (<div>
         <section>
-            <ChannelSideBar />
+            <ChannelSideBar channels={server.channels} server={server.id}/>
         </section>
         <PageContainer>
             <ServerChat {...server}/>
         </PageContainer>
     </div>)
 }
+
 
 export default ServerPage; 

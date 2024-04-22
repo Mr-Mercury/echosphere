@@ -1,13 +1,16 @@
-import { ChannelTypes } from "@/lib/entities/channel";
+import { SingleChannel } from "@/lib/entities/channel";
+import Link from "next/link";
 
-export const ChannelSideBar = () => {
+
+export const ChannelSideBar = (data: {channels: SingleChannel[], serverId:string}) => {
+    const {channels, serverId} = data;
     return (
-        <section>
-            <nav>Channel1</nav>
-            <nav>Channel2</nav>
-            <nav>Channel3</nav>
-            <nav>Channel4</nav>
-            <nav>Channel5</nav>
-        </section>
+        <ul>
+            {Array.from(channels.map(channel => (
+                <li key={channel.id}>
+                    <Link href={`/chat/server/${serverId}/${channel.id}`}>{channel.id}</Link>
+                </li>
+            )))}
+        </ul>
     )
 }
