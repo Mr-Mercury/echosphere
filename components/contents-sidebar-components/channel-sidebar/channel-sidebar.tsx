@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const ChannelSideBar = (data: {channels: SingleChannel[], server:string}) => {
     const {channels, server} = data;
-    console.log(data);
+    
     return (
         <ul>
             {Array.from(channels.map(channel => (

@@ -1,12 +1,11 @@
-import { ServerType } from "@/lib/entities/server"
+import { SingleChannel } from "@/lib/entities/channel";
 
-const ServerChat = (server: ServerType) => {
+const ChatWindow = (info: SingleChannel) => {
     return (
         <div>
-            <h1>{server.name}</h1>
-            <p>{server.id}</p>
+            <p>{info.id}</p>
         </div>
     )
 }
 
-export default ServerChat;
+export default ChatWindow;
