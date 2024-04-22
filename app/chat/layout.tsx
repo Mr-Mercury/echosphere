@@ -15,14 +15,17 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
 
 
     return(
-        //Styling wrapper needs to ensure they're rendering side by side
-        <div className="flex h-screen">
-            <ChatMainSidebar />
-            <section className="flex-1 p-6 overflow-y-auto">
-            {children}
-            </section>
+        <div className='h-full'>
+            <div className="flex h-screen bg-[#313338]">
+                <div className='hidden md:flex h-full w-[72px]
+                z-30 flex-col fixed inset-y-0'>
+                    <ChatMainSidebar />
+                </div>
+                <section className="flex-1 p-6 overflow-y-auto">
+                {children}
+                </section>
+            </div>
         </div>
-
         
     )
 }

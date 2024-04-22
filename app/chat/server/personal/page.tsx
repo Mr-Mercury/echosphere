@@ -1,9 +1,5 @@
-import { UserType } from "@/lib/entities/user";
-import { ChannelTypes } from "@/lib/entities/channel";
-import { ServerType } from "@/lib/entities/server";
-import { generateRandomBot, 
-    generateRandomChannels, 
-    generateRandomServer } from "@/lib/utils/mocking/mock";
+import { PageContainer } from "@/components/page-container";
+import ChatWindow from "@/components/islet/chat-window"
 import { FriendSidebar } from "@/components/contents-sidebar-components/friend-sidebar/friend-sidebar";
 import { getUser } from "@/lib/utils/data/fetching/userData";
 
@@ -13,10 +9,23 @@ export default async function Personal() {
     let user = await getUser('1234');
 
     return (
-        <section className="flex h-screen">
-            <FriendSidebar friends={user.friends} servers={user.servers}/>
-            <main className="flex-1 p-6 overflow-y-auto"> Friend Chat Window </main>
-        </section>
+        <div className='text-white'>
+            <section className="flex h-screen">
+                <FriendSidebar friends={user.friends} servers={user.servers}/>
+            </section>
+            <PageContainer>
+                <ChatWindow />
+            </PageContainer>
+        </div>
     )
 
 }
+
+<div>
+        <section>
+            <ChannelSideBar channels={server.channels} server={server.id}/>
+        </section>
+        <PageContainer>
+            <ChatWindow {...channel}/>
+        </PageContainer>
+    </div>
