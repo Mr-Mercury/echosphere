@@ -1,6 +1,5 @@
 import { UserType } from "@/lib/entities/user";
 import { useAtom } from "jotai";
-import { userDataAtom } from "@/lib/entities/atoms/userDataAtom";
 import { ChannelTypes } from "@/lib/entities/channel";
 import { ServerType } from "@/lib/entities/server";
 import { generateRandomBot, 
