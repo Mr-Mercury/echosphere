@@ -5,7 +5,6 @@ import { getChannelById } from "@/lib/utils/data/fetching/channelData"
 import { generateRandomChannels } from "@/lib/utils/mocking/mock";
 
 async function ChannelPage({params}: {params: {id:string, channel:string}}) {
-    console.log(params);
     const channelData = await getChannelById(params.channel);
     const channels = await generateRandomChannels(5);
 

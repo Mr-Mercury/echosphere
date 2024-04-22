@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/chat-sidebar-components/parent-sidebar"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/chat-sidebar-components/parent-sidebar", "components/jotai/providers.js"],
   "exclude": ["node_modules"]
 }
