@@ -1,33 +1,24 @@
-import { UserType } from "@/lib/entities/user"
+import { UserType } from "@/lib/entities/user";
+import { useAtom } from "jotai";
+import { userDataAtom } from "@/lib/entities/atoms/userDataAtom";
 import { ChannelTypes } from "@/lib/entities/channel";
 import { ServerType } from "@/lib/entities/server";
 import { generateRandomBot, 
     generateRandomChannels, 
     generateRandomServer } from "@/lib/utils/mocking/mock";
-import { FriendSidebar } from "@/components/contents-sidebar-components/friend-sidebar/friend-sidebar"
+import { FriendSidebar } from "@/components/contents-sidebar-components/friend-sidebar/friend-sidebar";
+import { getUser } from "@/lib/utils/data/fetching/userData";
 
-async function fetchData(): Promise<FetchedData>{
-    const friends: UserType[] = generateRandomBot(5);
-    const servers: ServerType[] = generateRandomServer(12)
-    return { friends, servers }
 
-}
+export default async function Personal() {
 
-export interface FetchedData {
-    friends: UserType[];
-    servers: ServerType[];
-}
-
-const Personal = async () => {
-    const data = fetchData();
+    let user = await getUser('1234');
 
     return (
         <section className="flex h-screen">
-            <FriendSidebar {...data}/>
+            <FriendSidebar friends={user.friends} servers={user.servers}/>
             <main className="flex-1 p-6 overflow-y-auto"> Friend Chat Window </main>
         </section>
     )
 
 }
-
-export default Personal

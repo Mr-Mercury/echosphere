@@ -24,7 +24,7 @@ export interface UserType {
     avatar?: string | null;
     bio?: string | null;
     statusMessage?: string | null;
-    status: UserStatus;
+    status?: UserStatus;
     activity?: Activity | null;
     human?: boolean;
     friends?: UserType[] | null;
