@@ -27,4 +27,5 @@ export interface UserType {
     status: UserStatus;
     activity?: Activity | null;
     human?: boolean;
+    friends?: UserType[] | null;
 }

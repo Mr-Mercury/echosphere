@@ -127,4 +127,5 @@ export const fakeUser: UserType = {
     username: "TestGoblin",
     status: UserStatus.Online,
     servers: generateRandomServer(8),
+    friends: generateRandomBot(5),
 }
