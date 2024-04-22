@@ -1,7 +1,5 @@
 import { UserType } from '@/lib/entities/user';
-import { useMemo } from 'react';
-import { atom, useAtom } from 'jotai';
-import { userDataAtom } from '@/lib/entities/atoms/userDataAtom';
+import { redirect } from 'next/navigation'
 import Link from 'next/link';
 import { getUser } from '@/lib/utils/data/fetching/userData';
 
@@ -10,8 +8,15 @@ export default async function ChatMainSidebar() {
 
     let user = await getUser('1234');
 
+    if (!user) {
+        return redirect('/');
+    }
+
+
+
     return (
-        <ul>
+        <ul className='space-y-4 flex flex-col items-center h-full text-primary
+        w-full dark:bg-[#1E1F22] py-3'>
             {Array.from(user.servers).map(server => (
                 <li key={server.id}>
                     <Link href={`/chat/server/${server.id}`}>{server.name}</Link>
