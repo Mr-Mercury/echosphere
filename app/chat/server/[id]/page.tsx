@@ -18,7 +18,7 @@ async function ServerPage({ params, }: {params:{id:string}}) {
             <ChannelSideBar channels={server.channels} server={server.id}/>
         </section>
         <PageContainer>
-            <ChatWindow {...channel}/>
+            <ChatWindow />
         </PageContainer>
     </div>)
 }
