@@ -1,5 +1,6 @@
 import { UserType } from '@/lib/entities/user';
 import { Separator } from '../ui/separator';
+import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'
 import Link from 'next/link';
 import { getUser } from '@/lib/utils/data/fetching/userData';
@@ -24,6 +25,7 @@ export default async function ChatMainSidebar() {
                     </li>
                 ))}
             </ul>
+            <ScrollArea ></ScrollArea>
             <Separator className='h-[2px] bg-zinc-600   
             rounded-md w-10 mx-auto'/>
             <ChatNewButton />
