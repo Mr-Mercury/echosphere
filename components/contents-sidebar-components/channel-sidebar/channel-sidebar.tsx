@@ -4,9 +4,10 @@ import { getUser } from "@/lib/utils/data/fetching/userData";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ServerHeader from "./channel-server-header";
+import { ServerType } from "@/lib/entities/server";
 
 interface ChannelSidebarProps {
-    server: string;
+    server: ServerType;
 }
 
 export const ChannelSideBar = async (params: ChannelSidebarProps) => {
@@ -34,7 +35,7 @@ export const ChannelSideBar = async (params: ChannelSidebarProps) => {
             <ul>
                 {Array.from(channels.map(channel => (
                     <li key={channel.id}>
-                        <Link href={`/chat/server/${server}/${channel.id}`}>{channel.id}</Link>
+                        <Link href={`/chat/server/${server.id}/${channel.id}`}>{channel.id}</Link>
                     </li>
                 )))}
             </ul>
