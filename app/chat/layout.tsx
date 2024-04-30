@@ -2,8 +2,6 @@ import React from "react";
 import { Suspense } from "react";
 
 import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar";
-import { UserType } from '@/lib/entities/user';
-import { getUser } from "@/lib/utils/data/fetching/userData";
 
 interface ChatLayoutProps {
     children?: React.ReactNode;
