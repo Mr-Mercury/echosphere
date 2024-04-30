@@ -18,8 +18,6 @@ const ChannelLayout = async ({ children, params }: {
 
     const server = await getServerById(params.id);
 
-    const channels = await generateRandomChannels(5);
-
     if (!server) {
         return redirect('/')
     }
@@ -28,7 +26,7 @@ const ChannelLayout = async ({ children, params }: {
         <div className='h-full'>
             <div className='hidden md:flex h-full w-60
             z-20 flex-col fixed inset-y-0'>
-                <ChannelSideBar channels={channels} server={params.id}/>
+                <ChannelSideBar server={params.id}/>
             </div>
             <main className='h-full md:pl-60'>{children}</main>
         </div>

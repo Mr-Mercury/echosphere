@@ -1,9 +1,12 @@
 import { SingleChannel } from "@/lib/entities/channel";
+import { generateRandomChannels } from "@/lib/utils/mocking/mock";
+
 import Link from "next/link";
 
 
-export const ChannelSideBar = (data: {channels: SingleChannel[], server:string}) => {
-    const {channels, server} = data;
+export const ChannelSideBar = (params: {server:string}) => {
+    const {server} = params; 
+    const channels = generateRandomChannels(8);
     
     return (
         <ul>
