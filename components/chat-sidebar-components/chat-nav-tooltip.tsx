@@ -1,9 +1,9 @@
 'use client';
 
 import { Tooltip, TooltipContent, 
-    TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
+    TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
-interface NavTooltipProps {
+    interface NavTooltipProps {
     label: string;
     children: React.ReactNode;
     side?: 'top' | 'right' | 'bottom' | 'left';
@@ -17,7 +17,7 @@ const NavTooltip = ({ label, children, side, align }: NavTooltipProps) => {
                 <TooltipTrigger asChild>
                     {children}
                 </TooltipTrigger>
-                <TooltipContent side={side} align={align} className='bg-black text-white p-1 rounded'>
+                <TooltipContent side={side} align={align} className=''>
                     <p className='font-semibold text-sm capitalize'>
                         {label.toLowerCase()}
                     </p>
