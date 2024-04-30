@@ -9,7 +9,7 @@ export default async function Personal() {
     let user = await getUser('1234');
 
     return (
-        <div className='text-white'>
+        <div>
             <section className="flex h-screen">
                 <FriendSidebar friends={user.friends} servers={user.servers}/>
             </section>
@@ -20,12 +20,3 @@ export default async function Personal() {
     )
 
 }
-
-<div>
-        <section>
-            <ChannelSideBar channels={server.channels} server={server.id}/>
-        </section>
-        <PageContainer>
-            <ChatWindow {...channel}/>
-        </PageContainer>
-    </div>
