@@ -26,7 +26,7 @@ const ChannelLayout = async ({ children, params }: {
         <div className='h-full'>
             <div className='hidden md:flex h-full w-60
             z-20 flex-col fixed inset-y-0'>
-                <ChannelSideBar server={params.id}/>
+                <ChannelSideBar server={server}/>
             </div>
             <main className='h-full md:pl-60'>{children}</main>
         </div>
