@@ -17,7 +17,7 @@ const NavTooltip = ({ label, children, side, align }: NavTooltipProps) => {
                 <TooltipTrigger asChild>
                     {children}
                 </TooltipTrigger>
-                <TooltipContent side={side} align={align}>
+                <TooltipContent side={side} align={align} className='bg-black text-white p-1 rounded'>
                     <p className='font-semibold text-sm capitalize'>
                         {label.toLowerCase()}
                     </p>
