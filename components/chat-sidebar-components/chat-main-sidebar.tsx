@@ -2,7 +2,7 @@ import { UserType } from '@/lib/entities/user';
 import { redirect } from 'next/navigation'
 import Link from 'next/link';
 import { getUser } from '@/lib/utils/data/fetching/userData';
-import ChatNewButton from './chat-new-button';
+import ChatNewButton from './chat-new-button/chat-new-button';
 
 // Later on, pass with button component
 export default async function ChatMainSidebar() {
