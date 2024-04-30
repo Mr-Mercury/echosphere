@@ -6,11 +6,9 @@ import { generateRandomChannels } from "@/lib/utils/mocking/mock";
 
 async function ChannelPage({params}: {params: {id:string, channel:string}}) {
     const channelData = await getChannelById(params.channel);
-    const channels = await generateRandomChannels(5);
 
     return (
         <div>
-            <ChannelSideBar channels={channels} server={params.id}/>
             <PageContainer>
                 <ChatWindow {...channelData}/>
             </PageContainer>
