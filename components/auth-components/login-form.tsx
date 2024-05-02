@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Button } from '../ui/button';
 import { FormError } from '../islets/auth/auth-form-error';
+import { FormSuccess } from '../islets/auth/auth-form-success';
 
 export const LoginForm = ({}) => {
 
@@ -57,6 +58,7 @@ export const LoginForm = ({}) => {
                     )}/>
                 </div>
                 <FormError />
+                <FormSuccess />
                 <Button type='submit' className='w-full' variant='outline'>
                     Login
                 </Button>
