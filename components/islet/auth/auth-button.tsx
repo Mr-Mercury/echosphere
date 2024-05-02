@@ -12,10 +12,6 @@ export const AuthButton = ({
     children, mode='redirect', asChild,
 }: AuthButtonProps) => {
 
-    const onClick = () => {
-        console.log('click!')
-    }
-
     if (mode === 'modal') {
         return (
             <span>
@@ -25,8 +21,8 @@ export const AuthButton = ({
     }
 
     return (
-        <span onClick={onClick} className='cursor-pointer'>
+        <Link href='/login' className='cursor-pointer'>
             {children}
-        </span>
+        </Link>
     )
 }
