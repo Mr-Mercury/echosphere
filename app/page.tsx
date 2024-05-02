@@ -5,6 +5,6 @@ export default function Home() {
   // const {currentUser: any} = getCurrentUser();
 
   return (
-    <div>HOME PAGE</div>
+    <main className="bg-[#313338]"></main>
   );
 }
