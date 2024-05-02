@@ -1,6 +1,6 @@
 'use client'
 import { FaGoogle, FaGithub } from "react-icons/fa";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 
 
 export const AuthSocial = () => {

@@ -1,8 +1,9 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { AuthHeader } from "./auth-header";
-import { AuthSocial } from "@/components/auth-components/auth-social";
+import { AuthHeader } from "../islets/auth/auth-header";
+import { AuthSocial } from "@/components/islets/auth/auth-social";
+import { AuthBackButton } from "./auth-back-button";
 
 interface AuthCardWrapperProps {
     children: React.ReactNode;
@@ -32,6 +33,9 @@ export const AuthCardWrapper = ({
                     <AuthSocial />
                 </CardFooter>
             )} 
+            <CardFooter>
+                <AuthBackButton label={backButtonLabel} href={backButtonHref}/>
+            </CardFooter>
         </Card>
     )
 }
