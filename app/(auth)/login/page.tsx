@@ -6,7 +6,7 @@ import { LoginForm } from "@/components/auth-components/login-form";
 
 const LoginPage = () => {
     return (
-        <AuthCardWrapper headerLabel='Login Here' 
+        <AuthCardWrapper headerLabel='Echosphere' 
         backButtonLabel="Don't have an account?" 
         backButtonHref='/registration'
         showSocial={true}>
