@@ -56,7 +56,7 @@ export const LoginForm = ({}) => {
                         </FormItem> 
                     )}/>
                 </div>
-                <FormError message='Whoopsies'/>
+                <FormError />
                 <Button type='submit' className='w-full' variant='outline'>
                     Login
                 </Button>
