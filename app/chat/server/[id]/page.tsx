@@ -2,7 +2,7 @@ import { ServerType } from "@/lib/entities/server"
 import { generateRandomServer } from "@/lib/utils/mocking/mock"
 import { getServerById } from "@/lib/utils/data/fetching/serverData"
 import { PageContainer } from "@/components/page-container"
-import ChatWindow from "@/components/islet/chat-window"
+import ChatWindow from "@/components/islets/chat-window"
 import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar"
 import { getChannelById } from "@/lib/utils/data/fetching/channelData"
 
