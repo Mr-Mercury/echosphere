@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema } from '@/schemas';
 import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Button } from '../ui/button';
 
 export const LoginForm = ({}) => {
 
@@ -48,6 +49,9 @@ export const LoginForm = ({}) => {
                         </FormItem> 
                     )}/>
                 </div>
+                <Button type='submit' className='w-full' variant='outline'>
+                    Login
+                </Button>
             </form>
         </Form>
     )
