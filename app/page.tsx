@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { AuthButton } from "@/components/islet/auth/auth-button";
+import { AuthButton } from "@/components/islets/auth/auth-button";
 import { cn } from "@/lib/utils";
+
+
+// NOTE - REMEMBER TO PROGRAMMATICALLY SKIP THIS PAGE AND JUMP TO CHAT OR THE 
+// DASHBOARD OR RESPONSE TABLES IF USER HAS A PREVIOUS SESSION
 
 const Home = () => {
     return (
@@ -16,7 +20,7 @@ const Home = () => {
                 <div>
                     <AuthButton>
                         <Button variant='secondary' size='lg'>
-                            Sign In
+                            Sign In or Register Account
                         </Button>
                     </AuthButton>
                 </div>
