@@ -12,7 +12,7 @@ export const AuthBackButton = ({
     href, label
 }: AuthBackButtonProps) => {
     return (
-        <Button variant='link' size='sm' className='font-normal w-full' asChild>
+        <Button variant='link' size='sm' className='font-normal text-foreground w-full' asChild>
             <Link href={href}>
                 {label}
             </Link>

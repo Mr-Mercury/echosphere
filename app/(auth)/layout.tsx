@@ -4,7 +4,7 @@ const AuthLayout = ({ children }:
     }) => {
     return (
         <div className='h-full flex items-center justify-center 
-        bg-[#313338] text-white'>
+        bg-background text-white'>
             {children}
         </div>
     )
