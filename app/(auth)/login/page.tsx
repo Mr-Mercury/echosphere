@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { AuthButton } from "@/components/islets/auth/auth-button";
-import { AuthCardWrapper } from "@/components/islets/auth/auth-card-wrapper";
+import { AuthCardWrapper } from "@/components/auth-components/auth-card-wrapper";
 import { cn } from "@/lib/utils";
 import { LoginForm } from "@/components/auth-components/login-form";
 
