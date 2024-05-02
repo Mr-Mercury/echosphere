@@ -1,8 +1,10 @@
 'use client'
 
+import Link from "next/link";
+
 interface AuthButtonProps {
     children: React.ReactNode;
-    mode?: 'model' | 'redirect';
+    mode?: 'modal' | 'redirect';
     asChild?: boolean;
 }
 
@@ -12,6 +14,14 @@ export const AuthButton = ({
 
     const onClick = () => {
         console.log('click!')
+    }
+
+    if (mode === 'modal') {
+        return (
+            <span>
+                MODAL WAS USED PLZ IMPLEMENT
+            </span>
+        )
     }
 
     return (
