@@ -1,4 +1,4 @@
-import { ChannelSideBar } from "@/components/contents-sidebar-components/channel-sidebar/channel-sidebar";
+import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar";
 import ChatWindow from "@/components/islet/chat-window";
 import { PageContainer } from "@/components/page-container";
 import { getChannelById } from "@/lib/utils/data/fetching/channelData"
