@@ -23,7 +23,9 @@ export const LoginForm = ({}) => {
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         console.log(values);    
     }
-
+    // I spent like 15 minutes trying to figure out why handleSubmit didn't work
+    // for future reference, with useForm, that handleSubmit needs to be passed a 
+    // FUNCTION DEFINITION, it will automatically pass it the event.  Nice. 
     return (
         <Form {...form}>
             <form 
@@ -57,8 +59,8 @@ export const LoginForm = ({}) => {
                         </FormItem> 
                     )}/>
                 </div>
-                <FormError />
-                <FormSuccess />
+                <FormError message='placeholder'/>
+                <FormSuccess message='placeholder' />
                 <Button type='submit' className='w-full' variant='outline'>
                     Login
                 </Button>
