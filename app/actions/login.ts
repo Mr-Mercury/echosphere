@@ -4,7 +4,7 @@ import { LoginSchema } from '@/schemas';
 
 
 //Again, type safety for login using zod
-export const loginAction = (values: z.infer<typeof LoginSchema>) => {
+export const loginAction = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(values)
 
     if (!validatedFields.success) {
