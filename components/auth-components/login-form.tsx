@@ -13,8 +13,8 @@ import { loginAction } from '@/app/actions/login';
 import { useTransition, useState } from 'react';
 
 export const LoginForm = ({}) => {
-    const [error, setError] = useState<string | undefined>('');
-    const [success, setSuccess] = useState<string | undefined>('');
+    const [useError, setError] = useState<string | undefined>('');
+    const [useSuccess, setSuccess] = useState<string | undefined>('');
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -26,6 +26,9 @@ export const LoginForm = ({}) => {
     }); 
 // useTransition here to facilitate smooth caching 
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+        setError('');
+        setSuccess('');
+
         startTransition(() => {
             loginAction(values)
                 .then((data) => {
@@ -72,8 +75,8 @@ export const LoginForm = ({}) => {
                         </FormItem> 
                     )}/>
                 </div>
-                <FormError message='placeholder'/>
-                <FormSuccess message='placeholder' />
+                <FormError message={useError}/>
+                <FormSuccess message={useSuccess} />
                 <Button disabled={isPending} type='submit' className='w-full' variant='outline'>
                     Login
                 </Button>
