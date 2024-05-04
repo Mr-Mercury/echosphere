@@ -3,7 +3,7 @@ import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'
 import Link from 'next/link';
-import { getUser } from '@/lib/utils/data/fetching/userData';
+import { getUser } from '@/lib/utilities/data/fetching/userData';
 import ChatNewButton from './chat-new-button/chat-new-button';
 import ChatNavItem from './chat-nav-item';
 

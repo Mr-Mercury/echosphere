@@ -1,10 +1,10 @@
 import { ServerType } from "@/lib/entities/server"
-import { generateRandomServer } from "@/lib/utils/mocking/mock"
-import { getServerById } from "@/lib/utils/data/fetching/serverData"
+import { generateRandomServer } from "@/lib/utilities/mocking/mock"
+import { getServerById } from "@/lib/utilities/data/fetching/serverData"
 import { PageContainer } from "@/components/page-container"
 import ChatWindow from "@/components/islets/chat-window"
 import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar"
-import { getChannelById } from "@/lib/utils/data/fetching/channelData"
+import { getChannelById } from "@/lib/utilities/data/fetching/channelData"
 
 async function ServerPage({ params, }: {params:{id:string}}) {
 
