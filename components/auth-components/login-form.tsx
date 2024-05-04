@@ -10,9 +10,11 @@ import { Button } from '../ui/button';
 import { FormError } from '../islets/auth/auth-form-error';
 import { FormSuccess } from '../islets/auth/auth-form-success';
 import { loginAction } from '@/app/actions/login';
-import { useTransition } from 'react';
+import { useTransition, useState } from 'react';
 
 export const LoginForm = ({}) => {
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -25,7 +27,7 @@ export const LoginForm = ({}) => {
 // useTransition here to facilitate smooth caching 
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         startTransition(() => {
-            loginAction(values);  
+            loginAction(values)
         })
     }
     // I spent like 15 minutes trying to figure out why handleSubmit didn't work
