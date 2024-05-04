@@ -1,8 +1,15 @@
+import { AuthCardWrapper } from "@/components/auth-components/auth-card-wrapper";
+import { LoginForm } from "@/components/auth-components/login-form";
+
 const RegistrationPage = () => {
     return (
-        <div>
-            Registration Page
-        </div>
+        <AuthCardWrapper headerLabel='Echosphere' 
+        backButtonLabel="Already have an account?" 
+        backButtonHref='/login'
+        showSocial={true}>
+            <LoginForm>
+            </LoginForm>
+        </AuthCardWrapper>
     )
 }
 
