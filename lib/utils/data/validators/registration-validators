@@ -1,0 +1,10 @@
+const passwordValidator = (password) => {
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  return hasLowerCase && hasUpperCase && hasNumber && hasSymbol;
+};
+
+export { passwordValidator } ;
