@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from '../ui/button';
 import { FormError } from '../islets/auth/auth-form-error';
 import { FormSuccess } from '../islets/auth/auth-form-success';
-import { loginAction } from '@/app/actions/login';
+import { registerAction } from '@/app/actions/register';
 import { useTransition, useState } from 'react';
 
 export const RegistrationForm = ({}) => {
@@ -31,7 +31,7 @@ export const RegistrationForm = ({}) => {
         setSuccess('');
 
         startTransition(() => {
-            loginAction(values)
+            registerAction(values)
                 .then((data) => {
                     setError(data.error);
                     setSuccess(data.success);
@@ -93,7 +93,7 @@ export const RegistrationForm = ({}) => {
                 <FormError message={useError}/>
                 <FormSuccess message={useSuccess} />
                 <Button disabled={isPending} type='submit' className='w-full' variant='outline'>
-                    Login
+                    Create an Account
                 </Button>
             </form>
         </Form>

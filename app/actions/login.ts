@@ -11,5 +11,5 @@ export const loginAction = async (values: z.infer<typeof LoginSchema>) => {
         return { error: "Invalid fields!"}
     }
 
-    return { success: "Validation email sent!"}
+    return { success: "Logging in!"}
 }
