@@ -25,5 +25,8 @@ export const RegistrationSchema = z.object({
     })
     .refine(passwordValidator, {
         message: 'Password requires both lower and uppercase letters, at least one number, and a symbol'
+    }),
+    username: z.string().min(1, {
+        message: 'You must enter a username'
     })
 });
