@@ -13,8 +13,8 @@ import { loginAction } from '@/app/actions/login';
 import { useTransition, useState } from 'react';
 
 export const LoginForm = ({}) => {
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [error, setError] = useState<string | undefined>('');
+    const [success, setSuccess] = useState<string | undefined>('');
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -28,6 +28,10 @@ export const LoginForm = ({}) => {
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         startTransition(() => {
             loginAction(values)
+                .then((data) => {
+                    setError(data.error);
+                    setSuccess(data.success);
+                });  
         })
     }
     // I spent like 15 minutes trying to figure out why handleSubmit didn't work
