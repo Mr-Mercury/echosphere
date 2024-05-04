@@ -9,8 +9,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from '../ui/button';
 import { FormError } from '../islets/auth/auth-form-error';
 import { FormSuccess } from '../islets/auth/auth-form-success';
+import { loginAction } from '@/app/actions/login';
+import { useTransition } from 'react';
 
 export const LoginForm = ({}) => {
+    const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -19,9 +22,11 @@ export const LoginForm = ({}) => {
             password: '',
         }
     }); 
-
+// useTransition here to facilitate smooth caching 
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-        console.log(values);    
+        startTransition(() => {
+            loginAction(values);  
+        })
     }
     // I spent like 15 minutes trying to figure out why handleSubmit didn't work
     // for future reference, with useForm, that handleSubmit needs to be passed a 
@@ -38,6 +43,7 @@ export const LoginForm = ({}) => {
                             <FormLabel>Email</FormLabel>
                             <FormControl>
                                 <Input {...field}
+                                disabled={isPending}
                                 placeholder='mail@mailtown.com'
                                 type='email'
                                 />
@@ -51,6 +57,7 @@ export const LoginForm = ({}) => {
                             <FormLabel>Password</FormLabel>
                             <FormControl>
                                 <Input {...field}
+                                disabled={isPending}
                                 placeholder='********'
                                 type='password'
                                 />
@@ -61,7 +68,7 @@ export const LoginForm = ({}) => {
                 </div>
                 <FormError message='placeholder'/>
                 <FormSuccess message='placeholder' />
-                <Button type='submit' className='w-full' variant='outline'>
+                <Button disabled={isPending} type='submit' className='w-full' variant='outline'>
                     Login
                 </Button>
             </form>
