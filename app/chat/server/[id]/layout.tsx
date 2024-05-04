@@ -1,6 +1,6 @@
-import { getUser } from "@/lib/utils/data/fetching/userData";
-import { getServerById } from "@/lib/utils/data/fetching/serverData";
-import { generateRandomChannels } from "@/lib/utils/mocking/mock";
+import { getUser } from "@/lib/utilities/data/fetching/userData";
+import { getServerById } from "@/lib/utilities/data/fetching/serverData";
+import { generateRandomChannels } from "@/lib/utilities/mocking/mock";
 import { redirect } from "next/navigation";
 import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar";
 
