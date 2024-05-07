@@ -8,6 +8,14 @@ import { getUserById } from "./lib/utilities/data/fetching/userData";
 
 // edge workaround for prisma
 export const { auth, handlers, signIn, signOut } = NextAuth({
+    events: {
+        async linkAccount({ user }) {
+            await db.user.update({
+                where: { id: user.id },
+                data: { emailVerified: new Date() }
+            })
+        }
+    },
     callbacks: {
         async session({ token, session }) {
             console.log({sessionToken: token,})
