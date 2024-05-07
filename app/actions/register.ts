@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { db } from '@/lib/db/db';
 import { getUserByEmail } from '@/lib/utilities/data/fetching/userData';
 import { generateVerificationToken } from '@/lib/utilities/data/tokens/token-generation';
-
+import { sendVerificationEmail } from '@/lib/utilities/mail/mail';
 
 //Again, type safety for login using zod
 export const registerAction = async (values: z.infer<typeof RegistrationSchema>) => {
@@ -31,7 +31,8 @@ export const registerAction = async (values: z.infer<typeof RegistrationSchema>)
         }
     });
 
-    const verificationToken = await generateVerificationToken(email);
-
+    /* TODO: Fix verification tokens */ 
+    // const verificationToken = await generateVerificationToken(email);
+    // await sendVerificationEmail(verificationToken.email, verificationToken.token)
     return { success: "Verification email sent!"}
 }
