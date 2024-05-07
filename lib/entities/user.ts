@@ -18,7 +18,7 @@ export enum UserStatus {
 // May not end up using bio, but have bot react to it somehow
 export interface UserType {
     id: string;
-    name: string;
+    name?: string;
     username: string;
     servers: ServerType[];
     avatar?: string | null;
