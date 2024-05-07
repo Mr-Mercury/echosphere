@@ -4,6 +4,7 @@ import { RegistrationSchema } from '@/schemas';
 import bcrypt from "bcryptjs";
 import { db } from '@/lib/db/db';
 import { getUserByEmail } from '@/lib/utilities/data/fetching/userData';
+import { generateVerificationToken } from '@/lib/utilities/data/tokens/token-generation';
 
 
 //Again, type safety for login using zod
@@ -30,7 +31,7 @@ export const registerAction = async (values: z.infer<typeof RegistrationSchema>)
         }
     });
 
-    
+    const verificationToken = await generateVerificationToken(email);
 
-    return { success: "Validation email sent!"}
+    return { success: "Verification email sent!"}
 }
