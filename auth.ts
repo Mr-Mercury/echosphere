@@ -21,17 +21,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
     },
     callbacks: {
-        async signIn({ user, account }) {
-            //Adjust if you add more providers? 
-            if (account?.provider !== 'credentials') return true;
+        // TODO: Fix verification email
+        // async signIn({ user, account }) {
+        //     //Adjust if you add more providers? 
+        //     if (account?.provider !== 'credentials') return true;
 
-            const currentUser = await getUserByEmail(user.id);
+        //     const currentUser = await getUserById(user.id);
 
-            //prevents sign in without email verification
-            if (!currentUser?.emailVerified) return false; 
+        //     //prevents sign in without email verification
+        //     if (!currentUser?.emailVerified) return false; 
             
-            return true;
-        },
+        //     return true;
+        // },
         async session({ token, session }) {
             console.log({sessionToken: token,})
             if (token.sub && session.user) {
