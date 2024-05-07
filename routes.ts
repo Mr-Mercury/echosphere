@@ -13,7 +13,7 @@ in users to /settings
 export const authRoutes = [
     '/login',
     '/registration',
-    '/auth/error',
+    '/error/auth',
 ]
 
 /*  This is the prefix for API auth routes.  Routes with the prefix are used 

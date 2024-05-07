@@ -11,11 +11,15 @@ import { FormError } from '../islets/auth/auth-form-error';
 import { FormSuccess } from '../islets/auth/auth-form-success';
 import { loginAction } from '@/app/actions/login';
 import { useTransition, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export const LoginForm = ({}) => {
     const [useError, setError] = useState<string | undefined>('');
     const [useSuccess, setSuccess] = useState<string | undefined>('');
     const [isPending, startTransition] = useTransition();
+
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get('error') === 'OAuthAccountNotLinked' ? 'Email already in use with different provider' : '';
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -75,7 +79,7 @@ export const LoginForm = ({}) => {
                         </FormItem> 
                     )}/>
                 </div>
-                <FormError message={useError}/>
+                <FormError message={useError || urlError}/>
                 <FormSuccess message={useSuccess} />
                 <Button disabled={isPending} type='submit' className='w-full' variant='outline'>
                     Login
