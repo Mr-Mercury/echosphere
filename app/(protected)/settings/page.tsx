@@ -3,6 +3,7 @@ import { auth, signOut } from "@/auth";
 // NOTE - signout only works in server components
 const SettingsPage = async () => {
     const session = await auth();
+    
     return (
         <div>
             {JSON.stringify(session)}
