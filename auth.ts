@@ -9,8 +9,8 @@ import { getUserById } from "./lib/utilities/data/fetching/userData";
 // edge workaround for prisma
 export const { auth, handlers, signIn, signOut } = NextAuth({
     pages: {
-        signIn: 'login',
-        error: 'error/auth'
+        signIn: '/login',
+        error: '/error/auth'
     },
     events: {
         async linkAccount({ user }) {
