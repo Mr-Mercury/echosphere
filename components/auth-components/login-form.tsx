@@ -36,8 +36,8 @@ export const LoginForm = ({}) => {
         startTransition(() => {
             loginAction(values)
                 .then((data) => {
-                    setError(data.error);
-                    setSuccess(data.success);
+                    setError(data?.error);
+                    setSuccess(data?.success);
                 });  
         })
     }
