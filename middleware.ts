@@ -6,6 +6,10 @@ const { auth } = NextAuth(authConfig);
 //Auth middleware - uses req.nextUrl.pathname and req.auth to determine 
 // permissions.  Routes are protected by default. 
 
+// Unkonwn typescript error cause, fixing it the way nextjs suggests completely
+// breaks the app with no errors - pages simply do not load. ß
+
+//@ts-ignore
 export default auth((req) => {
     const { nextUrl } = req;
 
