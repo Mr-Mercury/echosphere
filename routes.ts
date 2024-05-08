@@ -27,7 +27,7 @@ export const apiAuthPrefix = '/api/auth';
 @type {string}
 */ 
 // TODO: Change this to chat (or dashboard) later
-export const DEFAULT_LOGIN_REDIRECT = '/settings';
+export const DEFAULT_LOGIN_REDIRECT = '/chat/server/personal';
 
 export const PERSONAL_ROOM_ROUTE = '/chat/server/personal';
 
