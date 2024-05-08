@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db/db";
 import { redirect } from "next/navigation";
+import { generateRandomUsername, generateRandomName } from "../../mocking/mock";
 
 export const initializeProfile = async () => {
     const session = await auth();
@@ -8,25 +9,29 @@ export const initializeProfile = async () => {
     
     if (!user) redirect('/login');
 
-    const initializedUser = await db.user.findUnique({
+    const currentUser = await db.user.findUnique({
         where: {
             id: user.id
         }
     });
 
-    if (initializedUser?.initialized) {
-        return initializedUser;
+    if (currentUser?.initialized) {
+        return currentUser;
     }
 
+    if (user.name) user.username = generateRandomUsername()  
+        else user.name = generateRandomName();
 
 
-    const initializationObject = await db.user.update({
+    const initializedUser = await db.user.update({
         where: {
             id: user.id
         },
         data: {
-            friendId: 
+            name: user.name,
+            username: user.username, 
         }
     })
 
+    return initializedUser;
 }

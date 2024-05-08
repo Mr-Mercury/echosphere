@@ -1,7 +1,7 @@
 import { UserType, UserStatus } from '@/lib/entities/user';
-import { SingleChannel, ChannelTypes } from '@/lib/entities/channel';
+import { ChannelTypes } from '@/lib/entities/channel';
 import { ServerType } from '@/lib/entities/server';
-import { Activity } from '@/lib/entities/activity';
+import { uniqueNamesGenerator, starWars, adjectives, colors, animals} from 'unique-names-generator'
 
 export const mockDelay = 500;
 export const mockFriends = 10;
@@ -128,4 +128,18 @@ export const fakeUser: UserType = {
     status: UserStatus.Online,
     servers: generateRandomServer(8),
     friends: generateRandomBot(5),
+}
+
+export const generateRandomUsername = () => {
+    const randomName: string = uniqueNamesGenerator({
+        dictionaries: [adjectives, colors, animals]
+    });
+    return randomName;
+}
+
+export const generateRandomName = () => {
+    const randomName: string = uniqueNamesGenerator({
+        dictionaries: [starWars]
+    })
+    return randomName;
 }
