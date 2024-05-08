@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/chat-sidebar-components/chat-nav-tooltip";
 import { usePathname } from "next/navigation";
 import { PERSONAL_ROOM_ROUTE } from "@/routes";

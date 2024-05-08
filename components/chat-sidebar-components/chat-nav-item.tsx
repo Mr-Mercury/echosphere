@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "./chat-nav-tooltip";
 
 interface NavItemProps {
