@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import ServerHeader from "./channel-server-header";
 import { ServerType } from "@/lib/entities/server";
+import { auth } from "@/auth";
 
 interface ChannelSidebarProps {
     server: ServerType;
@@ -12,7 +13,8 @@ interface ChannelSidebarProps {
 
 export const ChannelSideBar = async (params: ChannelSidebarProps) => {
     const {server} = params; 
-    const user = await getUser('1234');
+    const session = await auth();
+    const user = session?.user;
 
     if (!user || !server) {
         return redirect('/')

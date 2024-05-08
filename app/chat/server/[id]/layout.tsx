@@ -10,8 +10,6 @@ const ChannelLayout = async ({ children, params }: {
     params: {id:string},
 }) => {
 
-    const user = await getUser('1234');
-
     // if (!user) {
     //     return redirectsignin()
     // }
