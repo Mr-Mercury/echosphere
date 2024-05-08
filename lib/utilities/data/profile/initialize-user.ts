@@ -29,7 +29,8 @@ export const initializeProfile = async () => {
         },
         data: {
             name: user.name,
-            username: user.username, 
+            username: user.username,
+            initialized: true, 
         }
     })
 
