@@ -1,6 +1,5 @@
 import { SingleChannel } from "@/lib/entities/channel";
 import { generateRandomBot, generateRandomChannels } from "@/lib/utilities/mocking/mock";
-import { getUser } from "@/lib/utilities/data/fetching/userData";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ServerHeader from "./channel-server-header";
