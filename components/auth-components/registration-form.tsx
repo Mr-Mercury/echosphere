@@ -14,6 +14,7 @@ import { loginAction } from '@/app/actions/login';
 import { useTransition, useState } from 'react';
 
 export const RegistrationForm = ({}) => {
+    
     const [useError, setError] = useState<string | undefined>('');
     const [useSuccess, setSuccess] = useState<string | undefined>('');
     const [isPending, startTransition] = useTransition();
@@ -38,7 +39,7 @@ export const RegistrationForm = ({}) => {
                     setSuccess(data.success);
                 })
         })
-
+        //TODO: Prevent this from logging you in if your credentials are valid lol
         startTransition(() => {
             loginAction(values)
         })
