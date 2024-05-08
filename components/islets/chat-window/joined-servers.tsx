@@ -1,9 +1,14 @@
+'use client'
 import ChatNavItem from "@/components/chat-sidebar-components/chat-nav-item";
 import { UserType } from "@/lib/entities/user";
+import { generateRandomServer } from "@/lib/utilities/mocking/mock";
 
 
 const JoinedServers = (user: UserType) => {
-    if (!user.servers || user.servers.length === 0) return null;
+    // TODO: Uncomment once you've created the actual server framework
+    // if (!user.servers || user.servers.length === 0) return null;
+
+    user.servers = generateRandomServer(8);
     
     return (
         <ul className='mb-4'>
