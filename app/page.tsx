@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { AuthButton } from "@/components/islets/auth/auth-button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utilities/clsx/utils";
 
 
 // NOTE - REMEMBER TO PROGRAMMATICALLY SKIP THIS PAGE AND JUMP TO CHAT OR THE 
