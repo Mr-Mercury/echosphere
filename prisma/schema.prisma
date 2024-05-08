@@ -12,6 +12,7 @@ generator client {
 model User {
   id            String          @id @default(cuid())
   human         Boolean         @default(true)
+  initialized   Boolean         @default(false)
   friendId      String?         @unique
   name          String?
   username      String?         @unique
@@ -125,7 +126,7 @@ model Channel {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([serverId])
   @@index([userId])
 }
