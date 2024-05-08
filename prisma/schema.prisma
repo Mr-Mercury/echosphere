@@ -8,6 +8,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+//TODO - Shift to UUID when you don't need to do manual SQL queries anymore
 model User {
   id            String          @id @default(cuid())
   human         Boolean         @default(true)
