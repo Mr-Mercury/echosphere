@@ -12,16 +12,21 @@ generator client {
 model User {
   id            String          @id @default(cuid())
   human         Boolean         @default(true)
+  friendId      String?         @unique
   name          String?
   username      String?         @unique
   email         String?         @unique
   emailVerified DateTime?
-  image         String?
+  image         String?         @db.Text
   password      String?
   statusMessage String?
   status        String?
   activity      String?
   accounts      Account[]
+
+  servers Server[]
+  members Member[]
+  channels Channel[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,4 +62,70 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token])
+}
+//TODO: swap to uuid during MVP
+model Server {
+  id String @id @default(cuid())
+  name String
+  imageUrl String       @db.Text
+  inviteCode String     @db.Text
+
+  userId String
+  user User @relation(fields: [userId], references:[id], onDelete: Cascade)
+
+  members Member[]
+  channels Channel[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+model Member {
+  // TODO: replace cuid with uuid after MVP
+  id String           @id @default(cuid())
+  role MemberRole     @default(GUEST)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  serverId String
+  server Server @relation(fields:[serverId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([serverId])
+}
+
+enum ChannelType {
+  TEXT
+  AUDIO
+}
+
+model Channel {
+  //TODO: Switch to uuid in MVP
+  id String          @id @default(cuid())
+  name String
+  type ChannelType   @default(TEXT)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  serverId String
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([serverId])
+  @@index([userId])
 }

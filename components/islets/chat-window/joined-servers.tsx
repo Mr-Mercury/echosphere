@@ -8,7 +8,7 @@ const JoinedServers = (user: UserType) => {
     // TODO: Uncomment once you've created the actual server framework
     // if (!user.servers || user.servers.length === 0) return null;
 
-    user.servers = generateRandomServer(8);
+    user.servers = generateRandomServer(14);
     
     return (
         <ul className='mb-4'>
