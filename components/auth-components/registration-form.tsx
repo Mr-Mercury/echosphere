@@ -10,6 +10,7 @@ import { Button } from '../ui/button';
 import { FormError } from '../islets/auth/auth-form-error';
 import { FormSuccess } from '../islets/auth/auth-form-success';
 import { registerAction } from '@/app/actions/register';
+import { loginAction } from '@/app/actions/login';
 import { useTransition, useState } from 'react';
 
 export const RegistrationForm = ({}) => {
@@ -35,8 +36,13 @@ export const RegistrationForm = ({}) => {
                 .then((data) => {
                     setError(data.error);
                     setSuccess(data.success);
-                });  
+                })
         })
+
+        startTransition(() => {
+            loginAction(values)
+        })
+
     }
     // I spent like 15 minutes trying to figure out why handleSubmit didn't work
     // for future reference, with useForm, that handleSubmit needs to be passed a 
