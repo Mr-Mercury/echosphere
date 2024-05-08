@@ -18,7 +18,7 @@ const UserButton = () => {
                 <div className={cn
                 ('absolute left-0 bg-white rounded-r-full transition-all',
                 pathname !== PERSONAL_ROOM_ROUTE && 'group-hover:h-[20px] group-hover:w-[4px]',
-                pathname === PERSONAL_ROOM_ROUTE ? 'h-[36px] w-[4px]' : '')} />
+                pathname === PERSONAL_ROOM_ROUTE ? 'h-[36px] w-[4px]' : 'h-[0px] w-[0px]')} />
                     <div className='flex mx-3 h-[48px] w-[48px]
                     rounded-[24px] group-hover:rounded-[16px]
                     transition-all overflow-hidden items-center
