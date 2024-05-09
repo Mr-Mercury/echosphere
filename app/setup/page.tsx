@@ -5,7 +5,6 @@ import Link from "next/link";
 
 const SetupPage = async () => {
     const currentUser = await initializeProfile();
-    console.log(currentUser);
 
     const server = await db.server.findFirst({
         where: {
