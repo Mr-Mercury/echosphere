@@ -3,6 +3,7 @@
 import { ServerSchema } from "@/schemas"
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form"
+import { useState, useEffect } from "react";
 import { 
     Dialog, 
     DialogContent, 
@@ -18,6 +19,11 @@ import { Button } from "../ui/button";
 
 
 const CreateServerDialogue = () => {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect( () => {
+        setIsMounted(true);
+    }, [])
     
     const form = useForm({
         resolver: zodResolver(ServerSchema),
@@ -33,6 +39,8 @@ const CreateServerDialogue = () => {
         console.log(val);
     }
 
+    if (!isMounted) return null;
+    
     return (
         <Dialog open={true}>
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
@@ -63,12 +71,13 @@ const CreateServerDialogue = () => {
                                         {...field}
                                         />
                                     </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                                 )}
                             />
                         </div>
                         <DialogFooter className='px-6 py-4'>
-                            <Button disabled={isLoading} className='bg-sky-500 hover:bg-sky-700'>
+                            <Button disabled={isLoading} variant='secondary'>
                                 Create
                             </Button>
                         </DialogFooter>
