@@ -2,6 +2,7 @@ import { initializeProfile } from "@/lib/utilities/data/profile/initialize-user"
 import { db } from "@/lib/db/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import CreateServerDialogue from "@/components/modal-dialogues/create-server-dialogue";
 
 const SetupPage = async () => {
     const currentUser = await initializeProfile();
@@ -20,7 +21,7 @@ const SetupPage = async () => {
     
     return (
         <div>
-            <div>Create a server</div>
+            <CreateServerDialogue />
             <Link href='/chat/server/personal'>Go to Profile</Link>
         </div>
     )
