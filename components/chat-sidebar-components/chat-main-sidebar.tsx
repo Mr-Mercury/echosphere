@@ -4,7 +4,6 @@ import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'
 import ChatNewButton from './chat-new-button/chat-new-button';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
-import { auth } from '@/auth';
 import JoinedServers from '../islets/chat-window/joined-servers';
 import UserButton from '../islets/users/user-button';
 

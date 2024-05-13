@@ -1,5 +1,7 @@
 import React from "react";
 import { Suspense } from "react";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { redirect } from "next/navigation";
 
 import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar";
 
@@ -11,7 +13,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
     children,
 }: ChatLayoutProps) => {
 
-
+    const user = currentUser();
+    if (!user) return redirect('/')
+    
     return(
         <div className='h-full'>
             <div className="flex h-screen bg-[#313338]">

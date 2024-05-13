@@ -1,7 +1,7 @@
 import { PageContainer } from "@/components/page-container";
 import ChatWindow from "@/components/islets/chat-window"
 import { FriendSidebar } from "@/components/content-sidebar-components/friend-sidebar/friend-sidebar";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 
 
 export default async function Personal() {
@@ -14,9 +14,18 @@ export default async function Personal() {
             <section className="flex h-screen">
                 <FriendSidebar friends={user.friends} servers={user.servers}/>
             </section>
-            <PageContainer>
-                <ChatWindow />
-            </PageContainer>
+            <PageContainer />
+
+            <div className=''>
+                    <form action={async () => {
+                        "use server";
+                        await signOut();
+                    }}>
+                        <button type='submit'>
+                            Sign out
+                        </button>
+                    </form>
+                </div>
         </div>
     )
 
