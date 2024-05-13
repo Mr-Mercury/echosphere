@@ -1,9 +1,9 @@
 import React from "react";
 import { Suspense } from "react";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { redirect } from "next/navigation";
 
 import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar";
-import { UserType } from '@/lib/entities/user';
-import { getUser } from "@/lib/utils/data/fetching/userData";
 
 interface ChatLayoutProps {
     children?: React.ReactNode;
@@ -13,16 +13,21 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
     children,
 }: ChatLayoutProps) => {
 
-
+    const user = currentUser();
+    if (!user) return redirect('/')
+    
     return(
-        //Styling wrapper needs to ensure they're rendering side by side
-        <div className="flex h-screen">
-            <ChatMainSidebar />
-            <section className="flex-1 p-6 overflow-y-auto">
-            {children}
-            </section>
+        <div className='h-full'>
+            <div className="flex h-screen bg-[#313338]">
+                <div className='hidden md:flex h-full w-[72px]
+                z-30 flex-col fixed inset-y-0'>
+                    <ChatMainSidebar />
+                </div>
+                <section className="flex-1 p-6 overflow-y-auto">
+                {children}
+                </section>
+            </div>
         </div>
-
         
     )
 }

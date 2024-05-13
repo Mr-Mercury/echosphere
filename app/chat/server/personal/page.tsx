@@ -1,22 +1,32 @@
-import { UserType } from "@/lib/entities/user";
-import { ChannelTypes } from "@/lib/entities/channel";
-import { ServerType } from "@/lib/entities/server";
-import { generateRandomBot, 
-    generateRandomChannels, 
-    generateRandomServer } from "@/lib/utils/mocking/mock";
-import { FriendSidebar } from "@/components/contents-sidebar-components/friend-sidebar/friend-sidebar";
-import { getUser } from "@/lib/utils/data/fetching/userData";
+import { PageContainer } from "@/components/page-container";
+import ChatWindow from "@/components/islets/chat-window"
+import { FriendSidebar } from "@/components/content-sidebar-components/friend-sidebar/friend-sidebar";
+import { auth, signOut } from "@/auth";
 
 
 export default async function Personal() {
 
-    let user = await getUser('1234');
+    let session = await auth();
+    let user = session?.user;
 
     return (
-        <section className="flex h-screen">
-            <FriendSidebar friends={user.friends} servers={user.servers}/>
-            <main className="flex-1 p-6 overflow-y-auto"> Friend Chat Window </main>
-        </section>
+        <div>
+            <section className="flex h-screen">
+                <FriendSidebar friends={user.friends} servers={user.servers}/>
+            </section>
+            <PageContainer />
+
+            <div className=''>
+                    <form action={async () => {
+                        "use server";
+                        await signOut();
+                    }}>
+                        <button type='submit'>
+                            Sign out
+                        </button>
+                    </form>
+                </div>
+        </div>
     )
 
 }

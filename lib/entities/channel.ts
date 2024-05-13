@@ -10,6 +10,7 @@ export type SingleChannel = {
     type: ChannelTypes;
     id: string;
     name: string;
+    members?: string[];
     allowedUsers?: Array<string> | null; 
     newActivity?: boolean;
     multipleHumans?: boolean | null;

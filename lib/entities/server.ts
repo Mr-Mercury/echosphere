@@ -5,6 +5,7 @@ export type ServerType = {
     id: string;
     name: string;
     image: string;
+    members?: string[];
     messages?: number;
     entities?: number;
     multipleHumans?: boolean | null;

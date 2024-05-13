@@ -1,6 +1,6 @@
 const Chat = () => {
     return (
-        <div>HELP</div>
+        <div>EASTER EGG!</div>
     )
 }
 
