@@ -3,6 +3,7 @@ import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'
 import ChatNewButton from './chat-new-button/chat-new-button';
+import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import { auth } from '@/auth';
 import JoinedServers from '../islets/chat-window/joined-servers';
 import UserButton from '../islets/users/user-button';
@@ -10,8 +11,7 @@ import UserButton from '../islets/users/user-button';
 // Later on, pass with button component
 export default async function ChatMainSidebar() {
 
-    let session = await auth();
-    let user = session?.user;
+    const user = currentUser();
 
     if (!user) {
         return redirect('/');
