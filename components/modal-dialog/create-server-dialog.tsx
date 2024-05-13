@@ -19,6 +19,9 @@ import { Button } from "../ui/button";
 
 
 const CreateServerDialogue = () => {
+    // The useState and useEffect are both required to prevent hydration errors
+    // TODO: Find out if this is actually best practice
+    
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect( () => {
@@ -49,8 +52,8 @@ const CreateServerDialogue = () => {
                         Create a Server
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <p>Customize your server with a name and image</p> 
-                        <p>(Don't worry, you can change it later!)</p>
+                        <div>Customize your server with a name and image</div> 
+                        <div>(Don't worry, you can change it later!)</div>
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
