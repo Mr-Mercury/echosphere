@@ -1,6 +1,7 @@
 'use client'
 
 import { ServerSchema } from "@/schemas";
+import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form"
@@ -18,12 +19,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import FileUpload from "../islets/uploads/file-upload";
+import { useRouter } from "next/navigation";
 
 
 const CreateServerDialogue = () => {
     // The useState and useEffect are both required to prevent hydration errors
     // TODO: Find out if this is actually best practice
-    
+    const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect( () => {
@@ -41,7 +43,15 @@ const CreateServerDialogue = () => {
     const isLoading = form.formState.isSubmitting;
 
     const onSubmit = async (val: z.infer<typeof ServerSchema>) => {
-        console.log(val);
+        try {
+            await axios.post('/api/servers', val);
+            // Clearing 
+            form.reset();
+            router.refresh();
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     if (!isMounted) return null;
