@@ -2,7 +2,8 @@
 // Other routes will be protected.  @type {string[]}
 
 export const publicRoutes = [
-    '/'
+    '/',
+    '/api/uploadthing'
 ]
 
 /*  This is an array of routes for authentication, and will redirect logged
