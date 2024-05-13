@@ -2,7 +2,7 @@ import { UserType } from '@/lib/entities/user';
 import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'
-import ChatNewButton from './chat-new-button/chat-new-button';
+import ChatNewButton from './chat-new-button';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import JoinedServers from '../islets/chat-window/joined-servers';
 import UserButton from '../islets/users/user-button';
