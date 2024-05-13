@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db/db";
 
-export const currentProfile = async () => {
+export const currentUser = async () => {
     const session = await auth();
 
     if (!session) {
