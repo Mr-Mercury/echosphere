@@ -22,11 +22,11 @@ const ChatNavItem = ({ id, image, name }: NavItemProps) => {
             flex items-center'>
                 <div className={cn
                 ('absolute left-0 bg-white rounded-r-full transition-all w-[4px]',
-                params?.id !== id && 'group-hover:h-[20px]',
-                params?.id === id ? 'h-[36px]' : 'h-[8px]')} />
+                params?.serverId !== id && 'group-hover:h-[20px]',
+                params?.serverId === id ? 'h-[36px]' : 'h-[8px]')} />
                 <div className={cn
                 ('relative group flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] transition-all overflow-hidden',
-                params?.id === id && 'bg-white/10 text-white rounded-[16px]'
+                params?.serverId === id && 'bg-white/10 text-white rounded-[16px]'
                 )}>
                     <Image fill src={image} alt='Server' />   
                 </div>
