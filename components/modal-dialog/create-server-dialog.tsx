@@ -16,7 +16,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import ImageUpload from 'components/islets/uploads/image-upload'
+import FileUpload from "../islets/uploads/file-upload";
 
 
 const CreateServerDialogue = () => {
@@ -65,7 +65,9 @@ const CreateServerDialogue = () => {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormControl>
-                                            <ImageUpload />
+                                            <FileUpload 
+                                                endpoint='serverImage' value={field.value}
+                                                onChange={field.onChange} />
                                         </FormControl>
                                     </FormItem>
                                 )}/>
