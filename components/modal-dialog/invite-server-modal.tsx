@@ -14,10 +14,11 @@ import { Button } from "../ui/button";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { useOrigin } from "@/hooks/use-origin";
 import { useState } from "react";
+import axios from "axios";
 
 
 const InviteServerModal = () => {
-    const { isOpen, onClose, type, data } = useModal();
+    const { onOpen, isOpen, onClose, type, data } = useModal();
     const origin = useOrigin();
 
     const isModalOpen = isOpen && type ==='invite';
@@ -36,6 +37,19 @@ const InviteServerModal = () => {
             setCopied(false);
         }, 1000);
     }
+
+    const onNew = async () => {
+        try {
+            setIsLoading(true);
+            const response = await axios.patch(`/api/servers/${server?.id}/invite-code`);
+
+            onOpen('invite', { server: response.data })
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     
     return (
         <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -50,17 +64,18 @@ const InviteServerModal = () => {
                         Invite Link:
                     </Label>
                     <div className='flex items-center mt-2 gap-x-2'>
-                        <Input 
+                        <Input
+                        disabled={isLoading} 
                         className='bg-zinc-700/50 border-0 focus-visible:ring-0 
                         text-secondary focus-visible:ring-offset-0'
                         value={inviteUrl}
                         />
-                        <Button size='icon'>
+                        <Button disabled={isLoading} size='icon'>
                             {copied? <Check />: <Copy onClick={copyClick} className='w-4 h-4'/>}
                         </Button>
                     </div>
-                    <Button variant='link' size='sm'
-                    className='text-xs text-secondary mt-4'>
+                    <Button variant='link' size='sm' disabled={isLoading}
+                    onClick={onNew} className='text-xs text-secondary mt-4'>
                         Generate a new link
                         <RefreshCw className='w-4 h-4 ml-1'/>
                         {/* TODO: REFRESHCW Above ^ Add left spacing*/}
