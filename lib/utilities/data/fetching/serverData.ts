@@ -1,7 +1,17 @@
-import { generateRandomServer } from "../../mocking/mock";
-import { fakeUser } from "../../mocking/mock";
+import { db } from "@/lib/db/db"
 
-export const getServerById = async (id:string) => {
-    const servers = fakeUser.servers
-    return servers[0];
+export const getServerById = async (serverId:string, userId:string) => {
+    
+    const server = await db.server.findUnique({
+        where: {
+            id: serverId,
+            members: {
+                some: {
+                    userId
+                }
+            }
+        }
+    });
+
+    return server;
 }
