@@ -44,6 +44,7 @@ const CreateServerModal = () => {
             // Clearing 
             form.reset();
             router.refresh();
+            onClose();
         } catch (error) {
             console.log(error);
         }
