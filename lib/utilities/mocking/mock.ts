@@ -1,7 +1,8 @@
-import { UserType, UserStatus } from '@/lib/entities/user';
-import { ChannelTypes } from '@/lib/entities/channel';
-import { ServerType } from '@/lib/entities/server';
+import { User } from '@prisma/client';
+import { Channel } from '@prisma/client';
+import { Server } from '@prisma/client';
 import { uniqueNamesGenerator, starWars, adjectives, colors, animals} from 'unique-names-generator'
+import { string } from 'zod';
 
 export const mockDelay = 500;
 export const mockFriends = 10;
@@ -56,18 +57,18 @@ function generateRandomStatus() {
     const value = Math.floor(Math.random() * 4);
     switch (value) {
         case 0:
-            return UserStatus.Online;
+            return 'Online';
         case 1: 
-            return UserStatus.Away;
+            return 'Away';
         case 2: 
-            return UserStatus.Offline;
+            return 'Offline';
         case 3: 
-            return UserStatus.Mobile;
+            return 'Mobile';
     }
-    return UserStatus.Online;
+    return 'Online';
 }
 
-export const generateRandomBot = (quantity: number): UserType[] => {
+export const generateRandomBot = (quantity: number): User[] => {
     const userArray = Array.from({length: quantity}, 
         (undef, i) => ({
             id: generateRandomId(),
@@ -81,10 +82,11 @@ export const generateRandomBot = (quantity: number): UserType[] => {
             human: false,
             servers: [],
         }));
+    // @ts-ignore TODO: Match return types to prisma schema
     return userArray;
 }
 
-export const generateRandomServer = (quantity: number): ServerType[] => {
+export const generateRandomServer = (quantity: number): Server[] => {
     const serverArray = Array.from({length: quantity}, 
         (undef, i) => ({
             id: generateRandomId(),
@@ -97,6 +99,7 @@ export const generateRandomServer = (quantity: number): ServerType[] => {
             contents: undefined,
             channels: generateRandomChannels(10)
         }))
+    // @ts-ignore TODO: Make mocking work with new type
     return serverArray;
 }
 
@@ -105,7 +108,7 @@ export const generateRandomChannels = (quantity: number): Channel[] => {
         (undef, i) => ({
             id: generateRandomId(),
             name: generateRandomString(15),
-            type: ChannelTypes.Public,
+            type: 'Public',
             allowedUser: null,
             newActivity: false,
             multipleHumans: false,
@@ -113,6 +116,7 @@ export const generateRandomChannels = (quantity: number): Channel[] => {
             dm: randomBool(),
             activity: null,
         }))
+    // @ts-ignore TODO: Make mocking work with new types
     return channelArray;
 }
 
@@ -121,14 +125,18 @@ export const getRandomBot = (id: string) => {
     return {...generateRandomBot(1)[0], id}
 };
 
-export const fakeUser: UserType = {
-    id: generateRandomId(),
-    name: "Hobbo Bobbo",
-    username: "TestGoblin",
-    status: UserStatus.Online,
-    servers: generateRandomServer(8),
-    friends: generateRandomBot(5),
-}
+
+// Create new fake user generation later when necessary. 
+
+// export const fakeUser: User = {
+//     id: generateRandomId(),
+//     name: "Hobbo Bobbo",
+//     username: "TestGoblin",
+//     status: 'Online',
+//     friendId: generateRandomString(5),
+//     currentServer: generateRandomServer(1)[0],
+
+// }
 
 export const generateRandomUsername = () => {
     const randomName: string = uniqueNamesGenerator({
