@@ -1,15 +1,35 @@
 import { getServerById } from "@/lib/utilities/data/fetching/serverData";
 import { redirect } from "next/navigation";
 import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
-const ChannelLayout = ({
-    children
+const ChannelLayout = async ({
+    children, params,
 }: {
     children: React.ReactNode;
+    params: { serverId: string }
 }) => {
+
+    const user = await currentUser();
+
+    if (!user) {
+        return redirect('/login')
+    }
+
+    const server = await getServerById(params.serverId, user.id);
+
+    if (!server) {
+        return redirect('/chat/server/personal')
+    }
+
     return (
         <div>
-            {children}
+            <div>
+                Server Sidebar
+            </div>
+            <main className='h-full md:pl-60'>
+                {children}
+            </main>
         </div>
     )
 }
