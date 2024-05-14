@@ -1,4 +1,3 @@
-import { UserType } from '@/lib/entities/user';
 import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
 import { redirect } from 'next/navigation'

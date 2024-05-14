@@ -1,9 +1,9 @@
 import { getServerById } from "@/lib/utilities/data/fetching/serverData";
 import { redirect } from "next/navigation";
-import { ChannelSideBar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar";
+import { ChannelSidebar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
-const ChannelLayout = async ({
+const ChannelSidebarLayout = async ({
     children, params,
 }: {
     children: React.ReactNode;
@@ -24,9 +24,9 @@ const ChannelLayout = async ({
 
     return (
         <div>
-            <div>
-                Server Sidebar
-            </div>
+            <ChannelSidebar serverId={server.id}>
+
+            </ChannelSidebar>
             <main className='h-full md:pl-60'>
                 {children}
             </main>
@@ -35,7 +35,7 @@ const ChannelLayout = async ({
 }
 
 
-export default ChannelLayout;
+export default ChannelSidebarLayout;
 
 
 // const ChannelLayout = async ({ children, params }: {
