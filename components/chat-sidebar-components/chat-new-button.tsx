@@ -5,7 +5,7 @@ import NavTooltip from "./chat-nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
 
 const ChatNewButton = () => {
-
+    // TODO: Change styling on button (almost invisible atm)
     const { onOpen } = useModal();
 
     return (
