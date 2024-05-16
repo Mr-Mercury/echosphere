@@ -13,7 +13,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
     children,
 }: ChatLayoutProps) => {
 
-    const user = currentUser();
+    const user = await currentUser();
     if (!user) return redirect('/')
     
     return(
