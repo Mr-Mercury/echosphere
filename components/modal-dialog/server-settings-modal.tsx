@@ -49,7 +49,7 @@ const ServerSettingsModal = () => {
 
     const onSubmit = async (val: z.infer<typeof ServerSchema>) => {
         try {
-            await axios.patch(`/api/servers${server?.id}/edit-server`, val);
+            await axios.patch(`@/app/api/servers${server?.id}/edit-server`, val);
             // Clearing 
             form.reset();
             router.refresh();
