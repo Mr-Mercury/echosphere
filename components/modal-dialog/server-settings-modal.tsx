@@ -49,7 +49,7 @@ const ServerSettingsModal = () => {
 
     const onSubmit = async (val: z.infer<typeof ServerSchema>) => {
         try {
-            await axios.post('/api/servers', val);
+            await axios.patch(`/api/servers${server?.id}/edit-server`, val);
             // Clearing 
             form.reset();
             router.refresh();
@@ -69,11 +69,10 @@ const ServerSettingsModal = () => {
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Create a Server
+                        Edit {server?.name}
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Customize your server with a name and image</div> 
-                        <div>(Don't worry, you can change it later!)</div>
+                        <div>Re-customize your server's name and image</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -110,7 +109,7 @@ const ServerSettingsModal = () => {
                         </div>
                         <DialogFooter className='px-6 py-4'>
                             <Button disabled={isLoading} variant='secondary'>
-                                Create
+                                Save Changes
                             </Button>
                         </DialogFooter>
                     </form>
