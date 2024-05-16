@@ -14,11 +14,12 @@ import axios from "axios";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ScrollArea } from "../ui/scroll-area";
 import { UserAvatar } from "../islets/users/user-avatar";
-import { Check, MoreVertical, Shield, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-react";
+import { Check, Loader2, MoreVertical, Shield, ShieldAlert, ShieldCheck, ShieldQuestion, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
     DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSubContent, 
     DropdownMenuTrigger, DropdownMenuSubTrigger } from "../ui/dropdown-menu";
 import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
+import { MemberRole } from "@prisma/client";
 
 const roleIcons = {
     'GUEST': null,
@@ -32,6 +33,16 @@ const MembersModal = () => {
 
     const isModalOpen = isOpen && type ==='members';
     const { server } = data as { server: ServerWithMembersAndProfiles };
+
+    const onRoleChange = async (userId: string, role: MemberRole) => {
+        try {
+            setLoadingId(userId);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingId('')
+        }
+    }
 
     return (
         <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -57,6 +68,9 @@ const MembersModal = () => {
                                     {member.user.email}
                                 </p>
                             </div>
+                            {loadingId === member.id && (
+                                <Loader2 className='animate-spin text-zinc-500 ml-auto h-4 w-4' />
+                            )}   
                             {server.userId !== member.userId && loadingId !== member.id && (
                                 <div className='ml-auto'>
                                     <DropdownMenu>
@@ -89,15 +103,17 @@ const MembersModal = () => {
                                                     </DropdownMenuSubContent>
                                                 </DropdownMenuPortal>
                                             </DropdownMenuSub>
-                                            <DropdownMenuSeparator>
-                                                <DropdownMenuItem>
-                                                    Kick
-                                                </DropdownMenuItem>
-                                            </DropdownMenuSeparator>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem>
+                                                <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
+                                                <div className='text-rose-500'>
+                                                    Remove
+                                                </div>
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
-                            )}   
+                            )}
                         </div>
                     ))}
                 </ScrollArea>
