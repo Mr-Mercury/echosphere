@@ -5,9 +5,18 @@ import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/chat-sidebar-components/chat-nav-tooltip";
 import { usePathname } from "next/navigation";
 import { PERSONAL_ROOM_ROUTE } from "@/routes";
+import { User } from "@prisma/client";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
-const UserButton = () => {
+type UserWithImage = User & { image: string};
+
+interface UserButtonProps {
+    user: UserWithImage;
+};
+
+const UserButton = ({user}: UserButtonProps) => {
     
+    const image = user.image;
     const pathname=usePathname();
 
 
@@ -23,7 +32,7 @@ const UserButton = () => {
                     rounded-[24px] group-hover:rounded-[16px]
                     transition-all overflow-hidden items-center
                     justify-center bg-[#313338]'>
-                        <Image src='https://picsum.photos/200'
+                        <Image src={image}
                         className='group' width={55} height={55}
                         alt='User profile image'/>
                     </div>
