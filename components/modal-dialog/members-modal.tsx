@@ -14,7 +14,11 @@ import axios from "axios";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ScrollArea } from "../ui/scroll-area";
 import { UserAvatar } from "../islets/users/user-avatar";
-import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { Check, MoreVertical, Shield, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
+    DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSubContent, 
+    DropdownMenuTrigger, DropdownMenuSubTrigger } from "../ui/dropdown-menu";
+import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 
 const roleIcons = {
     'GUEST': null,
@@ -54,8 +58,44 @@ const MembersModal = () => {
                                 </p>
                             </div>
                             {server.userId !== member.userId && loadingId !== member.id && (
-                                <div>
-                                    HEY HEY
+                                <div className='ml-auto'>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <MoreVertical className='h-4 w-4 text-zinc-100'/>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className='bg-black text-xs font-medium 
+                                            text-neutral-400' side='left'>
+                                            <DropdownMenuSub>
+                                                <DropdownMenuSubTrigger className='flex items-center'>
+                                                    <ShieldQuestion className='w-4 h-4 mr-2' />
+                                                    <span>Role</span>
+                                                </DropdownMenuSubTrigger>
+                                                <DropdownMenuPortal>
+                                                    <DropdownMenuSubContent className='bg-black text-xs 
+                                                    font-medium text-neutral-400'>
+                                                        <DropdownMenuItem>
+                                                            <Shield className='h-4 w-4 mr-2' />
+                                                            Guest
+                                                            {member.role === 'GUEST' && 
+                                                            <Check className='h-4 w-4 ml-auto'/>}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem>
+                                                            <ShieldCheck className='h-4 w-4 mr-2' />
+                                                            Moderator
+                                                            {member.role === 'MODERATOR' && 
+                                                            <Check className='h-4 w-4 ml-auto'/>}
+                                                        </DropdownMenuItem>
+                                                        {/*TODO: Add second member modal for bots, conditional on being a bot*/}
+                                                    </DropdownMenuSubContent>
+                                                </DropdownMenuPortal>
+                                            </DropdownMenuSub>
+                                            <DropdownMenuSeparator>
+                                                <DropdownMenuItem>
+                                                    Kick
+                                                </DropdownMenuItem>
+                                            </DropdownMenuSeparator>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             )}   
                         </div>
