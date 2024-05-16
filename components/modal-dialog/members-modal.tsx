@@ -14,10 +14,17 @@ import axios from "axios";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ScrollArea } from "../ui/scroll-area";
 import { UserAvatar } from "../islets/users/user-avatar";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 
+const roleIcons = {
+    'GUEST': null,
+    'MODERATOR': <ShieldCheck className='h-4 w-4 ml-2 text-indigo-500' />,
+    'ADMIN': <ShieldAlert className='h-4 w-4 text-rose-500' />,
+}
 
 const MembersModal = () => {
     const { onOpen, isOpen, onClose, type, data } = useModal();
+    const [loadingId, setLoadingId] = useState('');
 
     const isModalOpen = isOpen && type ==='members';
     const { server } = data as { server: ServerWithMembersAndProfiles };
@@ -38,10 +45,19 @@ const MembersModal = () => {
                         <div key={member.id} className='flex items-center gap-x-2 mb-6'>
                             <UserAvatar src={member.user.image}/> 
                             <div className='flex flex-col gap-y-1'>
-                                <div className='text-xs font-semibold flex items-center'>
+                                <div className='text-xs gap-x-1 font-semibold flex items-center'>
+                                    {roleIcons[member.role]}
                                     {member.user.username}: {member.role}
                                 </div>
-                            </div>   
+                                <p className='text-xs px-6 text-zinc-500'>
+                                    {member.user.email}
+                                </p>
+                            </div>
+                            {server.userId !== member.userId && loadingId !== member.id && (
+                                <div>
+                                    HEY HEY
+                                </div>
+                            )}   
                         </div>
                     ))}
                 </ScrollArea>

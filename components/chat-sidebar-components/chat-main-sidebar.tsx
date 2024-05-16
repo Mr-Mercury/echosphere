@@ -29,7 +29,7 @@ export default async function ChatMainSidebar() {
                         </li>
                     ))}
                 </ul> */}
-                <JoinedServers user={user} />
+                <JoinedServers />
             </ScrollArea>
             <Separator className='h-[2px] bg-zinc-600   
             rounded-md w-10 mx-auto'/>
