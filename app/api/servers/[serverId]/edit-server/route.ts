@@ -21,6 +21,8 @@ export async function PATCH (
                 name, imageUrl,
             }
         })
+
+        return NextResponse.json(server);
     } catch (error) {
         console.log('SERVER ID PATCH ERROR', error)
         return new NextResponse('Internal Error', {status: 500})
