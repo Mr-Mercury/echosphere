@@ -1,12 +1,12 @@
 import { PageContainer } from "@/components/page-container";
 import { FriendSidebar } from "@/components/content-sidebar-components/friend-sidebar/friend-sidebar";
 import { auth, signOut } from "@/auth";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
 
 export default async function Personal() {
 
-    let session = await auth();
-    let user = session?.user;
+    let user = currentUser();
 
     return (
         <div>
