@@ -43,7 +43,7 @@ const MembersModal = () => {
             const url = qs.stringifyUrl({
                 url: `/api/members/${userId}`,
                 query: {
-                    serverid: server.id,
+                    serverId: server.id,
                 }
             });
 
@@ -81,10 +81,10 @@ const MembersModal = () => {
                                     {member.user.email}
                                 </p>
                             </div>
-                            {loadingId === member.id && (
+                            {loadingId === member.userId && (
                                 <Loader2 className='animate-spin text-zinc-500 ml-auto h-4 w-4' />
                             )}   
-                            {server.userId !== member.userId && loadingId !== member.id && (
+                            {server.userId !== member.userId && loadingId !== member.userId && (
                                 <div className='ml-auto'>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger>
@@ -100,13 +100,13 @@ const MembersModal = () => {
                                                 <DropdownMenuPortal>
                                                     <DropdownMenuSubContent className='bg-black text-xs 
                                                     font-medium text-neutral-400'>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member.user.id, 'GUEST')}>
+                                                        <DropdownMenuItem onClick={() => onRoleChange(member.userId, 'GUEST')}>
                                                             <Shield className='h-4 w-4 mr-2' />
                                                             Guest
                                                             {member.role === 'GUEST' && 
                                                             <Check className='h-4 w-4 ml-auto'/>}
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member.user.id, 'MODERATOR')}>
+                                                        <DropdownMenuItem onClick={() => onRoleChange(member.userId, 'MODERATOR')}>
                                                             <ShieldCheck className='h-4 w-4 mr-2' />
                                                             Moderator
                                                             {member.role === 'MODERATOR' && 
