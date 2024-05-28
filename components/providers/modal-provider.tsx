@@ -1,6 +1,7 @@
 'use client'
 
 import CreateServerModal from "../modal-dialog/create-server-modal";
+import CreateChannelModal from "../modal-dialog/create-channel-modal";
 import { useState, useEffect } from "react";
 import InviteServerModal from "../modal-dialog/invite-server-modal";
 import ServerSettingsModal from "../modal-dialog/server-settings-modal";
@@ -28,6 +29,7 @@ export const ModalProvider = () => {
             <InviteServerModal />
             <ServerSettingsModal />
             <MembersModal />
+            <CreateChannelModal />
         </>
     )
 }
