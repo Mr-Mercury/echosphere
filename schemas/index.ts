@@ -1,3 +1,4 @@
+import { ChannelType } from '@prisma/client';
 import * as z from 'zod';
 
 // Validators
@@ -43,5 +44,8 @@ export const ServerSchema = z.object({
 export const ChannelSchema = z.object({
     name: z.string().min(1, {
         message: 'You need to name your channel'
+    }).refine(name => name !== 'general', {
+        message: 'Channel name cannot be "general"'
     }),
+    type: z.nativeEnum(ChannelType)
 })
