@@ -1,6 +1,6 @@
 'use client'
 
-import { ServerSchema } from "@/schemas";
+import { ChannelSchema } from "@/schemas";
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,7 +17,6 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import FileUpload from "../islets/uploads/file-upload";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 
@@ -29,16 +28,15 @@ const CreateChannelModal = () => {
     const isModalOpen = isOpen && type ==='createChannel';
 
     const form = useForm({
-        resolver: zodResolver(ServerSchema),
+        resolver: zodResolver(ChannelSchema),
         defaultValues: {
             name: '',
-            imageUrl: '',
         }
     })
 
     const isLoading = form.formState.isSubmitting;
 
-    const onSubmit = async (val: z.infer<typeof ServerSchema>) => {
+    const onSubmit = async (val: z.infer<typeof ChannelSchema>) => {
         try {
             await axios.post('/api/servers', val);
             // Clearing 
@@ -63,34 +61,21 @@ const CreateChannelModal = () => {
                         Create a Server
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Customize your server with a name and image</div> 
-                        <div>(Don't worry, you can change it later!)</div>
+                        <div>Create a new channel!</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
                         <div className='space-y-8 px-6'>
-                            <div className='flex items-center justify-center text-center'>
-                                <FormField control={form.control} name='imageUrl' 
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <FileUpload 
-                                                endpoint='serverImage' value={field.value}
-                                                onChange={field.onChange} />
-                                        </FormControl>
-                                    </FormItem>
-                                )}/>
-                            </div>
                             <FormField control={form.control} name='name' render={({field}) => (
                                 <FormItem>
                                     <FormLabel className='uppercase text-xs font-bold text-secondary'>
-                                        Server name
+                                        Channel name
                                     </FormLabel>
                                     <FormControl>
                                         <Input disabled={isLoading} className='border-0 
                                         focus-visible:ring-0 text-secondary focus-visible:ring-offset-0'
-                                        placeholder='Enter Server Name'
+                                        placeholder='Enter Channel'
                                         {...field}
                                         />
                                     </FormControl>
