@@ -39,3 +39,9 @@ export const ServerSchema = z.object({
         message: 'You need an image for your server'
     })
 });
+
+export const ChannelSchema = z.object({
+    name: z.string().min(1, {
+        message: 'You need to name your channel'
+    }),
+})
