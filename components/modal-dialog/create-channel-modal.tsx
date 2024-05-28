@@ -88,7 +88,32 @@ const CreateChannelModal = () => {
                             />
                             <FormField control={form.control} name='type' render={({field}) => (
                                 <FormItem>
-                                    
+                                    <FormLabel className='uppercase text-xs font-bold text-secondary'>Channel Type</FormLabel>
+                                    <Select disabled={isLoading} 
+                                    onValueChange={field.onChange} 
+                                    defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger
+                                                className='border-0
+                                                focus:ring-0 ring-offset-0
+                                                focus:ring-offset-0 capitalize outline-none'
+                                            >
+                                                {/* Un-kill CSS here - likely shadcn or radix issue */}
+                                                <SelectValue className='text-secondary' 
+                                                placeholder='Select a channel type'
+                                                />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className='bg-primary text-secondary'>
+                                            {Object.values(ChannelType).map((type) => (
+                                                <SelectItem key={type} value={type} className='capitalize'>
+                                                    {type.toLowerCase()}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                             />
