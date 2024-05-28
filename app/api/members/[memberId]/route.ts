@@ -95,7 +95,9 @@ export async function DELETE(
                     }
                 }
             }
-        })
+        });
+
+        return NextResponse.json(server);
     } catch (error) {
         console.log('MEMBER ID DELETE ERROR');
         return new NextResponse('Internal Error', {status: 500});
