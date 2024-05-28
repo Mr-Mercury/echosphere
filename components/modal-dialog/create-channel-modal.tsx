@@ -1,5 +1,6 @@
 'use client'
 
+import qs from 'query-string';
 import { ChannelSchema } from "@/schemas";
 import { ChannelType } from "@prisma/client";
 import axios from 'axios';
@@ -19,13 +20,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 
 
 const CreateChannelModal = () => {
     const { isOpen, onClose, type } = useModal();
     const router = useRouter();
+    const params = useParams();
 
     const isModalOpen = isOpen && type ==='createChannel';
 
@@ -41,7 +43,13 @@ const CreateChannelModal = () => {
 
     const onSubmit = async (val: z.infer<typeof ChannelSchema>) => {
         try {
-            await axios.post('/api/servers', val);
+            const url = qs.stringifyUrl({
+                url: '/api/channels',
+                query: {
+                    serverId: params?.serverId
+                }
+            })
+            await axios.post(url, val);
             // Clearing 
             form.reset();
             router.refresh();
@@ -100,8 +108,7 @@ const CreateChannelModal = () => {
                                                 focus:ring-offset-0 capitalize outline-none'
                                             >
                                                 {/* Un-kill CSS here - likely shadcn or radix issue */}
-                                                <SelectValue className='text-secondary' 
-                                                placeholder='Select a channel type'
+                                                <SelectValue className='text-secondary'
                                                 />
                                             </SelectTrigger>
                                         </FormControl>
