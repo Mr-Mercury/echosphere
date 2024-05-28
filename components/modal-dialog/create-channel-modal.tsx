@@ -1,6 +1,7 @@
 'use client'
 
 import { ChannelSchema } from "@/schemas";
+import { ChannelType } from "@prisma/client";
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +33,7 @@ const CreateChannelModal = () => {
         resolver: zodResolver(ChannelSchema),
         defaultValues: {
             name: '',
+            type: ChannelType.TEXT,
         }
     })
 
@@ -83,6 +85,12 @@ const CreateChannelModal = () => {
                                     <FormMessage />
                                 </FormItem>
                                 )}
+                            />
+                            <FormField control={form.control} name='type' render={({field}) => (
+                                <FormItem>
+                                    
+                                </FormItem>
+                            )}
                             />
                         </div>
                         <DialogFooter className='px-6 py-4'>
