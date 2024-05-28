@@ -46,7 +46,8 @@ const MembersModal = () => {
                     serverId: server.id,
                 }
             });
-            const res = await axios.patch(url, {role, member});
+            console.log(url);
+            const res = await axios.patch(url, {role});
             router.refresh();
             onOpen('members', {server: res.data})
         } catch (error) {
