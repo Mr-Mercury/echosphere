@@ -3,26 +3,24 @@
 import { 
     Dialog, 
     DialogContent, 
+    DialogDescription, 
+    DialogFooter, 
     DialogHeader, 
     DialogTitle 
 } from "../ui/dialog"
 
 import { useModal } from "@/hooks/use-modal-store";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Check, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 
 
 const LeaveServerModal = () => {
-    const { onOpen, isOpen, onClose, type, data } = useModal();
+    const { isOpen, onClose, type, data } = useModal();
 
     const isModalOpen = isOpen && type ==='leaveServer';
     const { server } = data;
 
-    const [copied, setCopied] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     return (
@@ -30,12 +28,30 @@ const LeaveServerModal = () => {
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Bring another human into the server
+                        Leave <span className='text-indigo-500'>{server?.name}</span>?
                     </DialogTitle>
+                    <DialogDescription className='text-center text-bold'>
+                        (I'm sure the bots will miss you!)
+                    </DialogDescription>
                 </DialogHeader>
-                <div className='p-6'>
-                    Leave Server
-                </div>
+                <DialogFooter className='px-6 py-4'>
+                    <div className='flex items-center justify-between w-full'>
+                        <Button className='bg-zinc-600'
+                            disabled={isLoading}
+                            onClick={onClose}
+                            variant='ghost'
+                            >
+                            Cancel
+                        </Button>
+                        <Button className='bg-zinc-600'
+                            disabled={isLoading}
+                            onClick={() => {}}
+                            variant='primary'
+                            >
+                            Escape
+                        </Button>
+                    </div>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     )
