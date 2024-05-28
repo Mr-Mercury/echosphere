@@ -39,6 +39,8 @@ const MembersModal = () => {
 
     const onRoleChange = async (memberId: string, role: MemberRole) => {
         try {
+            console.log(memberId);
+            console.log(role);
             setLoadingId(memberId);
             const url = qs.stringifyUrl({
                 url: `/api/members/${memberId}`,
