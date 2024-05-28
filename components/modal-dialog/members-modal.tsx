@@ -37,16 +37,15 @@ const MembersModal = () => {
     const isModalOpen = isOpen && type ==='members';
     const { server } = data as { server: ServerWithMembersAndProfiles };
 
-    const onRoleChange = async (userId: string, role: MemberRole) => {
+    const onRoleChange = async (memberId: string, role: MemberRole) => {
         try {
-            setLoadingId(userId);
+            setLoadingId(memberId);
             const url = qs.stringifyUrl({
-                url: `/api/members/${userId}`,
+                url: `/api/members/${memberId}`,
                 query: {
                     serverId: server.id,
                 }
             });
-
             const res = await axios.patch(url, {role});
             router.refresh();
             onOpen('members', {server: res.data})
@@ -100,13 +99,13 @@ const MembersModal = () => {
                                                 <DropdownMenuPortal>
                                                     <DropdownMenuSubContent className='bg-black text-xs 
                                                     font-medium text-neutral-400'>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member.userId, 'GUEST')}>
+                                                        <DropdownMenuItem onClick={() => onRoleChange(member.id, 'GUEST')}>
                                                             <Shield className='h-4 w-4 mr-2' />
                                                             Guest
                                                             {member.role === 'GUEST' && 
                                                             <Check className='h-4 w-4 ml-auto'/>}
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member.userId, 'MODERATOR')}>
+                                                        <DropdownMenuItem onClick={() => onRoleChange(member.id, 'MODERATOR')}>
                                                             <ShieldCheck className='h-4 w-4 mr-2' />
                                                             Moderator
                                                             {member.role === 'MODERATOR' && 

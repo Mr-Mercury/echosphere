@@ -3,19 +3,20 @@ import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req:Request, 
-    { params }: { params: { userId: string}}
+    { params }: { params: { memberId: string}}
 ) {
     try {
         const user = await currentUser();
-        const { searchParams } = new URL(req.url);
-        const { role } = await req.json();
-        const serverId = searchParams.get('serverId')
-
         if (!user) return new NextResponse('Unauthorized', { status: 401 });
         
+        const memberId = params.memberId;
+        if (!params.memberId) return new NextResponse('Missing User ID', {status: 400});
+
+        const { searchParams } = new URL(req.url);
+        const serverId = searchParams.get('serverId');
         if (!serverId) return new NextResponse('Missing Server ID', {status: 400});
 
-        if (!params.userId) return new NextResponse('Missing User ID', {status: 400});
+        const { role } = await req.json();
 
         const server = await db.server.update({
             where: {
@@ -26,7 +27,7 @@ export async function PATCH(req:Request,
                 members: {
                     update: {
                         where: {
-                            id: params.userId,
+                            id: memberId,
                             userId: {
                                 not: user.id
                             }
