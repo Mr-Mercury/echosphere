@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import InviteServerModal from "../modal-dialog/invite-server-modal";
 import ServerSettingsModal from "../modal-dialog/server-settings-modal";
 import MembersModal from "../modal-dialog/members-modal";
+import LeaveServerModal from "../modal-dialog/leave-server-modal";
 
 export const ModalProvider = () => {
     const [isMounted, setIsMounted] = useState('false');
@@ -30,6 +31,7 @@ export const ModalProvider = () => {
             <ServerSettingsModal />
             <MembersModal />
             <CreateChannelModal />
+            <LeaveServerModal />
         </>
     )
 }
