@@ -39,8 +39,6 @@ const MembersModal = () => {
 
     const onRoleChange = async (member: Member, role: MemberRole) => {
         try {
-            console.log(member);
-            console.log(role);
             setLoadingId(member.userId);
             const url = qs.stringifyUrl({
                 url: `/api/members/${member.id}`,
@@ -48,7 +46,7 @@ const MembersModal = () => {
                     serverId: server.id,
                 }
             });
-            const res = await axios.patch(url, {role});
+            const res = await axios.patch(url, {role, member});
             router.refresh();
             onOpen('members', {server: res.data})
         } catch (error) {

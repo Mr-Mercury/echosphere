@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { Member } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req:Request, 
@@ -9,14 +10,19 @@ export async function PATCH(req:Request,
         const user = await currentUser();
         if (!user) return new NextResponse('Unauthorized', { status: 401 });
         
-        const memberId = params.memberId;
-        if (!params.memberId) return new NextResponse('Missing User ID', {status: 400});
+
+        const { role, member } = await req.json();
+        const { memberId } = params;
+
+        console.log(member);
+        console.log(role);
+        console.log(memberId);
+
+        if (!member) return new NextResponse('Missing User ID', {status: 400});
 
         const { searchParams } = new URL(req.url);
         const serverId = searchParams.get('serverId');
         if (!serverId) return new NextResponse('Missing Server ID', {status: 400});
-
-        const { role } = await req.json();
 
         const server = await db.server.update({
             where: {
@@ -27,7 +33,7 @@ export async function PATCH(req:Request,
                 members: {
                     update: {
                         where: {
-                            id: memberId,
+                            id: member.id,
                             userId: {
                                 not: user.id
                             }
