@@ -135,9 +135,9 @@ const MembersModal = () => {
                                                 </DropdownMenuPortal>
                                             </DropdownMenuSub>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => onDelete(member)}>
                                                 <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
-                                                <div className='text-rose-500' onClick={() => onDelete(member)}>
+                                                <div className='text-rose-500'>
                                                     Remove
                                                 </div>
                                             </DropdownMenuItem>
