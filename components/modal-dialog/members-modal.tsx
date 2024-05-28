@@ -37,6 +37,24 @@ const MembersModal = () => {
     const isModalOpen = isOpen && type ==='members';
     const { server } = data as { server: ServerWithMembersAndProfiles };
 
+    const onDelete = async (member: Member) => {
+        try {
+            setLoadingId(member.userId);
+            const url = qs.stringifyUrl({
+                url: `/api/members/${member.id}`,
+                query: {
+                    serverId: server.id,
+                }
+            })
+            const res = await axios.delete(url);
+            router.refresh();
+            onOpen('members', {server: res.data});
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingId('');
+        }
+    }
     const onRoleChange = async (member: Member, role: MemberRole) => {
         try {
             setLoadingId(member.userId);
@@ -46,10 +64,9 @@ const MembersModal = () => {
                     serverId: server.id,
                 }
             });
-            console.log(url);
             const res = await axios.patch(url, {role});
             router.refresh();
-            onOpen('members', {server: res.data})
+            onOpen('members', {server: res.data});
         } catch (error) {
             console.log(error);
         } finally {
@@ -68,6 +85,7 @@ const MembersModal = () => {
                         { server?.members?.length} Member(s)
                     </DialogDescription>
                 </DialogHeader>
+                {/* TODO: Fix the icons to leave a blank spot OR have an icon for all roles so names don't bounce on role change */}
                 <ScrollArea className='mt-8 max-h-[420] pr-6'>
                     {server?.members?.map((member) => (
                         <div key={member.id} className='flex items-center gap-x-2 mb-6'>
@@ -119,7 +137,7 @@ const MembersModal = () => {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem>
                                                 <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
-                                                <div className='text-rose-500'>
+                                                <div className='text-rose-500' onClick={() => onDelete(member)}>
                                                     Remove
                                                 </div>
                                             </DropdownMenuItem>
