@@ -55,3 +55,49 @@ export async function PATCH(req:Request,
         return new NextResponse('Internal Error', { status: 500 })
     }
 }
+
+export async function DELETE(
+    req: Request, 
+    {params}: { params: {memberId:string }}
+) {
+    try {
+        const user = await currentUser();
+        if (!user) return new NextResponse('Unauthorized!', {status: 401});
+
+        const { searchParams } = new URL(req.url);
+        const serverId = searchParams.get('serverId');
+        if (!serverId) return new NextResponse('Missing Server Id!', {status: 400});
+
+        if (!params.memberId) return new NextResponse('Missing Member ID!', {status: 400});
+
+        const server = await db.server.update({
+            where: {
+                id: serverId,
+                userId: user.id,
+            },
+            data: {
+                members: {
+                    deleteMany: {
+                        id: params.memberId,
+                        userId: {
+                            not: user.id
+                        }
+                    }
+                }
+            },
+            include: {
+                members: {
+                    include: {
+                        user: true,
+                    },
+                    orderBy: {
+                        role: 'asc'
+                    }
+                }
+            }
+        })
+    } catch (error) {
+        console.log('MEMBER ID DELETE ERROR');
+        return new NextResponse('Internal Error', {status: 500});
+    }
+}
