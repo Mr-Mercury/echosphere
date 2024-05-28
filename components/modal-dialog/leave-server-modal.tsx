@@ -23,6 +23,8 @@ const LeaveServerModal = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    // CURRENT SPOT WORKING ON LEAVE SERVER
+
     return (
         <Dialog open={isModalOpen} onOpenChange={onClose}>
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
