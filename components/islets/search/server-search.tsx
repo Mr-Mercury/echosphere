@@ -1,7 +1,7 @@
 'use client'
 
 import { ChannelType, MemberRole } from "@prisma/client";
-import { Hash, Mic2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Hash, Mic2, Search, ShieldAlert, ShieldCheck } from "lucide-react";
 
 interface ServerSearchProps {
     data: {
@@ -25,14 +25,21 @@ const roleIconMap = {
     [MemberRole.MODERATOR]: <ShieldCheck className='h-4 w-4 mr-2 text-indigo-500' />,
     [MemberRole.ADMIN]: <ShieldAlert className='h-4 w-4 mr-2 text-rose-500' />,
 }
-
+//STOP HERE
 const ServerSearch = ({ 
     data
 }: ServerSearchProps) => {
     return (
-        <div>
-            Search Component (Server)
-        </div>
+        <>
+            <button className='group px-2 py-2 rounded-md 
+            flex items-center gap-x-2 w-full 
+            hover:bg-zinc-600/50 transition'>
+                <Search className='w-4 h-4 text-secondary'/>
+                <p className='font-semibold text-sm text-zinc-400 group-hover:text-secondary transition'>
+                    Search Server
+                </p>
+            </button>
+        </>
     )
 }
 
