@@ -29,7 +29,7 @@ const DeleteServerModal = () => {
         try {
             setIsLoading(true);
 
-            await axios.patch(`/api/servers/${server?.id}/leave`);
+            await axios.delete(`/api/servers/${server?.id}/delete`);
             onClose();
             router.refresh();
             router.push('/chat/server/personal');
@@ -48,7 +48,7 @@ const DeleteServerModal = () => {
                         Delete <span className='text-indigo-500'>{server?.name}</span>?
                     </DialogTitle>
                     <DialogDescription className='text-center text-bold'>
-                        (You have the power to obliterate an entire universe!)
+                        (Are you sure you want to obliterate an entire universe?!)
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className='px-6 py-4'>
