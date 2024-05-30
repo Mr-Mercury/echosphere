@@ -13,17 +13,32 @@ import { useModal } from "@/hooks/use-modal-store";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 
 const LeaveServerModal = () => {
     const { isOpen, onClose, type, data } = useModal();
+    const router = useRouter();
 
     const isModalOpen = isOpen && type ==='leaveServer';
     const { server } = data;
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // CURRENT SPOT WORKING ON LEAVE SERVER
+    const onClick = async () => {
+        try {
+            setIsLoading(true);
+
+            await axios.patch(`/api/servers/${server?.id}/leave`);
+            onClose();
+            router.refresh();
+            router.push('/chat/server/personal');
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -47,7 +62,7 @@ const LeaveServerModal = () => {
                         </Button>
                         <Button className='bg-zinc-600'
                             disabled={isLoading}
-                            onClick={() => {}}
+                            onClick={onClick}
                             variant='primary'
                             >
                             Escape
