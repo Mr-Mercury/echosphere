@@ -37,7 +37,13 @@ const ServerSearch = ({
                 <Search className='w-4 h-4 text-secondary'/>
                 <p className='font-semibold text-sm text-zinc-400 group-hover:text-secondary transition'>
                     Search Server
-                </p>
+                </p>    
+                <kbd className='text-secondary pointer-events-none inline-flex h-5
+                    select-none items-center gap-1 rounded
+                    bg-black px-1.5 font-mono text-[10px] font-medium
+                    ml-auto'>
+                    <span className='text-xs'>CMD</span>F
+                </kbd>
             </button>
         </>
     )
