@@ -42,7 +42,7 @@ const ServerSearch = ({
                     select-none items-center gap-1 rounded
                     bg-black px-1.5 font-mono text-[10px] font-medium
                     ml-auto'>
-                    <span className='text-xs'>CMD</span>F
+                    <span className='text-base'>⌘</span>F
                 </kbd>
             </button>
         </>
