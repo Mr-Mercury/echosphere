@@ -20,13 +20,15 @@ import { Button } from "../ui/button";
 import FileUpload from "../islets/uploads/file-upload";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
+import { useEffect } from "react";
 
 
-const CreateServerModal = () => {
-    const { isOpen, onClose, type } = useModal();
+const ServerSettingsModal = () => {
+    const { isOpen, onClose, type, data } = useModal();
     const router = useRouter();
 
-    const isModalOpen = isOpen && type ==='createServer';
+    const isModalOpen = isOpen && type ==='editServer';
+    const { server } = data;
 
     const form = useForm({
         resolver: zodResolver(ServerSchema),
@@ -34,13 +36,20 @@ const CreateServerModal = () => {
             name: '',
             imageUrl: '',
         }
-    })
+    });
+
+    useEffect(() => {
+        if (server) {
+            form.setValue('name', server.name);
+            form.setValue('imageUrl', server.imageUrl);
+        }
+    }, [server, form])
 
     const isLoading = form.formState.isSubmitting;
 
     const onSubmit = async (val: z.infer<typeof ServerSchema>) => {
         try {
-            await axios.post('/api/servers', val);
+            await axios.patch(`${origin}/api/servers/${server?.id}/edit-server`, val);
             // Clearing 
             form.reset();
             router.refresh();
@@ -60,11 +69,10 @@ const CreateServerModal = () => {
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Create a Server
+                        Edit {server?.name}
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Customize your server with a name and image</div> 
-                        <div>(Don't worry, you can change it later!)</div>
+                        <div>Re-customize your server's name and image</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -101,7 +109,7 @@ const CreateServerModal = () => {
                         </div>
                         <DialogFooter className='px-6 py-4'>
                             <Button disabled={isLoading} variant='secondary'>
-                                Create
+                                Save Changes
                             </Button>
                         </DialogFooter>
                     </form>
@@ -111,4 +119,4 @@ const CreateServerModal = () => {
     )
 }
 
-export default CreateServerModal;
+export default ServerSettingsModal;

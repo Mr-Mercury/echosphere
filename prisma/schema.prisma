@@ -1,6 +1,7 @@
 datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -71,7 +72,7 @@ model Server {
   id String @id @default(cuid())
   name String
   imageUrl String       @db.Text
-  inviteCode String     @db.Text
+  inviteCode String     @unique
 
   userId String
   user User @relation(fields: [userId], references:[id], onDelete: Cascade)

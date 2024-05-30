@@ -6,6 +6,7 @@ import { generateRandomUsername, generateRandomName } from "../../mocking/mock";
 export const initializeProfile = async () => {
     const session = await auth();
     const user = session?.user;
+    const image = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg';
     
     if (!user) redirect('/login');
 
@@ -31,6 +32,7 @@ export const initializeProfile = async () => {
             name: user.name,
             username: user.username,
             initialized: true, 
+            image
         }
     })
 

@@ -1,52 +1,71 @@
 'use client'
 
-import { ServerType } from "@/lib/entities/server";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Archive, ChevronDown, LogOut, PlusCircle, Settings, UserPlus, Users } from "lucide-react";
+import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
+import { MemberRole } from "@prisma/client";
+import { useModal } from "@/hooks/use-modal-store";
 
 interface ServerHeaderProps {
-    server: ServerType;
-    role?: 'admin' | 'common';
+    server: ServerWithMembersAndProfiles;
+    role?: MemberRole;
 }
 
 const ServerHeader = ({
     server, role
 }: ServerHeaderProps) => {
 
-    const isAdmin = role === 'admin'
+    const { onOpen } = useModal();
+
+    const isAdmin = role === 'ADMIN';
+    const isModerator = isAdmin || role === 'MODERATOR'
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className='focus:outline-none' asChild>
                 <button className='w-full text-md font-semibold px-3 
-                flex items-center h-12 border-neutral-800 border-b-2
+                flex items-center h-12 border-zinc-800 border-b-2
                 hover:bg-zinc-700/50 transition text-white'>
                     {server.name}
                     <ChevronDown className='h-5 w-5 ml-auto'/>
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='w-56 text-xs font-medium 
+            <DropdownMenuContent className='w-56 bg-black text-xs font-medium 
             text-neutral-400 space-y-[2px]'>
-                {isAdmin && (
-                    <DropdownMenuItem className='text-indigo-200 px-3 py-2 text-sm cursor-pointer'>
+                {isModerator && (
+                    <DropdownMenuItem className='text-indigo-200 hover:bg-sky-600 px-3 py-2 text-sm cursor-pointer'>
                         Add New Bot
                         <UserPlus className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>
                 )}
+                {isModerator && (
+                    <DropdownMenuItem 
+                    onClick={() => onOpen('invite', { server })}
+                    className='text-indigo-200 hover:bg-sky-600 px-3 py-2 text-sm cursor-pointer'>
+                        Invite User
+                        <UserPlus className='h-4 w-4 ml-auto'/>
+                    </DropdownMenuItem>
+                )}                
                 {isAdmin && (
-                    <DropdownMenuItem className='px-3 py-2 text-sm cursor-pointer'>
+                    <DropdownMenuItem 
+                    onClick={() => onOpen('editServer', { server })}
+                    className='px-3 py-2 text-sm cursor-pointer'>
                         Server Settings
                         <Settings className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>
                 )}
-                {isAdmin && (
-                    <DropdownMenuItem className='px-3 py-2 text-sm cursor-pointer'>
+                {isModerator && (
+                    <DropdownMenuItem 
+                    onClick={() => onOpen('members', { server })}
+                    className='px-3 py-2 text-sm cursor-pointer'>
                         Manage Bots & Members
                         <Users className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>
                 )}
-                {isAdmin && (
-                    <DropdownMenuItem className='px-3 py-2 text-sm cursor-pointer'>
+                {isModerator && (
+                    <DropdownMenuItem 
+                    className='px-3 py-2 text-sm cursor-pointer' 
+                    onClick={() => onOpen('createChannel')}>
                         Create Channel
                         <PlusCircle className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>
@@ -61,7 +80,8 @@ const ServerHeader = ({
                     </DropdownMenuItem>
                 )}
                 {!isAdmin && (
-                    <DropdownMenuItem className='text-rose-500 px-3 py-2 text-sm cursor-pointer'>
+                    <DropdownMenuItem className='text-rose-500 px-3 py-2 text-sm cursor-pointer'
+                    onClick={() => onOpen('leaveServer', { server })}>
                         Leave Server
                         <LogOut className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>

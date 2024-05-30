@@ -13,7 +13,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
     children,
 }: ChatLayoutProps) => {
 
-    const user = currentUser();
+    const user = await currentUser();
     if (!user) return redirect('/')
     
     return(
@@ -23,9 +23,10 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
                 z-30 flex-col fixed inset-y-0'>
                     <ChatMainSidebar />
                 </div>
-                <section className="flex-1 p-6 overflow-y-auto">
-                {children}
-                </section>
+                <div className='hidden md:flex h-full w-60 z-20 flex-col 
+                fixed inset-y-0 left-[72px]'>
+                    {children}
+                </div>
             </div>
         </div>
         
