@@ -1,9 +1,8 @@
 'use client'
 
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { ChannelType, MemberRole } from "@prisma/client";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Hash, Mic2, Search, ShieldAlert, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ServerSearchProps {
     data: {
@@ -21,7 +20,19 @@ const ServerSearch = ({
     data
 }: ServerSearchProps) => {
     const [open, setOpen] = useState(false);
-    console.log(data);
+
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => {
+            if (e.key === 'k' && (e.metaKey || e.ctrlKey )) {
+                e.preventDefault();
+                setOpen((open) => !open);
+            }
+        }
+        
+        document.addEventListener('keydown', down);
+        return () => document.removeEventListener('keydown', down);
+    }, [])
+
     return (
         <>
             <button className='group px-2 py-2 rounded-md 
@@ -41,29 +52,31 @@ const ServerSearch = ({
                 </kbd>
             </button>
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput placeholder='Search channels & members'/>
-                <CommandList>
-                    <CommandEmpty>
-                    No Results Found
-                    </CommandEmpty>
-                    {data.map(({ label, type, data }) => {
-                        if (!data?.length) return null;
+                <Command className='bg-primary text-zinc-400'>
+                    <CommandInput placeholder='Search channels & members'/>
+                    <CommandList>
+                        <CommandEmpty>
+                        No Results Found
+                        </CommandEmpty>
+                        {data.map(({ label, type, data }) => {
+                            if (!data?.length) return null;
 
-                        return (
-                            <CommandGroup key={label} heading={label}>
-                                {data?.map(({ id, icon, name }) => {
-                                    return (
-                                        <CommandItem key={id}>
-                                            {icon}
-                                            <span>{name}</span>
-                                        </CommandItem>
-                                    )
-                                })}
-                            </CommandGroup>
-                        )
+                            return (
+                                <CommandGroup key={label} heading={label}>
+                                    {data?.map(({ id, icon, name }) => {
+                                        return (
+                                            <CommandItem key={id}>
+                                                {icon}
+                                                <span>{name}</span>
+                                            </CommandItem>
+                                        )
+                                    })}
+                                </CommandGroup>
+                            )
 
-                    } )}
-                </CommandList>
+                        } )}
+                    </CommandList>
+                </Command>
             </CommandDialog>
         </>
     )
