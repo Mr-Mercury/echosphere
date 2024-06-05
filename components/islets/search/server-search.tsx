@@ -28,7 +28,7 @@ const ServerSearch = ({
                 setOpen((open) => !open);
             }
         }
-        
+
         document.addEventListener('keydown', down);
         return () => document.removeEventListener('keydown', down);
     }, [])
@@ -48,7 +48,7 @@ const ServerSearch = ({
                     select-none items-center gap-1 rounded
                     bg-black px-1.5 font-mono text-[10px] font-medium
                     ml-auto'>
-                    <span className='text-base'>⌘</span>F
+                    <span className='text-base'>⌘</span>K
                 </kbd>
             </button>
             <CommandDialog open={open} onOpenChange={setOpen}>
