@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import ServerHeader from "./channel-server-header";
-import { auth } from "@/auth";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { getServerChannelsById } from "@/lib/utilities/data/fetching/serverData";
 import { ChannelType, MemberRole } from "@prisma/client";
@@ -35,11 +33,11 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
     const server = await getServerChannelsById(params.serverId, user.id);
 
     const textChannels = server?.channels.filter((channel) => {
-        channel.type === ChannelType.TEXT
+        return channel.type === ChannelType.TEXT
     })
 
     const audioChannels = server?.channels.filter((channel) => {
-        channel.type === ChannelType.AUDIO
+        return channel.type === ChannelType.AUDIO
     })
 
     if (!server) return redirect('/chat/server/personal');
@@ -67,7 +65,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                                 data: textChannels?.map((channel) => ({
                                     id: channel.id,
                                     name: channel.name,
-                                    icon: iconMap[channel.type]
+                                    icon: iconMap[channel.type],
                                 }))
                             },
                             {
@@ -76,7 +74,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                                 data: audioChannels?.map((channel) => ({
                                     id: channel.id,
                                     name: channel.name,
-                                    icon: iconMap[channel.type]
+                                    icon: iconMap[channel.type],
                                 }))
                             },
                             {
@@ -85,7 +83,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                                 data: server.members?.map((member) => ({
                                     id: member.id,
                                     name: member.user.username!,
-                                    icon: roleIconMap[member.role]
+                                    icon: roleIconMap[member.role],
                                 }))
                             }
                         ]}/>
