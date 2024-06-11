@@ -44,7 +44,8 @@ export const ChannelItem = ({
             {channel.name !== 'general' && role !== MemberRole.GUEST && (
                 <div className='ml-auto flex items-center gap-x-2'>
                     <NavTooltip label='Edit'>
-                        <Edit className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
+                        <Edit onClick={() => onOpen('editChannel', {server, channel})}
+                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
                     </NavTooltip>
                     <NavTooltip label='Delete'>
                         <Trash onClick={() => onOpen('deleteChannel', {server, channel})}
