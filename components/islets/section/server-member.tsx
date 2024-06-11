@@ -27,7 +27,7 @@ export const ServerMember = ({
     const icon = roleIconMap[member.role];
 
     const onClick = () => {
-        router.push(`chat/personal/${member.id}`)
+        router.push(`/chat/server/personal/dm/${member.id}`)
     }
 
     //TYPESCRIPT GYMASTICS MAY EXPLODE SOMETHING
