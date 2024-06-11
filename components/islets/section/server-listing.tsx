@@ -28,7 +28,7 @@ export const ServerListing = ({
             {role !== MemberRole.GUEST && sectionType === 'channels' && (
                 <NavTooltip label='Create Channel' side='top'>
                     <button 
-                        onClick={() => onOpen('createChannel')}
+                        onClick={() => onOpen('createChannel', { channelType })}
                         className='text-zinc-400 hover:text-zinc-300 transition'>
                         <Plus className='h-4 w-4'/>
                     </button>
