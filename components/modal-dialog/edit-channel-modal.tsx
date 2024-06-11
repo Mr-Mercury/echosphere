@@ -57,7 +57,7 @@ const EditChannelModal = () => {
                     serverId: server?.id
                 }
             })
-            await axios.post(url, val);
+            await axios.patch(url, val);
             // Clearing 
             form.reset();
             router.refresh();
