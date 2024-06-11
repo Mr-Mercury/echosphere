@@ -10,7 +10,6 @@ async function ChannelPage({params}: {params: {id:string, channel:string}}) {
     return (
         <div>
             <PageContainer>
-                CHANNEL
                 <ChatWindow {...channelData}/>
             </PageContainer>
         </div>
