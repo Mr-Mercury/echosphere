@@ -1,7 +1,7 @@
 'use client'
 
 import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
-import { useModal } from "@/hooks/use-modal-store";
+import { ModalType, useModal } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utilities/clsx/utils";
 import { Channel, ChannelType, MemberRole, Server } from "@prisma/client"
 import { Edit, Hash, Lock, Mic2, Trash } from "lucide-react";
@@ -31,6 +31,10 @@ export const ChannelItem = ({
         router.push(`/chat/server/${params?.serverId}/${channel.id}`)
     }
 
+    const onAction = (e: React.MouseEvent, action: ModalType) => {
+        e.stopPropagation();
+        onOpen(action, {channel, server})
+    }
     return (
         <button
             onClick={onClick}
@@ -48,11 +52,11 @@ export const ChannelItem = ({
             {channel.name !== 'general' && role !== MemberRole.GUEST && (
                 <div className='ml-auto flex items-center gap-x-2'>
                     <NavTooltip label='Edit'>
-                        <Edit onClick={() => onOpen('editChannel', {server, channel})}
+                        <Edit onClick={(e) => onAction(e, 'editChannel')}
                         className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
                     </NavTooltip>
                     <NavTooltip label='Delete'>
-                        <Trash onClick={() => onOpen('deleteChannel', {server, channel})}
+                        <Trash onClick={(e) => onAction(e, 'deleteChannel')}
                         className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
                     </NavTooltip>
                 </div>
