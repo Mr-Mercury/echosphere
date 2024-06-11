@@ -23,10 +23,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
                 z-30 flex-col fixed inset-y-0'>
                     <ChatMainSidebar />
                 </div>
-                <div className='hidden md:flex h-full w-60 z-20 flex-col 
-                fixed inset-y-0 left-[72px]'>
+                <main className='md:pl-[72px] h-full'>
                     {children}
-                </div>
+                </main>
             </div>
         </div>
         
