@@ -116,7 +116,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                     <div className='mb-2'>
                         <ServerListing 
                             sectionType='channels' 
-                            channelType={ChannelType.TEXT}
+                            channelType={ChannelType.AUDIO}
                             role={role}
                             label='Voice Channels'
                         />
