@@ -9,6 +9,7 @@ import { Hash, Mic2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ServerListing } from "@/components/islets/section/server-listing";
 import { ChannelItem } from "@/components/islets/chat-window/channel-item";
+import { MemberList } from "@/components/islets/chat-window/member-list";
 
 interface ChannelSidebarProps {
     serverId: string;
@@ -109,6 +110,24 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                         ))}
                     </div>
                 )}
+                {!!audioChannels?.length && (
+                    <div className='mb-2'>
+                        <ServerListing 
+                            sectionType='channels' 
+                            channelType={ChannelType.TEXT}
+                            role={role}
+                            label='Voice Channels'
+                        />
+                        {audioChannels.map((channel) => (
+                            <ChannelItem key={channel.id}
+                            channel={channel}
+                            role={role}
+                            server={server} 
+                            />
+                        ))}
+                    </div>
+                )}
+                <MemberList server={server} role={role} />
             </ScrollArea>
         </div>
     )
