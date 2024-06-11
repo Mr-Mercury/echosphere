@@ -101,7 +101,11 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             label='Text Channels'
                         />
                         {textChannels.map((channel) => (
-                            <ChannelItem />
+                            <ChannelItem key={channel.id}
+                            channel={channel}
+                            role={role}
+                            server={server} 
+                            />
                         ))}
                     </div>
                 )}
