@@ -4,7 +4,7 @@ import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ChannelType, MemberRole } from "@prisma/client";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 
 interface ServerListingProps {
     label: string;
@@ -33,6 +33,15 @@ export const ServerListing = ({
                         <Plus className='h-4 w-4'/>
                     </button>
                 </NavTooltip>
+            )}
+            {role === MemberRole.ADMIN && sectionType === 'members' && (
+                <NavTooltip label='Manage Members' side='top'>
+                <button 
+                    onClick={() => onOpen('members', {server})}
+                    className='text-zinc-400 hover:text-zinc-300 transition'>
+                    <Settings className='h-4 w-4'/>
+                </button>
+            </NavTooltip>
             )}
         </div>
     )
