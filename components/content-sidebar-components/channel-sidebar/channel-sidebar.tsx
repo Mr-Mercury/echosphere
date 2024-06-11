@@ -6,6 +6,8 @@ import { ChannelType, MemberRole } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ServerSearch from "@/components/islets/search/server-search";
 import { Hash, Mic2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ServerListing } from "@/components/islets/section/server-listing";
 
 interface ChannelSidebarProps {
     serverId: string;
@@ -88,6 +90,17 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             }
                         ]}/>
                 </div>
+                <Separator className='bg-zinc-700 rounded-md my-2'/>
+                {!!textChannels?.length && (
+                    <div className='mb-2'>
+                        <ServerListing 
+                            sectionType='channels' 
+                            channelType={ChannelType.TEXT}
+                            role={role}
+                            label='Text Channels'
+                        />
+                    </div>
+                )}
             </ScrollArea>
         </div>
     )
