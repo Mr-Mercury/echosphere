@@ -8,6 +8,7 @@ import ServerSearch from "@/components/islets/search/server-search";
 import { Hash, Mic2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ServerListing } from "@/components/islets/section/server-listing";
+import { ChannelItem } from "@/components/islets/chat-window/channel-item";
 
 interface ChannelSidebarProps {
     serverId: string;
@@ -99,6 +100,9 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             role={role}
                             label='Text Channels'
                         />
+                        {textChannels.map((channel) => (
+                            <ChannelItem />
+                        ))}
                     </div>
                 )}
             </ScrollArea>
