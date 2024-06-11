@@ -28,9 +28,6 @@ export const MemberList = async ({server, role}: MemberListProps) => {
                     server={server}
                     role={role}
                 />
-                {members.map((member) => (
-                    // <ServerMember />
-                ))}
             </div>
         )}
         </div>
