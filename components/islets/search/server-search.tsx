@@ -41,7 +41,7 @@ const ServerSearch = ({
         setOpen(false);
 
         if (type === 'member') {
-            return router.push(`/chat/server/${params?.serverId}/conversation/${id}`)
+            return router.push(`/chat/server/personal/dm/${id}`)
         }
 
         if (type === 'channel') {
