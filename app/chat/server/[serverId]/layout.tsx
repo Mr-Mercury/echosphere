@@ -27,7 +27,7 @@ const ChannelSidebarLayout = async ({
             <div className='hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0'>
                 <ChannelSidebar serverId={server.id} />
             </div>
-            <main className='h-full md:pl-60'>
+            <main className='h-full w-full md:pl-60'>
                 {children}
             </main>
         </div>
@@ -36,28 +36,3 @@ const ChannelSidebarLayout = async ({
 
 
 export default ChannelSidebarLayout;
-
-
-// const ChannelLayout = async ({ children, params }: {
-//     children: React.ReactNode,
-//     params: {id:string},
-// }) => {
-
-//     const server = await getServerById(params.id);
-
-//     if (!server) {
-//         return redirect('/')
-//     }
-
-//     return (
-//         <div className='h-full'>
-//             <div className='hidden md:flex h-full w-60
-//             z-20 flex-col fixed inset-y-0'>
-//                 <ChannelSideBar server={server}/>
-//             </div>
-//             <main className='h-full md:pl-60'>{children}</main>
-//         </div>
-//     )
-// }
-
-// export default ChannelLayout;
