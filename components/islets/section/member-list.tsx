@@ -1,9 +1,9 @@
-import { ServerListing } from "../section/server-listing"
+import { ServerListing } from "./server-listing"
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser"
 import { redirect } from "next/navigation"
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { MemberRole } from "@prisma/client";
-import { ServerMember } from "../section/server-member";
+import { ServerMember } from "./server-member";
 
 interface MemberListProps {
     server: ServerWithMembersAndProfiles;
