@@ -1,6 +1,7 @@
 'use client'
 
 import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
+import { useModal } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utilities/clsx/utils";
 import { Channel, ChannelType, MemberRole, Server } from "@prisma/client"
 import { Edit, Hash, Lock, Mic2, Trash } from "lucide-react";
@@ -20,6 +21,7 @@ const iconMap = {
 export const ChannelItem = ({
     channel, server, role
 }: ChannelItemProps) => {
+    const {onOpen} = useModal();
     const params = useParams();
     const router = useRouter();
 
@@ -45,7 +47,8 @@ export const ChannelItem = ({
                         <Edit className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
                     </NavTooltip>
                     <NavTooltip label='Delete'>
-                        <Trash className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
+                        <Trash onClick={() => onOpen('deleteChannel', {server, channel})}
+                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
                     </NavTooltip>
                 </div>
             )}
