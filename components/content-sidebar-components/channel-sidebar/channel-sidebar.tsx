@@ -101,6 +101,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             role={role}
                             label='Text Channels'
                         />
+                        <div className='space-y-[2px]'>
                         {textChannels.map((channel) => (
                             <ChannelItem key={channel.id}
                             channel={channel}
@@ -108,6 +109,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             server={server} 
                             />
                         ))}
+                        </div>
                     </div>
                 )}
                 {!!audioChannels?.length && (
@@ -118,6 +120,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             role={role}
                             label='Voice Channels'
                         />
+                        <div className='space-y-[2px]'>
                         {audioChannels.map((channel) => (
                             <ChannelItem key={channel.id}
                             channel={channel}
@@ -125,9 +128,12 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             server={server} 
                             />
                         ))}
+                        </div>
                     </div>
                 )}
-                <MemberList server={server} role={role} />
+                <div className='space-y-[2px]'>
+                    <MemberList server={server} role={role} />
+                </div>
             </ScrollArea>
         </div>
     )

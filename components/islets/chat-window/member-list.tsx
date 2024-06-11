@@ -3,6 +3,7 @@ import { currentUser } from "@/lib/utilities/data/fetching/currentUser"
 import { redirect } from "next/navigation"
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { MemberRole } from "@prisma/client";
+import { ServerMember } from "../section/server-member";
 
 interface MemberListProps {
     server: ServerWithMembersAndProfiles;
@@ -28,6 +29,9 @@ export const MemberList = async ({server, role}: MemberListProps) => {
                     server={server}
                     role={role}
                 />
+                {members.map((member) => (
+                    <ServerMember key={member.id} member={member} server={server}/>
+                ))}
             </div>
         )}
         </div>
