@@ -2,6 +2,7 @@
 
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Hash, Mic2, Search, ShieldAlert, ShieldCheck } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ServerSearchProps {
@@ -21,6 +22,9 @@ const ServerSearch = ({
 }: ServerSearchProps) => {
     const [open, setOpen] = useState(false);
 
+    const router = useRouter();
+    const params = useParams();
+
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey )) {
@@ -31,7 +35,19 @@ const ServerSearch = ({
 
         document.addEventListener('keydown', down);
         return () => document.removeEventListener('keydown', down);
-    }, [])
+    }, []);
+
+    const onClick = ({ id, type }: { id: string, type: 'channel' | 'member' }) => {
+        setOpen(false);
+
+        if (type === 'member') {
+            return router.push(`/chat/server/${params?.serverId}/conversation/${id}`)
+        }
+
+        if (type === 'channel') {
+            return router.push(`chat/server/${params?.serverId}/channel/${id}`)
+        }
+    }
 
     return (
         <>
@@ -65,7 +81,8 @@ const ServerSearch = ({
                                 <CommandGroup key={label} heading={label}>
                                     {data?.map(({ id, icon, name }) => {
                                         return (
-                                            <CommandItem key={id}>
+                                            // Using onSelect here so that you can search w keyboard commands
+                                            <CommandItem key={id} onSelect={() => onClick({ id, type })}>
                                                 {icon}
                                                 <span>{name}</span>
                                             </CommandItem>

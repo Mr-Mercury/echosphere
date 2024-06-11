@@ -69,10 +69,10 @@ const CreateChannelModal = () => {
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Create a Server
+                        Create a new Channel
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Create a new channel!</div> 
+                        <div>Give it a descriptive name!</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
