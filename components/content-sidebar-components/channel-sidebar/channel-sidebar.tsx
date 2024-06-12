@@ -35,7 +35,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
     //I would not be making this kind of request outside of a server component
     //Because it's a waterfall request - but it works out in RSC.  Very nice. 
     const server = await getServerChannelsById(params.serverId, user.id);
-
+    //TODO: Fix this prisma error - it's being called in DMs when it doesn't need to be - layout issue?
     const textChannels = server?.channels.filter((channel) => {
         return channel.type === ChannelType.TEXT
     })
