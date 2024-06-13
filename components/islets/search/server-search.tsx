@@ -45,7 +45,7 @@ const ServerSearch = ({
         }
 
         if (type === 'channel') {
-            return router.push(`chat/server/${params?.serverId}/channel/${id}`)
+            return router.push(`/chat/server/${params?.serverId}/${id}`)
         }
     }
 

@@ -5,7 +5,9 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem } from '../ui/form';
 import { Input } from '../ui/input';
-import { Plus } from 'lucide-react';
+import { Plus, Smile } from 'lucide-react';
+import axios from 'axios';
+import qs from 'query-string';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -53,7 +55,12 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                         </button>
                                         <Input disabled={isLoading} 
                                         className='px-14 py-6 bg-zinc-700/70 border-none 
-                                        border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'/>
+                                        border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
+                                        placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
+                                        {...field}/>
+                                         <div className='absolute top-7 right-8'>
+                                            <Smile />
+                                        </div>
                                     </div>
                                 </FormControl>
                             </FormItem>

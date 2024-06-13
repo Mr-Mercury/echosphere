@@ -2,6 +2,7 @@ import ChatHeader from "@/components/message-window/chat-header";
 import { ChatInput } from "@/components/message-window/chat-input";
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { Smile } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface ChannelIdPageProps {
