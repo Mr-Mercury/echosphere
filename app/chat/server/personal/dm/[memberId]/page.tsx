@@ -1,4 +1,4 @@
-import ChatHeader from "@/components/chat-window/chat-header";
+import ChatHeader from "@/components/message-window/chat-header";
 import { db } from "@/lib/db/db";
 import { conversationUtil } from "@/lib/utilities/conversation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";

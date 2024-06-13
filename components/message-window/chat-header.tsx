@@ -1,6 +1,7 @@
 import { Hash } from "lucide-react";
 import { MobileToggle } from "../islets/mobile/mobile-toggle";
 import { UserAvatar } from "../islets/users/user-avatar";
+import { SocketIndicator } from "../islets/socket-indicator/socket-indicator";
 
 interface ChatHeaderProps {
     serverId: string;
@@ -23,6 +24,9 @@ const ChatHeader = ({serverId, name, type, imageUrl}: ChatHeaderProps) => {
             <p className='font-semibold text-md text-secondary'>
                 {name}
             </p>
+            <div className='ml-auto flex items-center'>
+                <SocketIndicator />
+            </div>
         </div>
     )
 }
