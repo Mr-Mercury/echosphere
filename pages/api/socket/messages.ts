@@ -9,13 +9,19 @@ export default async function messageHandler(
     req: NextApiRequest, res: NextApiResponseIoServer
 ) {
     if (req.method !== 'POST') return res.status(405).json({error: 'Method not allowed'});
-
+        
     try {
-        const user = await currentUser();
+        console.log('SCRACH YOUR BUTTTTTTT');
+        const authorized = await fetch('/api/protected');
+        const json = await authorized.json();
+        const userId = json.data;
+
+        console.log(userId);
+
         const { content, fileUrl } = req.body;
         const { serverId, channelId } = req.query;
 
-        if (!user) return res.status(401).json({error: 'Unauthorized via pages messages (socket/messages)'});
+        if (!userId) return res.status(401).json({error: 'Unauthorized via pages messages (socket/messages)'});
         if (!serverId) return res.status(400).json({error: 'Server ID missing!'});
         if (!channelId) return res.status(400).json({error: 'Channel ID missing!'})
 
