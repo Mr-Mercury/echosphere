@@ -15,6 +15,7 @@ interface ChannelIdPageProps {
 const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
 
     const user = await currentUser();
+
     if (!user) return redirect('/login');
 
     const channel = await db.channel.findUnique({
