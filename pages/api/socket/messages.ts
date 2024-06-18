@@ -11,12 +11,8 @@ export default async function messageHandler(
     if (req.method !== 'POST') return res.status(405).json({error: 'Method not allowed'});
         
     try {
-        console.log('SCRACH YOUR BUTTTTTTT');
-        const authorized = await fetch('/api/protected');
-        const json = await authorized.json();
-        const userId = json.data;
-
-        console.log(userId);
+        
+        //TODO: AUTH GOES HERE
 
         const { content, fileUrl } = req.body;
         const { serverId, channelId } = req.query;
