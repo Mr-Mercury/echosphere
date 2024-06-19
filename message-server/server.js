@@ -7,12 +7,11 @@ const socketUserCheck = require('./lib/socketUserCheck');
 const db = require('./lib/messageDbConnection');
 
 
-const port = 4000;
+const port = process.env.PORT;
 const app = express();
 
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
-
 }
 
 
