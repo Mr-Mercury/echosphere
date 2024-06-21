@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
       "target": "ES2020",                  // Set the target ECMAScript version for modern Node.js
-      "module": "ESNext",                  // Use ES modules
-      "moduleResolution": "node",          // Resolve modules like Node.js
+      "module": "NodeNext",                  // Use ES modules
+      "moduleResolution": "NodeNext",          // Resolve modules like Node.js
       "outDir": "./dist",                  // Output directory for compiled files
       "rootDir": "./",       // Root directory containing the source files
       "esModuleInterop": true,             // Enables ES Module interop
@@ -12,7 +12,8 @@
       "forceConsistentCasingInFileNames": true,
       "resolveJsonModule": true,           // Allow importing JSON modules
       "noImplicitAny": true,               // Raise error on expressions and declarations with an implied 'any' type
-      "isolatedModules": true              // Ensure each file can be safely transpiled without relying on other imports
+      "isolatedModules": true,
+      "incremental": true              // Ensure each file can be safely transpiled without relying on other imports
     },
     "include": [
       "**/*.ts"             // Files to include
