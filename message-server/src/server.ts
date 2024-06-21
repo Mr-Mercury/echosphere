@@ -18,8 +18,10 @@ const io = new IoServer(server);
 
 app.use(express.json());
 
-
+io.on('connection', (socket) => {
+    
+})
 
 server.listen(port, () => {
-    console.log('listening on port ' + port);
+    console.log('Socket listening on port ' + port);
 })
