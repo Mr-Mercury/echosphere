@@ -4,6 +4,8 @@ export const config = {
         bodyParser: false,
     },
 };
+// NOTE: This file is a 'lazy' implementation for creating a socket on demand - for saving money.  
+// consider using this in deployment : | 
 const ioHandler = (req, res) => {
     if (!res.socket.server.io) {
         const path = '/api/socket/io';

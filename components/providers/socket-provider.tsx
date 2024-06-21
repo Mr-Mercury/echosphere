@@ -25,9 +25,8 @@ export const SocketProvider = ({children}: { children: React.ReactNode}) => {
     useEffect(() => {
         //Sets up the socket instance - env variable so it remains flexible in dev vs deployed
         // TODO: When deploying, for horizontal scaling, URL should be load balancer
-        const socketInstance = new (ClientIo as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
-            path: '/api/socket/io',
-            addTrailingSlash: false,
+        // Research whether including the path config option is best
+        const socketInstance = new (ClientIo as any)(process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL!, {
         })
 
         socketInstance.on('connect', () => {
