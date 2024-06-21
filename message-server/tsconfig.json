@@ -4,7 +4,8 @@
       "module": "NodeNext",                  // Use ES modules
       "moduleResolution": "NodeNext",          // Resolve modules like Node.js
       "outDir": "./dist",                  // Output directory for compiled files
-      "rootDir": "./",       // Root directory containing the source files
+      "rootDir": "./",  
+      "sourceMap": true,     // Root directory containing the source files
       "esModuleInterop": true,             // Enables ES Module interop
       "allowSyntheticDefaultImports": true,// Allow default imports from modules with no default export
       "strict": true,                      // Enable all strict type-checking options
@@ -16,7 +17,7 @@
       "incremental": true              // Ensure each file can be safely transpiled without relying on other imports
     },
     "include": [
-      "**/*.ts"             // Files to include
+      "src/**/*.ts"             // Files to include
     ],
     "exclude": [
       "node_modules",                      // Exclude node_modules
