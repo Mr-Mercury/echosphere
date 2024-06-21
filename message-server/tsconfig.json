@@ -4,7 +4,7 @@
       "module": "NodeNext",                  // Use ES modules
       "moduleResolution": "NodeNext",          // Resolve modules like Node.js
       "outDir": "./dist",                  // Output directory for compiled files
-      "rootDir": "./",  
+      "rootDir": "./src",  
       "sourceMap": true,     // Root directory containing the source files
       "esModuleInterop": true,             // Enables ES Module interop
       "allowSyntheticDefaultImports": true,// Allow default imports from modules with no default export

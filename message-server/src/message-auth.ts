@@ -1,6 +1,10 @@
 import { getSession } from "@auth/express"
 import { Request, Response, NextFunction } from "express";
 
+const AuthConfig = {
+  secret: process.env.AUTH_SECRET,
+  providers: [],
+}
 
 export async function authenticatedUser(
   req: Request,

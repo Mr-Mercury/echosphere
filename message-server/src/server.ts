@@ -1,23 +1,25 @@
 import { ExpressAuth, getSession } from "@auth/express"
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
+import { createServer } from 'http';
+import { Server as IoServer } from 'socket.io'
 
-require('dotenv').config();
-
-import { socketUserCheck } from './lib/socketUserCheck.js';
+import { authenticatedUser } from "./message-auth.js";
+    
 import { db } from "./lib/messageDbConnection.js";
 
 //TODO: Env variables for port to enable horizontal scaling 
+
+//TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
+// postgres adapter later on OR use the Redis adapter (preferred)
 const port = 4000;
 const app = express();
-
-const AuthConfig = {
-    secret: process.env.AUTH_SECRET,
-}
-
+const server = createServer(app);
+const io = new IoServer(server);
 
 app.use(express.json());
 
-app.listen(port, () => {
-    console.log('listening on port ' + port);
 
+
+server.listen(port, () => {
+    console.log('listening on port ' + port);
 })
