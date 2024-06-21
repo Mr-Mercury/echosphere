@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = void 0;
-const client_1 = require("@prisma/client");
-exports.db = globalThis.prisma || new client_1.PrismaClient();
+import { PrismaClient } from '@prisma/client';
+export const db = globalThis.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== 'production')
-    globalThis.prisma = exports.db;
+    globalThis.prisma = db;
+//# sourceMappingURL=messageDbConnection.js.map

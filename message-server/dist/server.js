@@ -1,16 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express = require('express');
-require('dotenv').config();
-const { ExpressAuth, getSession } = require('./message-auth');
-const socketUserCheck = require('./lib/socketUserCheck');
-const db = require('./lib/messageDbConnection');
-const port = process.env.PORT;
+import express from "express";
+import { createServer } from 'http';
+import { Server as IoServer } from 'socket.io';
+//TODO: Env variables for port to enable horizontal scaling 
+//TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
+// postgres adapter later on OR use the Redis adapter (preferred)
+const port = 4000;
 const app = express();
-const AuthConfig = {
-    secret: process.env.AUTH_SECRET,
-};
+const server = createServer(app);
+const io = new IoServer(server);
 app.use(express.json());
-app.listen(port, () => {
+server.listen(port, () => {
     console.log('listening on port ' + port);
 });
+//# sourceMappingURL=server.js.map
