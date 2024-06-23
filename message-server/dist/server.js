@@ -7,7 +7,13 @@ import { Server as IoServer } from 'socket.io';
 const port = 4000;
 const app = express();
 const server = createServer(app);
-const io = new IoServer(server);
+const io = new IoServer(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 app.use(express.json());
 io.on('connection', (socket) => {
 });
