@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
 //TODO: Env variables for port to enable horizontal scaling 
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
 // postgres adapter later on OR use the Redis adapter (preferred)
@@ -23,12 +24,17 @@ app.use(cors({
     credentials: true,
 }));
 // Auth logic here 
-io.use((socket, next) => {
-    console.log('hey im working');
-    next();
-});
+let activeSessions = {};
+io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    //@ts-ignore
+    console.log('a user connected' + socket.user);
+    scheduleSessionRecheck(socket);
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+        //@ts-ignore
+        clearInterval(socket.sessionInterval);
+    });
 });
 server.listen(port, () => {
     console.log('Socket listening on port ' + port);

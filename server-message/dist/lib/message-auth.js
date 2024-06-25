@@ -1,0 +1,47 @@
+import { getSession } from "@auth/express";
+import dotenv from 'dotenv';
+dotenv.config();
+const AuthConfig = {
+    secret: process.env.AUTH_SECRET,
+    providers: [],
+};
+export async function authenticateUser(
+//@ts-ignore
+socket) {
+    try {
+        const session = await getSession(socket.request, AuthConfig);
+        if (session && session.user) {
+            return session.user;
+        }
+        throw new Error('Invalid session');
+    }
+    catch (error) {
+        console.log('MESSAGE AUTH FAILURE: ' + error);
+    }
+}
+//@ts-ignore
+export async function socketAuthMiddleware(socket, next) {
+    try {
+        const user = await authenticateUser(socket);
+        socket.user = user;
+        next();
+    }
+    catch (error) {
+        console.log('MESSAGE AUTH MIDDLEWARE ERROR' + error);
+        next(new Error('Unauthorized:' + error));
+    }
+}
+//@ts-ignore
+export function scheduleSessionRecheck(socket) {
+    socket.sessionInterval = setInterval(async () => {
+        try {
+            const user = await authenticateUser(socket);
+            console.log('Session recheck successful for user', user?.id);
+        }
+        catch (error) {
+            console.log('Session recheck failed:', error);
+            socket.disconnect(true);
+        }
+    }, 1800000); // 30 minutes in milliseconds
+}
+//# sourceMappingURL=message-auth.js.map
