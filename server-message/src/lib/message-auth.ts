@@ -6,11 +6,6 @@ import fetch from 'node-fetch';
 
 dotenv.config();
 
-const AuthConfig = {
-  secret: process.env.AUTH_SECRET,
-  providers: [],
-}
-
 export async function authenticateUser(
   //@ts-ignore
   socket
@@ -25,7 +20,7 @@ export async function authenticateUser(
         'Cookie': cookies
       }
     });
-    
+
     const data = response.json();
 
     //@ts-ignore
@@ -45,6 +40,7 @@ export async function authenticateUser(
 export async function socketAuthMiddleware(socket, next) {
   try {
     const user = await authenticateUser(socket);
+    console.log(user);
     socket.user = user;
     next();
   } catch (error) {

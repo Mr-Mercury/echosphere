@@ -50,10 +50,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         // Extract any necessary info for the session token here. 
         // currently adding userId to session token
         async jwt({ token, user }) {
+            
             if (user) {
                 token.sub = user.id;
             }
-            
+
             if (!token.sub) return token;
 
             const existingUser = await getUserById(token.sub);

@@ -37,6 +37,7 @@ socket) {
 export async function socketAuthMiddleware(socket, next) {
     try {
         const user = await authenticateUser(socket);
+        console.log(user);
         socket.user = user;
         next();
     }
