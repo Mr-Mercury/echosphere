@@ -47,6 +47,7 @@ let activeSessions = {};
 app.post('/authenticate', async (req, res, next) => {
     try {
         const session = await getSession(req, AuthConfig);
+        console.log('In /authenticate');
         if (session && session.user) {
             res.json({ user: session.user });
         } else {
