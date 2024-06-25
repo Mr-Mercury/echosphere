@@ -1,7 +1,8 @@
 import { ExpressAuth, getSession } from "@auth/express"
 import express, { Request, Response, NextFunction } from "express";
 import { createServer } from 'http';
-import { Server as IoServer } from 'socket.io'
+import { Server as IoServer } from 'socket.io';
+
 
 import { authenticatedUser } from "./message-auth.js";
     
