@@ -9,10 +9,13 @@ export async function authenticateUser(
 //@ts-ignore
 socket) {
     try {
-        const session = await getSession(socket.request, AuthConfig);
-        console.log(session);
-        if (session && session.user) {
-            return session.user;
+        const cookies = socket.request.cookies;
+        const sessionToken = cookies['authjs.session-token'];
+        if (cookies && sessionToken) {
+            const session = await getSession(sessionToken, AuthConfig);
+            console.log(session);
+            if (session && session.user)
+                return session.user;
         }
         throw new Error('Invalid session');
     }
@@ -23,7 +26,7 @@ socket) {
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
-        console.log(socket);
+        console.log(socket.request.cookies);
         const user = await authenticateUser(socket);
         socket.user = user;
         next();

@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
 //TODO: Env variables for port to enable horizontal scaling 
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
@@ -19,6 +20,7 @@ const io = new IoServer(server, {
     }
 });
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
