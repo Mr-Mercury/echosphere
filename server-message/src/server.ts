@@ -80,7 +80,6 @@ app.use(cors({
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
-        console.log(session);
 
         if (session && session.user) {
             res.json({ user: session.user });
@@ -98,16 +97,16 @@ io.use(socketAuthMiddleware);
 
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('a user connected ' + socket.user);
+    console.log('User ' + socket.user?.username || 'Unknown' + ' connected');
 
     scheduleSessionRecheck(socket);
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
+    socket.on('disconnect', () => {//@ts-ignore
+        console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
         //@ts-ignore
-        clearInterval(socket.sessionInterval)
-    })
-})
+        clearInterval(socket.sessionInterval);
+    });
+});
 
 server.listen(port, () => {
     console.log('Socket listening on port ' + port);

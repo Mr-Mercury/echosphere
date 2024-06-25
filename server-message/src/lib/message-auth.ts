@@ -21,10 +21,10 @@ export async function authenticateUser(
       }
     });
 
-    const data = response.json();
+    const data = await response.json();
 
     //@ts-ignore
-    if (response.ok) {
+    if (response.ok && data.user) {
         //@ts-ignore
       return data.user
     } else {
@@ -40,9 +40,10 @@ export async function authenticateUser(
 export async function socketAuthMiddleware(socket, next) {
   try {
     const user = await authenticateUser(socket);
-    console.log(user);
-    socket.user = user;
-    next();
+    if (user) {
+      socket.user = user;
+      next();
+    }
   } catch (error) {
     console.log('MESSAGE AUTH MIDDLEWARE ERROR' + error);
     next(new Error('Unauthorized:' + error))
@@ -53,7 +54,6 @@ export async function socketAuthMiddleware(socket, next) {
 export function scheduleSessionRecheck(socket) {
   socket.sessionInterval = setInterval(async () => {
       try {
-          console.log('in interval check')
           const user = await authenticateUser(socket);
           if (user) console.log('Session recheck successful for user', user?.id);
           else throw new Error('Session Invalid')
