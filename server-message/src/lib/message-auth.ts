@@ -16,6 +16,7 @@ export async function authenticateUser(
   socket
 ) {
   try {
+    console.log('in authenticate user');
     const cookies = socket.handshake.headers.cookie;
     const response = await fetch('http://localhost:4000/authenticate', {
       method: 'POST',
@@ -43,6 +44,7 @@ export async function authenticateUser(
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
   try {
+    console.log('in socket auth middleware')
     const user = await authenticateUser(socket);
     socket.user = user;
     next();
@@ -56,6 +58,7 @@ export async function socketAuthMiddleware(socket, next) {
 export function scheduleSessionRecheck(socket) {
   socket.sessionInterval = setInterval(async () => {
       try {
+          console.log('in interval check')
           const user = await authenticateUser(socket);
           if (user) console.log('Session recheck successful for user', user?.id);
           else throw new Error('Session Invalid')
