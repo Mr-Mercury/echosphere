@@ -5,7 +5,7 @@ import { Server as IoServer } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import { authenticateUser, scheduleSessionRecheck, socketAuthMiddleware } from "./message-auth.js";
+import { authenticateUser, scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
     
 import { db } from "./lib/messageDbConnection.js";
 
@@ -36,10 +36,6 @@ app.use(cors({
 
 // Auth logic here 
 let activeSessions = {};
-
-app.use((req, res, next) => {
-    const sessionToken = req.headers.
-})
 
 io.use(socketAuthMiddleware);
 
