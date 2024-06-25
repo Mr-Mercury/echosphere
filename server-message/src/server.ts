@@ -2,6 +2,7 @@ import { ExpressAuth, getSession } from "@auth/express"
 import express, { Request, Response, NextFunction } from "express";
 import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
+import { messageGetUserById } from "./lib/messageGetUserById.js";
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -19,18 +20,36 @@ dotenv.config();
 
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
-    providers: [],
+    providers: [
+      // Add the same providers if necessary
+    ],
     callbacks: {//@ts-ignore
       async jwt({ token, user }) {
         if (user) {
-          token.id = user.id;
+          token.sub = user.id;
+          token.username = user.username;
+          token.human = user.human;
         }
+  
+        if (!token.sub) return token;
+    
+        const existingUser = await messageGetUserById(token.sub); // Ensure this utility is available
+        if (!existingUser) return token;
+  
+        token.human = existingUser.human; 
+        token.username = existingUser.username;
         return token;
       },//@ts-ignore
       async session({ session, token }) {
-        if (token) {
-          session.user.id = token.id;
+        if (token.sub && session.user) {
+          session.user.id = token.sub;
         }
+  
+        if (token.username && session.user) {
+          session.user.username = token.username;
+          session.user.human = token.human;
+        }
+  
         return session;
       },
     },

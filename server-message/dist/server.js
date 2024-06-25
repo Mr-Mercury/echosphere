@@ -12,6 +12,20 @@ dotenv.config();
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [],
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
+            }
+            return token;
+        }, //@ts-ignore
+        async session({ session, token }) {
+            if (token) {
+                session.user.id = token.id;
+            }
+            return session;
+        },
+    },
 };
 const port = 4000;
 const app = express();
