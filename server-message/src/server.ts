@@ -20,7 +20,22 @@ dotenv.config();
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [],
-}
+    callbacks: {//@ts-ignore
+      async jwt({ token, user }) {
+        if (user) {
+          token.id = user.id;
+        }
+        return token;
+      },//@ts-ignore
+      async session({ session, token }) {
+        if (token) {
+          session.user.id = token.id;
+        }
+        return session;
+      },
+    },
+  };
+  
 
 const port = 4000;
 const app = express();
@@ -42,12 +57,12 @@ app.use(cors({
 }))
 
 // Auth logic here 
-let activeSessions = {};
 
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
-        console.log(await getSession(req, AuthConfig));
+        console.log(session);
+
         if (session && session.user) {
             res.json({ user: session.user });
         } else {
