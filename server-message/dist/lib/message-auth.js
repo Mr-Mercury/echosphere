@@ -1,10 +1,6 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 dotenv.config();
-const AuthConfig = {
-    secret: process.env.AUTH_SECRET,
-    providers: [],
-};
 export async function authenticateUser(
 //@ts-ignore
 socket) {
