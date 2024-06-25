@@ -2,6 +2,7 @@ import { getSession } from "@auth/express";
 import express from "express";
 import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
+import { messageGetUserById } from "./lib/messageGetUserById.js";
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
@@ -11,17 +12,32 @@ import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth
 dotenv.config();
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
-    providers: [],
+    providers: [
+    // Add the same providers if necessary
+    ],
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.id = user.id;
+                token.sub = user.id;
+                token.username = user.username;
+                token.human = user.human;
             }
+            if (!token.sub)
+                return token;
+            const existingUser = await messageGetUserById(token.sub); // Ensure this utility is available
+            if (!existingUser)
+                return token;
+            token.human = existingUser.human;
+            token.username = existingUser.username;
             return token;
         }, //@ts-ignore
         async session({ session, token }) {
-            if (token) {
-                session.user.id = token.id;
+            if (token.sub && session.user) {
+                session.user.id = token.sub;
+            }
+            if (token.username && session.user) {
+                session.user.username = token.username;
+                session.user.human = token.human;
             }
             return session;
         },
@@ -46,7 +62,6 @@ app.use(cors({
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
-        console.log(session);
         if (session && session.user) {
             res.json({ user: session.user });
         }
@@ -62,10 +77,10 @@ app.post('/authenticate', async (req, res) => {
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('a user connected ' + socket.user);
+    console.log('A user connected ' + socket.user?.username || 'Unknown');
     scheduleSessionRecheck(socket);
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log('User disconnected ' + socket.user?.username || 'Unknown');
         //@ts-ignore
         clearInterval(socket.sessionInterval);
     });
