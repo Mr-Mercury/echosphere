@@ -72,7 +72,7 @@ const ServerSettingsModal = () => {
                         Edit {server?.name}
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Re-customize your server's name and image</div> 
+                        <div>Re-customize your server&apos;s name and image</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>

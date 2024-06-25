@@ -14,7 +14,7 @@ export async function authenticateUser(
   socket
 ) {
   try {
-    const cookies = socket.request.cookies;
+    
     const sessionToken = cookies['authjs.session-token'];
 
     if (cookies && sessionToken) {
