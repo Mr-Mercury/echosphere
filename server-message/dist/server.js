@@ -30,10 +30,11 @@ app.use(cors({
 }));
 // Auth logic here 
 let activeSessions = {};
-app.post('/authenticate', async (req, res, next) => {
+app.post('/authenticate', async (req, res) => {
     try {
+        console.log(AuthConfig);
         const session = await getSession(req, AuthConfig);
-        console.log('In /authenticate');
+        console.log(await getSession(req, AuthConfig));
         if (session && session.user) {
             res.json({ user: session.user });
         }

@@ -18,8 +18,6 @@ export async function authenticateUser(
   try {
     const cookies = socket.handshake.headers.cookie;
 
-    console.log(cookies);
-
     const response = await fetch('http://localhost:4000/authenticate', {
       method: 'POST',
       headers: {
@@ -27,9 +25,7 @@ export async function authenticateUser(
         'Cookie': cookies
       }
     });
-
-    console.log(response);
-
+    
     const data = response.json();
 
     //@ts-ignore
