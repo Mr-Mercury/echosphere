@@ -1,6 +1,8 @@
 import { getSession } from "@auth/express"
 import { Request, Response, NextFunction } from "express";
 import dotenv from 'dotenv';
+import cookie from 'cookie';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -14,15 +16,25 @@ export async function authenticateUser(
   socket
 ) {
   try {
-    
-    const sessionToken = cookies['authjs.session-token'];
+    const cookies = socket.handshake.headers.cookie;
+    const response = await fetch('http://localhost:4000/authenticate', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Cookie': cookies
+      }
+    });
 
-    if (cookies && sessionToken) {
-      const session = await getSession(sessionToken, AuthConfig);
-      console.log(session);
-      if (session && session.user) return session.user;
-    }
-    throw new Error('Invalid session');
+    const data = response.json();
+
+    //@ts-ignore
+    if (response.ok) {
+        //@ts-ignore
+      return data.user
+    } else {
+      //@ts-ignore
+      throw new Error(data.error || 'Authentication failed')
+    };
   } catch (error) {
     console.log('MESSAGE AUTH FAILURE: ' + error);
   }
@@ -31,7 +43,6 @@ export async function authenticateUser(
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
   try {
-    console.log(socket.request.cookies);
     const user = await authenticateUser(socket);
     socket.user = user;
     next();
@@ -46,7 +57,8 @@ export function scheduleSessionRecheck(socket) {
   socket.sessionInterval = setInterval(async () => {
       try {
           const user = await authenticateUser(socket);
-          console.log('Session recheck successful for user', user?.id);
+          if (user) console.log('Session recheck successful for user', user?.id);
+          else throw new Error('Session Invalid')
       } catch (error) {
           console.log('Session recheck failed:', error);
           socket.disconnect(true);
