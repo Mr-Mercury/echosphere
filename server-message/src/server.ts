@@ -2,9 +2,10 @@ import { ExpressAuth, getSession } from "@auth/express"
 import express, { Request, Response, NextFunction } from "express";
 import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
+import dotenv from 'dotenv';
+import cors from 'cors';
 
-
-import { authenticatedUser } from "./message-auth.js";
+import { authenticateUser, scheduleSessionRecheck, socketAuthMiddleware } from "./message-auth.js";
     
 import { db } from "./lib/messageDbConnection.js";
 
@@ -12,9 +13,12 @@ import { db } from "./lib/messageDbConnection.js";
 
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
 // postgres adapter later on OR use the Redis adapter (preferred)
+dotenv.config();
+
 const port = 4000;
 const app = express();
 const server = createServer(app);
+
 const io = new IoServer(server, {
     cors: {
         origin: "http://localhost:3000",
@@ -25,8 +29,32 @@ const io = new IoServer(server, {
 
 app.use(express.json());
 
-io.on('connection', (socket) => {
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}))
 
+// Auth logic here 
+let activeSessions = {};
+
+app.use((req, res, next) => {
+    const sessionToken = req.headers.
+})
+
+io.use(socketAuthMiddleware);
+
+
+io.on('connection', (socket) => {
+    //@ts-ignore
+    console.log('a user connected' + socket.user);
+
+    scheduleSessionRecheck(socket);
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+        //@ts-ignore
+        clearInterval(socket.sessionInterval)
+    })
 })
 
 server.listen(port, () => {
