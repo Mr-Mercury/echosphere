@@ -1,4 +1,6 @@
 import { getSession } from "@auth/express";
+import dotenv from 'dotenv';
+dotenv.config();
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [],

@@ -27,6 +27,7 @@ export const SocketProvider = ({children}: { children: React.ReactNode}) => {
         // TODO: When deploying, for horizontal scaling, URL should be load balancer
         // Research whether including the path config option is best
         const socketInstance = new (ClientIo as any)(process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL!, {
+            withCredentials: true
         })
 
         socketInstance.on('connect', () => {
