@@ -4,6 +4,8 @@ import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
 
 import { authenticateUser, scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
     
@@ -28,6 +30,7 @@ const io = new IoServer(server, {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(cors({
     origin: 'http://localhost:3000',
@@ -42,7 +45,7 @@ io.use(socketAuthMiddleware);
 
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('a user connected' + socket.user);
+    console.log('a user connected ' + socket.user);
 
     scheduleSessionRecheck(socket);
 
