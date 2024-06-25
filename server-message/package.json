@@ -1,9 +1,12 @@
 {
     "type": "module",
     "main": "./dist/server.js",
-    "scripts":{
-        "start":"node dist/server.js",
-        "build":"tsc -p tsconfig.json",
-        "dev":"ts-node src/server.ts"
+    "scripts": {
+        "start": "node dist/server.js",
+        "build": "tsc -p tsconfig.json",
+        "dev": "ts-node src/server.ts"
+    },
+    "dependencies": {
+        "cookie": "^0.6.0"
     }
 }

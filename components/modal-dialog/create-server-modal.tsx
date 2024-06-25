@@ -64,7 +64,7 @@ const CreateServerModal = () => {
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
                         <div>Customize your server with a name and image</div> 
-                        <div>(Don't worry, you can change it later!)</div>
+                        <div>(Don&apos;t worry, you can change it later!)</div>
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>

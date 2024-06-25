@@ -48,7 +48,7 @@ const LeaveServerModal = () => {
                         Leave <span className='text-indigo-500'>{server?.name}</span>?
                     </DialogTitle>
                     <DialogDescription className='text-center text-bold'>
-                        (I'm sure the bots will miss you!)
+                        (I&apos;m sure the bots will miss you!)
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className='px-6 py-4'>
