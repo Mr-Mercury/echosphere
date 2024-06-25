@@ -9,8 +9,8 @@ export async function authenticateUser(
 //@ts-ignore
 socket) {
     try {
-        console.log('in authenticate user');
         const cookies = socket.handshake.headers.cookie;
+        console.log(cookies);
         const response = await fetch('http://localhost:4000/authenticate', {
             method: 'POST',
             headers: {
@@ -18,6 +18,7 @@ socket) {
                 'Cookie': cookies
             }
         });
+        console.log(response);
         const data = response.json();
         //@ts-ignore
         if (response.ok) {
@@ -37,7 +38,6 @@ socket) {
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
-        console.log('in socket auth middleware');
         const user = await authenticateUser(socket);
         socket.user = user;
         next();
