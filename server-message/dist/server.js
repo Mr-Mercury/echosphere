@@ -28,7 +28,7 @@ let activeSessions = {};
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('a user connected' + socket.user);
+    console.log('a user connected ' + socket.user);
     scheduleSessionRecheck(socket);
     socket.on('disconnect', () => {
         console.log('User disconnected');

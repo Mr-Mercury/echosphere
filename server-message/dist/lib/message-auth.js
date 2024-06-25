@@ -10,6 +10,7 @@ export async function authenticateUser(
 socket) {
     try {
         const session = await getSession(socket.request, AuthConfig);
+        console.log(session);
         if (session && session.user) {
             return session.user;
         }
@@ -22,6 +23,7 @@ socket) {
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
+        console.log(socket);
         const user = await authenticateUser(socket);
         socket.user = user;
         next();
