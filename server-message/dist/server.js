@@ -14,6 +14,7 @@ const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [
     // Add the same providers if necessary
+    // TODO: Test with oAuth
     ],
     callbacks: {
         async jwt({ token, user }) {
@@ -77,10 +78,10 @@ app.post('/authenticate', async (req, res) => {
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('A user connected ' + socket.user?.username || 'Unknown');
+    console.log('User ' + socket.user?.username || 'Unknown' + ' connected');
     scheduleSessionRecheck(socket);
     socket.on('disconnect', () => {
-        console.log('User disconnected ' + socket.user?.username || 'Unknown');
+        console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
         //@ts-ignore
         clearInterval(socket.sessionInterval);
     });

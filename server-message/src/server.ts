@@ -3,7 +3,6 @@ import express, { Request, Response, NextFunction } from "express";
 import { createServer } from 'http';
 import { Server as IoServer } from 'socket.io';
 import { messageGetUserById } from "./lib/messageGetUserById.js";
-import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -22,6 +21,7 @@ const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [
       // Add the same providers if necessary
+      // TODO: Test with oAuth
     ],
     callbacks: {//@ts-ignore
       async jwt({ token, user }) {
