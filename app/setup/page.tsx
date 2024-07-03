@@ -16,7 +16,7 @@ const SetupPage = async () => {
             }
         }
     })
-
+    // TODO: Figure out why this crashes w context
     if (server) return redirect(`chat/server/${server.id}`);
     
     return (

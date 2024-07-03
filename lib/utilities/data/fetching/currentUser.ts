@@ -8,8 +8,6 @@ export const currentUser = async () => {
         return null;
     }
 
-    console.log(session);
-
     const id = session.user.id;
 
     const user = await db.user.findUnique({
