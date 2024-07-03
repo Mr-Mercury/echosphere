@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Plus, Smile } from 'lucide-react';
 import axios from 'axios';
 import qs from 'query-string';
+import { useSocket } from '../providers/socket-provider';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -21,7 +22,8 @@ const formSchema = z.object({
 })
 
 export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
-    
+    const { socket, isConnected } = useSocket(); 
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             content: '',
@@ -30,14 +32,15 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     });
 
     const isLoading = form.formState.isSubmitting;
+    
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             const url = qs.stringifyUrl({
                 url: apiUrl,
                 query,
             });
-            
             await axios.post(url, values)
+
         } catch(error) {
             console.log(error);
         }
