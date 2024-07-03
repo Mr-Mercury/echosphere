@@ -101,6 +101,10 @@ io.on('connection', (socket) => {
 
     scheduleSessionRecheck(socket);
 
+    socket.on('message', () => {//@ts-ignore
+        console.log('User ' + socket.user?.username || 'Unknown' + ' messaged');
+    })
+
     socket.on('disconnect', () => {//@ts-ignore
         console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
         //@ts-ignore

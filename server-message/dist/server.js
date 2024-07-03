@@ -80,6 +80,9 @@ io.on('connection', (socket) => {
     //@ts-ignore
     console.log('User ' + socket.user?.username || 'Unknown' + ' connected');
     scheduleSessionRecheck(socket);
+    socket.on('message', () => {
+        console.log('User ' + socket.user?.username || 'Unknown' + ' messaged');
+    });
     socket.on('disconnect', () => {
         console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
         //@ts-ignore
