@@ -81,7 +81,7 @@
     app.post('/authenticate', async (req, res) => {
         try {
             const session = await getSession(req, AuthConfig);
-            
+
             if (session && session.user) {
                 res.json({ session });
             } else {
@@ -109,16 +109,18 @@
 
     io.on('connection', (socket) => {
         //@ts-ignore
-        console.log('User ' + (socket.user?.username || 'Unknown') + ' connected');
+        const session = socket.session;
+        //@ts-ignore
+        console.log('User ' + (session?.user.username || 'Unknown') + ' connected');
 
         scheduleSessionRecheck(socket);
 
         socket.on('message', () => {//@ts-ignore
-            console.log('User ' + socket.user?.username || 'Unknown' + ' messaged');
+            console.log('User ' + session?.user.username || 'Unknown' + ' messaged');
         })
 
         socket.on('disconnect', () => {//@ts-ignore
-            console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
+            console.log('User ' + session?.user.username || 'Unknown' + ' disconnected');
             activeSessions.delete(socket.id);
             //@ts-ignore
             clearInterval(socket.sessionInterval);

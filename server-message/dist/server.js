@@ -64,7 +64,6 @@ app.use(cors({
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
-        console.log(activeSessions);
         if (session && session.user) {
             res.json({ session });
         }
@@ -89,13 +88,15 @@ app.post('/message', async (req, res) => {
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
     //@ts-ignore
-    console.log('User ' + (socket.user?.username || 'Unknown') + ' connected');
+    const session = socket.session;
+    //@ts-ignore
+    console.log('User ' + (session?.user.username || 'Unknown') + ' connected');
     scheduleSessionRecheck(socket);
     socket.on('message', () => {
-        console.log('User ' + socket.user?.username || 'Unknown' + ' messaged');
+        console.log('User ' + session?.user.username || 'Unknown' + ' messaged');
     });
     socket.on('disconnect', () => {
-        console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
+        console.log('User ' + session?.user.username || 'Unknown' + ' disconnected');
         activeSessions.delete(socket.id);
         //@ts-ignore
         clearInterval(socket.sessionInterval);

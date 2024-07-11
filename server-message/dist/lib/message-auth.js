@@ -18,7 +18,7 @@ socket) {
         //@ts-ignore
         if (response.ok && data.session.user) {
             //@ts-ignore
-            return data;
+            return data.session;
         }
         else {
             //@ts-ignore
@@ -33,23 +33,22 @@ socket) {
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
-        const storedSession = activeSessions.get(socket.id);
-        if (storedSession) {
-            socket.session = storedSession.session;
-            next();
+        let session = activeSessions.get(socket.id);
+        if (!session) {
+            session = await authenticateSocketSession(socket);
+            if (session) {
+                activeSessions.set(socket.id, session);
+            }
+            else {
+                throw new Error('Authentication failed');
+            }
         }
-        const newSession = await authenticateSocketSession(socket);
-        //@ts-ignore
-        if (newSession) {
-            activeSessions.set(socket.id, newSession);
-            //@ts-ignore
-            socket.session = newSession.session;
-            next();
-        }
+        socket.session = session;
+        next();
     }
     catch (error) {
-        console.log('MESSAGE AUTH MIDDLEWARE ERROR' + error);
-        next(new Error('Unauthorized:' + error));
+        console.log('MESSAGE AUTH MIDDLEWARE ERROR: ' + error);
+        next(new Error('Unauthorized: ' + error));
     }
 }
 //@ts-ignore
