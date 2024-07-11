@@ -1,7 +1,8 @@
+import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 dotenv.config();
-export async function authenticateUser(
+export async function authenticateSocketSession(
 //@ts-ignore
 socket) {
     try {
@@ -15,9 +16,9 @@ socket) {
         });
         const data = await response.json();
         //@ts-ignore
-        if (response.ok && data.user) {
+        if (response.ok && data.session.user) {
             //@ts-ignore
-            return data.user;
+            return data;
         }
         else {
             //@ts-ignore
@@ -32,9 +33,13 @@ socket) {
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
-        const user = await authenticateUser(socket);
-        if (user) {
-            socket.user = user;
+        const storedSession = activeSessions.get(socket.id);
+        if (storedSession) {
+            next();
+        }
+        const newSession = await authenticateSocketSession(socket);
+        if (newSession) {
+            activeSessions.set(socket.id, newSession);
             next();
         }
     }
@@ -47,14 +52,14 @@ export async function socketAuthMiddleware(socket, next) {
 export function scheduleSessionRecheck(socket) {
     socket.sessionInterval = setInterval(async () => {
         try {
-            const user = await authenticateUser(socket);
-            if (user)
-                console.log('Session recheck successful for user', user?.id);
+            const session = await authenticateSocketSession(socket); //@ts-ignore
+            if (session)
+                console.log('Session revalidation successful for user', session?.user?.id);
             else
                 throw new Error('Session Invalid');
         }
         catch (error) {
-            console.log('Session recheck failed:', error);
+            console.log('Session revalidation failed:', error);
             socket.disconnect(true);
         }
     }, 1800000); // 30 minutes in milliseconds
