@@ -96,7 +96,10 @@
     app.post('/message', async (req, res) => {
         try {
             const { message, socketId } = req.body;
-            const session = activeSessions.get(socketId);
+            const { channelId, serverId } = req.query;
+            
+            const session = await getSession(req, AuthConfig);
+
             
 
         } catch (error) {

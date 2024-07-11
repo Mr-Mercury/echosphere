@@ -79,7 +79,7 @@ app.post('/authenticate', async (req, res) => {
 app.post('/message', async (req, res) => {
     try {
         const { message, socketId } = req.body;
-        const session = activeSessions.get(socketId);
+        const { channelId, serverId } = req.query;
     }
     catch (error) {
         console.log('MESSAGE SERVER POST ERROR');
