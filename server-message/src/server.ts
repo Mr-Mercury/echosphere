@@ -95,7 +95,10 @@
 
     app.post('/message', async (req, res) => {
         try {
-
+            const { message, socketId } = req.body;
+            const session = activeSessions.get(socketId);
+            
+            
 
         } catch (error) {
             console.log('MESSAGE SERVER POST ERROR')

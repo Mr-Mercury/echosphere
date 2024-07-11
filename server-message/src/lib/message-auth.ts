@@ -40,10 +40,16 @@ export async function authenticateSocketSession(
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
   try {
-    const session = await authenticateSocketSession(socket);
+    const storedSession = activeSessions.get(socket.id);
+
+    if (storedSession) {
+      next();
+    }
     
-    if (session) {
-      activeSessions.set(socket.id, session);
+    const newSession = await authenticateSocketSession(socket);
+    
+    if (newSession) {
+      activeSessions.set(socket.id, newSession);
       next();
     }
   } catch (error) {
