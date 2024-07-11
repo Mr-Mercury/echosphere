@@ -13,7 +13,6 @@ export async function authenticateSocketSession(
 ) {
   try {
     const cookies = socket.handshake.headers.cookie;
-
     const response = await fetch('http://localhost:4000/authenticate', {
       method: 'POST',
       headers: {
@@ -25,7 +24,7 @@ export async function authenticateSocketSession(
     const data = await response.json();
 
     //@ts-ignore
-    if (response.ok && data.user) {
+    if (response.ok && data.session.user) {
         //@ts-ignore
       return data
     } else {
@@ -43,13 +42,16 @@ export async function socketAuthMiddleware(socket, next) {
     const storedSession = activeSessions.get(socket.id);
 
     if (storedSession) {
+      socket.session = storedSession.session;
       next();
     }
     
     const newSession = await authenticateSocketSession(socket);
-    
+    //@ts-ignore
     if (newSession) {
       activeSessions.set(socket.id, newSession);
+      //@ts-ignore
+      socket.session = newSession.session;
       next();
     }
   } catch (error) {
@@ -62,11 +64,13 @@ export async function socketAuthMiddleware(socket, next) {
 export function scheduleSessionRecheck(socket) {
   socket.sessionInterval = setInterval(async () => {
       try {
-          const session = await authenticateSocketSession(socket);//@ts-ignore
-          if (session) console.log('Session revalidation successful for user', session?.user?.id);
-          else throw new Error('Session Invalid')
+          const sessionData = await authenticateSocketSession(socket);//@ts-ignore
+          const isSessionExpired = sessionData => new Date() > new Date(sessionData.session.expires);
+          //@ts-ignore
+          if (sessionData && !isSessionExpired) console.log('Session revalidation successful for user ', sessionData.user.id);
+          else throw new Error('Session Invalid or Expired')
       } catch (error) {
-          console.log('Session revalidation failed:', error);
+          console.log('Session revalidation failed: ', error);
           socket.disconnect(true);
       }
   }, 1800000); // 30 minutes in milliseconds

@@ -1,6 +1,7 @@
 import { getSession } from "@auth/express";
 import express from "express";
 import { createServer } from 'http';
+import activeSessions from "./util/sessionStore.js";
 import { Server as IoServer } from 'socket.io';
 import { messageGetUserById } from "./lib/messageGetUserById.js";
 import dotenv from 'dotenv';
@@ -63,28 +64,41 @@ app.use(cors({
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
+        console.log(activeSessions);
         if (session && session.user) {
-            res.json({ user: session.user });
+            res.json({ session });
         }
         else {
             throw new Error('APP AUTHENTICATE SESSION ERROR');
         }
     }
     catch (error) {
-        console.log('APP AUTHENTICATION ERROR: ' + error);
+        console.log('MESSAGE SERVER AUTHENTICATION ERROR: ' + error);
         res.status(401).json({ error: 'Authentication failed' });
+    }
+});
+app.post('/message', async (req, res) => {
+    try {
+        const { message, socketId } = req.body;
+        const session = activeSessions.get(socketId);
+    }
+    catch (error) {
+        console.log('MESSAGE SERVER POST ERROR');
     }
 });
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
+    console.log(socket);
     //@ts-ignore
-    console.log('User ' + socket.user?.username || 'Unknown' + ' connected');
+    console.log('User ' + (socket.user?.username || 'Unknown') + ' connected');
     scheduleSessionRecheck(socket);
     socket.on('message', () => {
         console.log('User ' + socket.user?.username || 'Unknown' + ' messaged');
     });
     socket.on('disconnect', () => {
         console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
+        const session = activeSessions.get(socket.id);
+        activeSessions.delete(socket.id);
         //@ts-ignore
         clearInterval(socket.sessionInterval);
     });

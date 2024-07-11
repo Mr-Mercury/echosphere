@@ -81,7 +81,7 @@
     app.post('/authenticate', async (req, res) => {
         try {
             const session = await getSession(req, AuthConfig);
-
+            console.log(activeSessions);
             if (session && session.user) {
                 res.json({ session });
             } else {
@@ -97,7 +97,6 @@
         try {
             const { message, socketId } = req.body;
             const session = activeSessions.get(socketId);
-            
             
 
         } catch (error) {
@@ -120,7 +119,6 @@
 
         socket.on('disconnect', () => {//@ts-ignore
             console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
-            const session = activeSessions.get(socket.id);
             activeSessions.delete(socket.id);
             //@ts-ignore
             clearInterval(socket.sessionInterval);
