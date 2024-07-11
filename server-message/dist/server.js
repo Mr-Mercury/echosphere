@@ -88,7 +88,6 @@ app.post('/message', async (req, res) => {
 });
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
-    console.log(socket);
     //@ts-ignore
     console.log('User ' + (socket.user?.username || 'Unknown') + ' connected');
     scheduleSessionRecheck(socket);
@@ -97,7 +96,6 @@ io.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         console.log('User ' + socket.user?.username || 'Unknown' + ' disconnected');
-        const session = activeSessions.get(socket.id);
         activeSessions.delete(socket.id);
         //@ts-ignore
         clearInterval(socket.sessionInterval);
