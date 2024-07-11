@@ -35,11 +35,15 @@ export async function socketAuthMiddleware(socket, next) {
     try {
         const storedSession = activeSessions.get(socket.id);
         if (storedSession) {
+            socket.session = storedSession.session;
             next();
         }
         const newSession = await authenticateSocketSession(socket);
+        //@ts-ignore
         if (newSession) {
             activeSessions.set(socket.id, newSession);
+            //@ts-ignore
+            socket.session = newSession.session;
             next();
         }
     }
@@ -52,14 +56,16 @@ export async function socketAuthMiddleware(socket, next) {
 export function scheduleSessionRecheck(socket) {
     socket.sessionInterval = setInterval(async () => {
         try {
-            const session = await authenticateSocketSession(socket); //@ts-ignore
-            if (session)
-                console.log('Session revalidation successful for user', session?.user?.id);
+            const sessionData = await authenticateSocketSession(socket); //@ts-ignore
+            const isSessionExpired = sessionData => new Date() > new Date(sessionData.session.expires);
+            //@ts-ignore
+            if (sessionData && !isSessionExpired)
+                console.log('Session revalidation successful for user ', sessionData.user.id);
             else
-                throw new Error('Session Invalid');
+                throw new Error('Session Invalid or Expired');
         }
         catch (error) {
-            console.log('Session revalidation failed:', error);
+            console.log('Session revalidation failed: ', error);
             socket.disconnect(true);
         }
     }, 1800000); // 30 minutes in milliseconds
