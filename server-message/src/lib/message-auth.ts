@@ -1,6 +1,5 @@
 import { getSession } from "@auth/express";
 import activeSessions from "../util/sessionStore.js";
-import { Request, Response, NextFunction } from "express";
 import dotenv from 'dotenv';
 import cookie from 'cookie';
 import fetch from 'node-fetch';
