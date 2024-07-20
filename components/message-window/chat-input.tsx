@@ -43,6 +43,7 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
             console.log(values);
             
             await axios.post(url, values)
+            //socket.on -> pass the message & the query, 
 
         } catch(error) {
             console.log(error);
