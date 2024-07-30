@@ -98,7 +98,7 @@
 
     app.post('/message', async (req, res) => {
         try {
-            const { content } = req.body;
+            const { content, fileUrl } = req.body;
             const { channelId, serverId } = req.query;
             const session = await getSession(req, AuthConfig);
 
@@ -106,8 +106,8 @@
             if (!serverId) return res.status(400).json({ error: 'Missing server ID!'});
             if (!channelId) return res.status(400).json({ error: 'Missing channel ID!'});
 
-            const result = await messageHandler(session?.user?.id, serverId, channelId, content);
-            
+            const result = await messageHandler(session?.user?.id, serverId, channelId, fileUrl, content);
+
             res.status(result.status).send(result.message);
         } catch (error) {
             console.log('MESSAGE SERVER POST ERROR')
@@ -128,17 +128,22 @@
 
         scheduleSessionRecheck(socket);
 
-        socket.on('message', (data) => {//@ts-ignore
+        socket.on('message', async (data) => {//@ts-ignore
             console.log('User ' + session?.user.username || 'Unknown' + ' messaged');
             try{
             const { query, message } = data;
             const { serverId, channelId } = query;
+            //TODO: add fileUrl for socket to frontend
+            const fileUrl = 'http://www.temporary.com';
             
             if (!serverId) return { status: 400, error: 'Server Id missing!'};
             if (!channelId) return { status: 400, error: 'Channel Id missing!'};
 
-            // Send requred info to message Handler
+            // Send requred info to message Handler followed by emission & key
+            const result = await messageHandler(userId, serverId, channelId, fileUrl, message); 
 
+            const channelKey = `chat:${channelId}:messages`;
+            io.emit(channelKey, result);
             // Emit response from message handler
             } catch (error) {
                 console.log('SOCKET MESSAGE POST ERROR: ', error);
