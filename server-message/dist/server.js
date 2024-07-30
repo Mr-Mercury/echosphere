@@ -81,6 +81,7 @@ app.post('/message', async (req, res) => {
     try {
         const { content, fileUrl } = req.body;
         const { channelId, serverId } = req.query;
+        //TODO: Start here to address message posting issues (this is the route for bots)
         const session = await getSession(req, AuthConfig);
         if (!session)
             return res.status(401).json({ error: 'Session Missing!' });
@@ -106,12 +107,12 @@ io.on('connection', (socket) => {
     console.log('User ' + (username || 'Unknown') + ' connected');
     scheduleSessionRecheck(socket);
     socket.on('message', async (data) => {
-        console.log('User ' + session?.user.username || 'Unknown' + ' messaged');
+        console.log('User ' + (session?.user.username || 'Unknown') + ' messaged');
         try {
             const { query, values } = data;
             const { serverId, channelId } = query;
             //TODO: add fileUrl for socket to frontend
-            const fileUrl = values.fileUrl || 'http://www.temporary.com';
+            const fileUrl = values.fileUrl;
             const content = values.content;
             if (!serverId)
                 return { status: 400, error: 'Server Id missing!' };
