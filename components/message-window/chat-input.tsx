@@ -5,12 +5,13 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem } from '../ui/form';
 import { Input } from '../ui/input';
-import { Plus, Smile } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import axios from 'axios';
 import qs from 'query-string';
 import { useSocket } from '../providers/socket-provider';
 import { useModal } from '@/hooks/use-modal-store';
 import EmojiMenu from '../islets/chat-window/emoji-menu';
+import { useRouter } from 'next/navigation';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -26,6 +27,7 @@ const formSchema = z.object({
 export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     const { onOpen } = useModal(); 
     const { socket, isConnected } = useSocket();
+    const router = useRouter();
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -47,7 +49,8 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
             console.log(values);
             
             socket.emit('message', { query, values });
-            
+            form.reset();
+            router.refresh();
         } catch(error) {
             console.log(error);
         }
