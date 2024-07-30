@@ -3,6 +3,7 @@
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
 import { Loader2, ServerCrash } from "lucide-react";
+import { Member } from "@prisma/client";
 
 interface ChatMessagesProps {
     name: string;
@@ -28,7 +29,7 @@ const ChatMessages = ({
     const queryKey = `chat:${chatId}`
     const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} = useChatQuery({
         queryKey,
-        apiUrl,
+        messageApiUrl,
         paramKey,
         paramValue,
     })
