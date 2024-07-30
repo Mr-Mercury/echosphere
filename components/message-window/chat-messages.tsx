@@ -2,7 +2,7 @@
 
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
-import { Loader2 } from "lucide-react";
+import { Loader2, ServerCrash } from "lucide-react";
 
 interface ChatMessagesProps {
     name: string;
@@ -28,6 +28,7 @@ const ChatMessages = ({
     const queryKey = `chat:${chatId}`
     const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} = useChatQuery({
         queryKey,
+        apiUrl,
         paramKey,
         paramValue,
     })
@@ -42,6 +43,18 @@ const ChatMessages = ({
             </div>
         )
     }
+
+    if (status === 'error') {
+        return (
+            <div className='flex flex-col flex-1 justify-center items-center'>
+                <ServerCrash className='h-7 w-7 text-zinc-400 my-4'/>
+                <p className='text-xs text-zinc-400'>
+                    Something exploded, currently putting out fires...
+                </p>
+            </div>
+        )
+    }
+
     return (
         <div className='flex-1 flex flex-col py-4 overflow-y-auto'>
             <div className='flex-1'/>
