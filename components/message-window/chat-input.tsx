@@ -47,7 +47,7 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
             console.log(values);
             
             socket.emit('message', { query, values });
-
+            
         } catch(error) {
             console.log(error);
         }
@@ -78,7 +78,9 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                         placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
                                         {...field}/>
                                          <div className='absolute top-7 right-8'>
-                                            <EmojiMenu />
+                                            <EmojiMenu onChange={(emoji:string) => {
+                                                field.onChange(`${field.value} ${emoji}`)
+                                            }}/>
                                         </div>
                                     </div>
                                 </FormControl>
