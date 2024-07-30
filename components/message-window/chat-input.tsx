@@ -10,6 +10,7 @@ import axios from 'axios';
 import qs from 'query-string';
 import { useSocket } from '../providers/socket-provider';
 import { useModal } from '@/hooks/use-modal-store';
+import EmojiMenu from '../islets/chat-window/emoji-menu';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -77,7 +78,7 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                         placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
                                         {...field}/>
                                          <div className='absolute top-7 right-8'>
-                                            <Smile />
+                                            <EmojiMenu />
                                         </div>
                                     </div>
                                 </FormControl>
