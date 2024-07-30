@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ModalProvider } from "@/components/providers/modal-provider";
 import { SocketProvider } from "@/components/providers/socket-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +24,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <SocketProvider>
           <ModalProvider />
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </SocketProvider>
       </body>
     </html>
