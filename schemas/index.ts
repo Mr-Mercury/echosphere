@@ -49,3 +49,9 @@ export const ChannelSchema = z.object({
     }),
     type: z.nativeEnum(ChannelType)
 })
+
+export const MessageFileUploadSchema = z.object({
+    fileUrl: z.string().min(1, {
+        message: 'You need a valid filepath'
+    })
+})
