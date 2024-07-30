@@ -1,8 +1,8 @@
 import ChatHeader from "@/components/message-window/chat-header";
 import { ChatInput } from "@/components/message-window/chat-input";
+import ChatMessages from "@/components/message-window/chat-messages";
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
-import { Smile } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface ChannelIdPageProps {
@@ -13,7 +13,7 @@ interface ChannelIdPageProps {
 }
 
 const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
-
+    const messageApiUrl = process.env.MESSAGE_API_URL as string;
     const user = await currentUser();
 
     if (!user) return redirect('/login');
@@ -35,7 +35,14 @@ const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
     return (
         <div className='bg-[#313338] flex flex-col h-full'>
             <ChatHeader name={channel.name} serverId={channel.serverId} type='channel'/>
-            <div className='flex-1'>Messages Go Here</div>
+            <ChatMessages 
+            member={member} name={channel.name} type='channel'
+            chatId={channel.id}
+            messageApiUrl={messageApiUrl} 
+            socketQuery={{ channelId: channel.id, serverId: channel.serverId }}
+            paramKey='channelId'
+            paramValue={channel.id}
+             />
             <ChatInput name={channel.name} type='channel' apiUrl='http://localhost:4000/message' query={ {channelId: channel.id, serverId: channel.serverId} }/>
         </div>
     )
