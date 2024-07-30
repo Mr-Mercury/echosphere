@@ -102,7 +102,7 @@
             const { channelId, serverId } = req.query;
             const session = await getSession(req, AuthConfig);
 
-            if (!session) return res.status(401).json({ error: 'Unauthorized!'});
+            if (!session) return res.status(401).json({ error: 'Session Missing!'});
             if (!serverId) return res.status(400).json({ error: 'Missing server ID!'});
             if (!channelId) return res.status(400).json({ error: 'Missing channel ID!'});
 
@@ -131,16 +131,17 @@
         socket.on('message', async (data) => {//@ts-ignore
             console.log('User ' + session?.user.username || 'Unknown' + ' messaged');
             try{
-            const { query, message } = data;
+            const { query, values } = data;
             const { serverId, channelId } = query;
             //TODO: add fileUrl for socket to frontend
-            const fileUrl = 'http://www.temporary.com';
+            const fileUrl = values.fileUrl || 'http://www.temporary.com';
+            const content = values.content;
             
             if (!serverId) return { status: 400, error: 'Server Id missing!'};
             if (!channelId) return { status: 400, error: 'Channel Id missing!'};
 
             // Send requred info to message Handler followed by emission & key
-            const result = await messageHandler(userId, serverId, channelId, fileUrl, message); 
+            const result = await messageHandler(userId, serverId, channelId, fileUrl, content); 
 
             const channelKey = `chat:${channelId}:messages`;
             io.emit(channelKey, result);

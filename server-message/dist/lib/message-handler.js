@@ -2,7 +2,7 @@ import { db } from "./messageDbConnection.js";
 //@ts-ignore
 async function messageHandler(userId, serverId, channelId, fileUrl, content) {
     // Save to DB
-    const server = db.server.findFirst({
+    const server = await db.server.findFirst({
         where: {
             id: serverId,
             members: {
@@ -17,7 +17,7 @@ async function messageHandler(userId, serverId, channelId, fileUrl, content) {
     });
     if (!server)
         return { status: 404, message: 'Message Handler Error: Server not found!' };
-    const channel = db.channel.findFirst({
+    const channel = await db.channel.findFirst({
         where: {
             id: channelId,
             serverId: serverId,
