@@ -3,7 +3,8 @@
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
 import { Loader2, ServerCrash } from "lucide-react";
-import { Member } from "@prisma/client";
+import { Member, Message } from "@prisma/client";
+import { Fragment } from "react";
 
 interface ChatMessagesProps {
     name: string;
@@ -14,6 +15,12 @@ interface ChatMessagesProps {
     paramKey: 'channelId' | 'conversationId';
     paramValue: string;
     type: 'channel' | 'dm';
+}
+
+type MessageWithMemberWithUser = Message & {
+    member: Member & {
+        user: User
+    }
 }
 
 const ChatMessages = ({
@@ -60,6 +67,17 @@ const ChatMessages = ({
         <div className='flex-1 flex flex-col py-4 overflow-y-auto'>
             <div className='flex-1'/>
             <ChatWelcome type={type} name={name} />
+            <div className='flex flex-col-reverse mt-auto'>
+                {data?.pages?.map((group, index) => (
+                    <Fragment key={index}>
+                        {group.items.map((message: MessageWithMemberWithUser) => (
+                            <div key={message.id}>
+                                {message.content}
+                            </div>
+                        ))}
+                    </Fragment>
+                ) )}
+            </div>
         </div>
     )
 }
