@@ -13,7 +13,7 @@ interface ChannelIdPageProps {
 }
 
 const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
-    const messageApiUrl = process.env.MESSAGE_API_URL as string;
+    const messageApiUrl = process.env.NEXT_PUBLIC_MESSAGE_API_URL as string;
     const user = await currentUser();
 
     if (!user) return redirect('/login');
