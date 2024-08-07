@@ -3,7 +3,7 @@
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
 import { Loader2, ServerCrash } from "lucide-react";
-import { Member, Message } from "@prisma/client";
+import { Member, Message, User } from "@prisma/client";
 import { Fragment } from "react";
 import { ChatItem } from "./chat-item";
 import { format } from 'date-fns';
