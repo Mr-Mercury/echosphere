@@ -132,6 +132,7 @@
         socket.on('message', async (data) => {//@ts-ignore
             console.log('User ' + (session?.user.username || 'Unknown') + ' messaged');
             try{
+                console.log(data);
             const { query, values } = data;
             const { serverId, channelId } = query;
             //TODO: add fileUrl for socket to frontend
@@ -140,7 +141,8 @@
             
             if (!serverId) return { status: 400, error: 'Server Id missing!'};
             if (!channelId) return { status: 400, error: 'Channel Id missing!'};
-
+            
+            console.log(userId, serverId, channelId, fileUrl, content);
             // Send requred info to message Handler followed by emission & key
             const result = await messageHandler(userId, serverId, channelId, fileUrl, content); 
 
