@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useSocket } from "../providers/socket-provider";
+import { useRouter } from "next/navigation";
 
 
 interface ChatItemProps {
@@ -96,8 +97,8 @@ export const ChatItem = ({
             })
 
             // await axios.patch(url, values);
-
              socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT'});
+             setIsEditing(false);
         } catch (error) {
             console.log(error);
         }
