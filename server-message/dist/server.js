@@ -6,7 +6,7 @@ import { Server as IoServer } from 'socket.io';
 import { messageGetUserById } from "./lib/messageGetUserById.js";
 import dotenv from 'dotenv';
 import cors from 'cors';
-import messageHandler from "./lib/message-handler.js";
+import { messagePostHandler, messageEditHandler } from "./lib/message-handler.js";
 import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
 //TODO: Env variables for port to enable horizontal scaling 
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
@@ -89,7 +89,7 @@ app.post('/message', async (req, res) => {
             return res.status(400).json({ error: 'Missing server ID!' });
         if (!channelId)
             return res.status(400).json({ error: 'Missing channel ID!' });
-        const result = await messageHandler(session?.user?.id, serverId, channelId, fileUrl, content);
+        const result = await messagePostHandler(session?.user?.id, serverId, channelId, fileUrl, content);
         res.status(result.status).send(result.message);
     }
     catch (error) {
@@ -109,7 +109,6 @@ io.on('connection', (socket) => {
     socket.on('message', async (data) => {
         console.log('User ' + (session?.user.username || 'Unknown') + ' messaged');
         try {
-            console.log(data);
             const { query, values } = data;
             const { serverId, channelId } = query;
             //TODO: add fileUrl for socket to frontend
@@ -119,9 +118,8 @@ io.on('connection', (socket) => {
                 return { status: 400, error: 'Server Id missing!' };
             if (!channelId)
                 return { status: 400, error: 'Channel Id missing!' };
-            console.log(userId, serverId, channelId, fileUrl, content);
             // Send requred info to message Handler followed by emission & key
-            const result = await messageHandler(userId, serverId, channelId, fileUrl, content);
+            const result = await messagePostHandler(userId, serverId, channelId, fileUrl, content);
             const channelKey = `chat:${channelId}:messages`;
             io.emit(channelKey, result);
             // Emit response from message handler
@@ -130,6 +128,19 @@ io.on('connection', (socket) => {
             console.log('SOCKET MESSAGE POST ERROR: ', error);
             io.emit('error', { status: 500, error: 'SOCKET MESSAGE POST ERROR' });
         }
+    });
+    socket.on('edit', async (data) => {
+        console.log('User ' + session?.user.username || 'Unknown' + ' edited a message');
+        const { query, content, messageId, method } = data;
+        const { serverId, channelId } = query;
+        if (!serverId)
+            return { status: 400, error: 'Server Id missing!' };
+        if (!channelId)
+            return { status: 400, error: 'Channel Id missing!' };
+        if (!content)
+            return { status: 400, error: 'No content in replacement!' };
+        const response = messageEditHandler(userId, messageId, serverId, channelId, content, method);
+        return response;
     });
     socket.on('disconnect', () => {
         console.log('User ' + session?.user.username || 'Unknown' + ' disconnected');
