@@ -153,7 +153,7 @@
             }   
         })
 
-        socket.on('edit', async (data) => {//@ts-ignore
+        socket.on('alter', async (data) => {//@ts-ignore
             console.log('User ' + session?.user.username || 'Unknown' + ' edited a message');
             const {query, content, messageId, method} = data;
             const { serverId, channelId } = query;
