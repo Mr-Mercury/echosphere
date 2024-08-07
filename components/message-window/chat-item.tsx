@@ -5,6 +5,7 @@ import { UserAvatar } from "../islets/users/user-avatar";
 import NavTooltip from "../chat-sidebar-components/nav-tooltip";
 import { FileIcon, ShieldAlert, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface ChatItemProps {
     id: string;
@@ -32,6 +33,9 @@ export const ChatItem = ({
     currentMember, isUpdated,
     messageApiUrl, socketQuery
 }: ChatItemProps) => {
+    const [isEditing, useIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const fileType = fileUrl?.split('.').pop();
     const isAdmin = currentMember.role === MemberRole.ADMIN;
     const isModerator = currentMember.role === MemberRole.MODERATOR;
@@ -65,7 +69,7 @@ export const ChatItem = ({
                         <a href={fileUrl} target='_blank' rel='noopener noreferrer'
                             className='relative aspect-square rounded-md mt-2 overflow-hidden border 
                             flex items-center bg-primary h-48 w-48'>
-                            <Image src={fileUrl} alt={content} fill className='object-cover'/>
+                            <Image src={fileUrl} alt={content} layout='fill' className='object-cover'/>
                         </a>
                     )}
                     {isPDF && (
@@ -76,6 +80,11 @@ export const ChatItem = ({
                                 PDF file
                             </a>
                         </div>
+                    )}
+                    {!fileUrl && !isEditing && (
+                        <p>
+                            {content}
+                        </p>
                     )}
                 </div>
             </div>

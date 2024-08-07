@@ -3,6 +3,7 @@ import { db } from "./messageDbConnection.js";
 //@ts-ignore
 async function messageHandler( userId, serverId, channelId, fileUrl, content) {
     // Save to DB
+
     const server = await db.server.findFirst({
         where: {
             id: serverId as string,

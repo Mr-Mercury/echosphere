@@ -52,7 +52,7 @@ const MessageFileModal = () => {
                 query,
             });
             //TODO: Find better workaround for content field
-            const values = { values: val, content: val.fileUrl}
+            const values = { fileUrl: val.fileUrl, content: val.fileUrl}
             
             socket.emit('message', { query, values })
             // Clearing 
