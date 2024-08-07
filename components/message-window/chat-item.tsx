@@ -15,6 +15,7 @@ import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useSocket } from "../providers/socket-provider";
 
 
 interface ChatItemProps {
@@ -49,6 +50,7 @@ export const ChatItem = ({
 }: ChatItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const {socket} = useSocket();
     
     const fileType = fileUrl?.split('.').pop();
     const isAdmin = currentMember.role === MemberRole.ADMIN;
@@ -93,7 +95,9 @@ export const ChatItem = ({
                 query: socketQuery
             })
 
-            await axios.patch(url, values);
+            // await axios.patch(url, values);
+
+             socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT'});
         } catch (error) {
             console.log(error);
         }

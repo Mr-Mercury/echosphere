@@ -45,8 +45,6 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                 url: apiUrl,
                 query,
             });
-            console.log(url);
-            console.log(values);
             
             socket.emit('message', { query, values });
             form.reset();
