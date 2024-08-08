@@ -13,12 +13,12 @@ import {
     DialogFooter, 
     DialogHeader, 
     DialogTitle 
-} from "../ui/dialog"
+} from "../../ui/dialog"
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import FileUpload from "../islets/uploads/file-upload";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
+import FileUpload from "../../islets/uploads/file-upload";
 import { useRouter } from "next/navigation";
 
 
