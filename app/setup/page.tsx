@@ -2,7 +2,7 @@ import { initializeProfile } from "@/lib/utilities/data/profile/initialize-user"
 import { db } from "@/lib/db/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import CreateServerDialogue from "@/components/modal-dialog/create-server-setup-dialog";
+import CreateServerDialogue from "@/components/modal-dialog/servers/create-server-setup-dialog";
 
 const SetupPage = async () => {
     const currentUser = await initializeProfile();
