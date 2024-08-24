@@ -129,7 +129,7 @@ io.on('connection', (socket) => {
             io.emit('error', { status: 500, error: 'SOCKET MESSAGE POST ERROR' });
         }
     });
-    socket.on('edit', async (data) => {
+    socket.on('alter', async (data) => {
         console.log('User ' + session?.user.username || 'Unknown' + ' edited a message');
         const { query, content, messageId, method } = data;
         const { serverId, channelId } = query;

@@ -1,8 +1,6 @@
 import { getSession } from "@auth/express";
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
-import cookie from 'cookie';
-import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -35,6 +33,7 @@ export async function authenticateSocketSession(
   }
 }
 
+//TODO: Spin out session management into Redis
 //@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
   try {

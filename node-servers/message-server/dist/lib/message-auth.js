@@ -1,6 +1,5 @@
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
-import fetch from 'node-fetch';
 dotenv.config();
 export async function authenticateSocketSession(
 //@ts-ignore
