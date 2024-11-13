@@ -1,74 +1,80 @@
 import { getSession } from "@auth/express";
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
+import { ChatSocket } from "./entities/types.js";
 
 dotenv.config();
 
 export async function authenticateSocketSession(
-  //@ts-ignore
-  socket
+  socket: ChatSocket
 ) {
   try {
     const cookies = socket.handshake.headers.cookie;
+    
+    // Properly type the headers object
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'Cookie': cookies || ''
+    };
+
     const response = await fetch('http://localhost:4000/authenticate', {
       method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-        'Cookie': cookies
-      }
+      headers
     });
 
     const data = await response.json();
 
-    //@ts-ignore
-    if (response.ok && data.session.user) {
-        //@ts-ignore
-      return data.session
+    if (response.ok && data.session?.user) {
+      return data.session;
     } else {
-      //@ts-ignore
-      throw new Error(data.error || 'Authentication failed')
-    };
+      throw new Error(data.error || 'Authentication failed');
+    }
   } catch (error) {
     console.log('MESSAGE AUTH FAILURE: ' + error);
+    throw error;
   }
 }
 
-//TODO: Spin out session management into Redis
-//@ts-ignore
-export async function socketAuthMiddleware(socket, next) {
+export async function socketAuthMiddleware(
+  socket: ChatSocket,
+  next: (err?: Error) => void
+) {
   try {
-      let session = activeSessions.get(socket.id);
+    let session = activeSessions.get(socket.id);
 
-      if (!session) {
-        
-          session = await authenticateSocketSession(socket);
+    if (!session) {
+      session = await authenticateSocketSession(socket);
 
-          if (session) {
-              activeSessions.set(socket.id, session);
-          } else {
-              throw new Error('Authentication failed');
-          }
+      if (session) {
+        activeSessions.set(socket.id, session);
+      } else {
+        throw new Error('Authentication failed');
       }
+    }
 
-      socket.session = session;
-      next();
+    socket.data.session = session;
+    next();
   } catch (error) {
-      console.log('MESSAGE AUTH MIDDLEWARE ERROR: ' + error);
-      next(new Error('Unauthorized: ' + error));
+    console.log('MESSAGE AUTH MIDDLEWARE ERROR: ' + error);
+    next(new Error(`Unauthorized: ${error}`));
   }
 }
-//@ts-ignore
-export function scheduleSessionRecheck(socket) {
-  socket.sessionInterval = setInterval(async () => {
-      try {
-          const sessionData = await authenticateSocketSession(socket);//@ts-ignore
-          const isSessionExpired = sessionData => new Date() > new Date(sessionData.session.expires);
-          //@ts-ignore
-          if (sessionData && !isSessionExpired) console.log('Session revalidation successful for user ', sessionData.user.id);
-          else throw new Error('Session Invalid or Expired')
-      } catch (error) {
-          console.log('Session revalidation failed: ', error);
-          socket.disconnect(true);
+
+export function scheduleSessionRecheck(socket: ChatSocket) {
+  socket.data.sessionInterval = setInterval(async () => {
+    try {
+      const sessionData = await authenticateSocketSession(socket);
+      const isSessionExpired = (sessionData: any) => 
+        new Date() > new Date(sessionData.session.expires);
+
+      if (sessionData && !isSessionExpired(sessionData)) {
+        console.log('Session revalidation successful for user ', sessionData.user.id);
+      } else {
+        throw new Error('Session Invalid or Expired');
       }
+    } catch (error) {
+      console.log('Session revalidation failed: ', error);
+      socket.disconnect(true);
+    }
   }, 1800000); // 30 minutes in milliseconds
 }
