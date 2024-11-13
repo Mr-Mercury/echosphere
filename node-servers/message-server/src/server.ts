@@ -8,36 +8,51 @@
     import cors from 'cors';
     import {messagePostHandler, messageEditHandler} from "./lib/message-handler.js";
 
+    import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
+    import type { Session } from "@auth/express";
+    import type { JWT } from "next-auth/jwt";
+    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/types.js";
+
+
+
 
     import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
         
     import { db } from "./lib/messageDbConnection.js";
 
     //TYPES - TODO: remove index signatures in final version
-    interface User {
-        id: string;
-        username: string;
-        human: boolean;
-        [key: string]: any;
+
+    // This is necessary because the AuthJS guys hate credentials and provide no functionality for them
+    declare module '@auth/core/adapters' {
+        interface AdapterUser {
+            username: string;
+            human: boolean;
+        }
+    }
+
+
+    interface AuthConfigType {
+        secret: string | undefined;
+        providers: any[];
+        callbacks: {
+            jwt: (params: {
+                token: JWT;
+                user?: User;
+                trigger?: "signIn" | "signUp" | "update";
+                session?: any;
+                isNewUser?: boolean;
+            }) => Promise<Token>;
+            session: (params: {
+                session: AdapterSession & { user: AdapterUser };
+                user: AdapterUser;
+                token: Token;
+                newSession?: any;
+                trigger?: "update";
+            }) => Promise<Session>;
+        };
     }
     
-    interface Session {
-        user?: User;
-        [key: string]: any;
-    }
     
-    interface Token {
-        sub?: string;
-        username?: string;
-        human?: boolean;
-        [key: string]: any;
-    }
-    
-    interface SocketSession extends Socket {
-        session?: Session;
-        sessionInterval?: NodeJS.Timeout;
-        [key: string]: any;
-    }
 
     //TODO: Env variables for port to enable horizontal scaling 
 
@@ -45,45 +60,46 @@
     // postgres adapter later on OR use the Redis adapter (preferred)
     dotenv.config();
 
-    const AuthConfig = {
+    const AuthConfig: Parameters<typeof getSession>[1] = {
         secret: process.env.AUTH_SECRET,
-        providers: [
-        // Add the same providers if necessary
-        // TODO: Test with oAuth
-        ],
+        providers: [],
         callbacks: {
-        async jwt({ token, user }: { token: Token; user?: User}) {
-            if (user) {
-            token.sub = user.id;
-            token.username = user.username;
-            token.human = user.human;
-            }
+            async jwt(params) {
+                let token = params.token;
+                const { user } = params;
     
-            if (!token.sub) return token;
-        
-            const existingUser = await messageGetUserById(token.sub); // Ensure this utility is available
-            if (!existingUser) return token;
+                if (user) {
+                    token.sub = user.id;
+                    token.username = (user as any).username;
+                    token.human = (user as any).human;
+                }
     
-            token.human = existingUser.human; 
-            token.username = existingUser.username;
-            return token;
-        },//@ts-ignore
-        async session({ session, token }) {
-            if (token.sub && session.user) {
-            session.user.id = token.sub;
-            }
+                if (!token.sub) return token;
+            
+                const existingUser = await messageGetUserById(token.sub);
+                if (!existingUser) return token;
     
-            if (token.username && session.user) {
-            session.user.username = token.username;
-            session.user.human = token.human;
-            }
+                token.human = existingUser.human;
+                token.username = existingUser.username;
+                return token;
+            },
+            async session(params) {
+                const { session, token } = params;
     
-            return session;
-        },
+                if (token.sub && session.user) {
+                    session.user.id = token.sub;
+                }
+    
+                if (session.user) {
+                    (session.user as any).username = (token as any).username;
+                    (session.user as any).human = (token as any).human;
+                }
+    
+                return session;
+            },
         },
     };
-    
-
+        
     const port = 4000;
     const app = express();
     const server = createServer(app);
@@ -146,19 +162,17 @@
     io.use(socketAuthMiddleware);
 
 
-    io.on('connection', (socket) => {
-        //@ts-ignore
-        const session = socket.session;
-        const username = session?.user.username;
+    io.on('connection', (socket: ChatSocket) => {
+        const session = socket.data.session;
+        const username = session?.user?.username;
         // TODO: Null check here when adding guests
-        const userId = session?.user.id ?? 'Guest';
-        //@ts-ignore
+        const userId = session?.user?.id ?? 'Guest';
         console.log('User ' + (username || 'Unknown') + ' connected');
 
         scheduleSessionRecheck(socket);
 
-        socket.on('message', async (data) => {//@ts-ignore
-            console.log('User ' + (session?.user.username || 'Unknown') + ' messaged');
+        socket.on('message', async (data) => {
+            console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
             try{
                 const { query, values } = data;
                 const { serverId, channelId } = query;
@@ -181,8 +195,8 @@
             }   
         })
 
-        socket.on('alter', async (data) => {//@ts-ignore
-            console.log('User ' + session?.user.username || 'Unknown' + ' edited a message');
+        socket.on('alter', async (data) => {
+            console.log('User ' + session?.user?.username || 'Unknown' + ' edited a message');
             const {query, content, messageId, method} = data;
             const { serverId, channelId } = query;
             
@@ -195,11 +209,10 @@
             return response;
 
         })
-        socket.on('disconnect', () => {//@ts-ignore
-            console.log('User ' + session?.user.username || 'Unknown' + ' disconnected');
+        socket.on('disconnect', () => {
+            console.log('User ' + session?.user?.username || 'Unknown' + ' disconnected');
             activeSessions.delete(socket.id);
-            //@ts-ignore
-            clearInterval(socket.sessionInterval);
+            clearInterval(socket.data.sessionInterval);
         });
     });
 
