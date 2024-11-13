@@ -13,26 +13,30 @@
         
     import { db } from "./lib/messageDbConnection.js";
 
-    //TYPES
+    //TYPES - TODO: remove index signatures in final version
     interface User {
         id: string;
         username: string;
         human: boolean;
+        [key: string]: any;
     }
     
     interface Session {
         user?: User;
+        [key: string]: any;
     }
     
     interface Token {
         sub?: string;
         username?: string;
         human?: boolean;
+        [key: string]: any;
     }
     
     interface SocketSession extends Socket {
         session?: Session;
         sessionInterval?: NodeJS.Timeout;
+        [key: string]: any;
     }
 
     //TODO: Env variables for port to enable horizontal scaling 
@@ -47,8 +51,8 @@
         // Add the same providers if necessary
         // TODO: Test with oAuth
         ],
-        callbacks: {//@ts-ignore
-        async jwt({ token, user }) {
+        callbacks: {
+        async jwt({ token, user }: { token: Token; user?: User}) {
             if (user) {
             token.sub = user.id;
             token.username = user.username;
