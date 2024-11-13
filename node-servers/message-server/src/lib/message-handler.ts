@@ -1,10 +1,12 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
+import { MessagePostHandlerParams, MessageEditHandlerParams } from "./entities/message-handler-types.js";
 
-//@ts-ignore
-export async function messagePostHandler( userId, serverId, channelId, fileUrl, content) {
+
+export async function messagePostHandler( 
+    {userId, serverId, channelId, fileUrl, content}: MessagePostHandlerParams) 
+{
     // Save to DB
-
     const server = await db.server.findFirst({
         where: {
             id: serverId as string,
@@ -55,8 +57,10 @@ export async function messagePostHandler( userId, serverId, channelId, fileUrl, 
     // Send back response with message
 }
 
-//@ts-ignore
-export async function messageEditHandler (userId, messageId, serverId, channelId, content, method) {
+export async function messageEditHandler ( 
+    {userId, messageId, serverId, channelId, content, method}: MessageEditHandlerParams
+    ) 
+{
     try {
         const server = await db.server.findFirst({
             where: {
