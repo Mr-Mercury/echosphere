@@ -11,7 +11,7 @@
     import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
     import type { Session } from "@auth/express";
     import type { JWT } from "next-auth/jwt";
-    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/types.js";
+    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/server-types.js";
 
 
 
