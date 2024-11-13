@@ -2,18 +2,38 @@
     import express, { Request, Response, NextFunction } from "express";
     import { createServer } from 'http';
     import activeSessions from "./util/sessionStore.js";
-    import { Server as IoServer } from 'socket.io';
+    import { Server as IoServer, Socket } from 'socket.io';
     import { messageGetUserById } from "./lib/messageGetUserById.js";
     import dotenv from 'dotenv';
     import cors from 'cors';
     import {messagePostHandler, messageEditHandler} from "./lib/message-handler.js";
 
 
-
-
     import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
         
     import { db } from "./lib/messageDbConnection.js";
+
+    //TYPES
+    interface User {
+        id: string;
+        username: string;
+        human: boolean;
+    }
+    
+    interface Session {
+        user?: User;
+    }
+    
+    interface Token {
+        sub?: string;
+        username?: string;
+        human?: boolean;
+    }
+    
+    interface SocketSession extends Socket {
+        session?: Session;
+        sessionInterval?: NodeJS.Timeout;
+    }
 
     //TODO: Env variables for port to enable horizontal scaling 
 
@@ -108,6 +128,10 @@
             if (!channelId) return res.status(400).json({ error: 'Missing channel ID!'});
 
             const result = await messagePostHandler(session?.user?.id, serverId, channelId, fileUrl, content);
+
+            if (result.status === 200) {
+                const channelKey = `chat:${channelId}:messages`
+            }
 
             res.status(result.status).send(result.message);
         } catch (error) {
