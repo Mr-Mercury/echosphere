@@ -1,11 +1,13 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
-import { MessagePostHandlerParams, MessageEditHandlerParams } from "./entities/message-handler-types.js";
+import { MessagePostHandlerParams, MessageEditHandlerParams,
+    MessageResponse, MessageUpdateResponse } from "./entities/message-handler-types.js";
 
 
 export async function messagePostHandler( 
-    {userId, serverId, channelId, fileUrl, content}: MessagePostHandlerParams) 
+    params: MessagePostHandlerParams) 
 {
+    const { userId, serverId, channelId, fileUrl, content } = params;
     // Save to DB
     const server = await db.server.findFirst({
         where: {
@@ -32,7 +34,6 @@ export async function messagePostHandler(
 
     if (!channel) return {status: 404, error: 'Message Handler Error: Channel not found!'};
 
-    //@ts-ignore
     const member = server.members.find((member) => member.userId);
 
     if (!member) return {status: 404, error: "Message Handler Error: User not found in Member list!"};
