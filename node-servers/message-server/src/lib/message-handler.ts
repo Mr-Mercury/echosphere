@@ -59,9 +59,11 @@ export async function messagePostHandler(
 }
 
 export async function messageEditHandler ( 
-    {userId, messageId, serverId, channelId, content, method}: MessageEditHandlerParams
+        params: MessageEditHandlerParams
     ) 
 {
+    const { userId, messageId, serverId, channelId, content, method } = params;
+     
     try {
         const server = await db.server.findFirst({
             where: {

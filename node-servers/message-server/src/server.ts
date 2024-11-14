@@ -11,7 +11,7 @@
     import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
     import type { Session } from "@auth/express";
     import type { JWT } from "next-auth/jwt";
-    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/types.js";
+    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/server-types.js";
 
 
 
@@ -191,9 +191,12 @@
                 
                 if (!serverId) return { status: 400, error: 'Server Id missing!'};
                 if (!channelId) return { status: 400, error: 'Channel Id missing!'};
-                
+
+                const params = { 
+                    userId, serverId, channelId, fileUrl, content 
+                }  
                 // Send requred info to message Handler followed by emission & key
-                const result = await messagePostHandler(userId, serverId, channelId, fileUrl, content); 
+                const result = await messagePostHandler(params); 
 
                 const channelKey = `chat:${channelId}:messages`;
                 io.emit(channelKey, result);
@@ -213,11 +216,16 @@
             if (!channelId) return { status: 400, error: 'Channel Id missing!'};
             if (!content) return { status: 400, error: 'No content in replacement!'};
 
-            const response = messageEditHandler(userId, messageId, serverId, channelId, content, method)
+            const params = { 
+                userId, messageId, serverId, channelId, content, method
+            }
+
+            const response = messageEditHandler(params)
 
             return response;
 
         })
+        
         socket.on('disconnect', () => {
             console.log('User ' + session?.user?.username || 'Unknown' + ' disconnected');
             activeSessions.delete(socket.id);
