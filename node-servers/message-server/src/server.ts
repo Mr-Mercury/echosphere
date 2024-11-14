@@ -11,7 +11,7 @@
     import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
     import type { Session } from "@auth/express";
     import type { JWT } from "next-auth/jwt";
-    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/server-types.js";
+    import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/types.js";
 
 
 
@@ -143,11 +143,20 @@
             //TODO: Start here to address message posting issues (this is the route for bots)
             const session = await getSession(req, AuthConfig);
 
-            if (!session) return res.status(401).json({ error: 'Session Missing!'});
-            if (!serverId) return res.status(400).json({ error: 'Missing server ID!'});
-            if (!channelId) return res.status(400).json({ error: 'Missing channel ID!'});
+            if (!session) return res.status(401).json({ error: 'Session Missing!' });
+            if (!serverId) return res.status(400).json({ error: 'Missing server ID! '});
+            if (!channelId) return res.status(400).json({ error: 'Missing channel ID!' });
+            if (!session?.user?.id) return res.status(400).json({ error: 'Missing User ID!' });
+            if (typeof serverId !== 'string' || typeof channelId !== 'string') {
+                return res.status(400).json({ error: 'Invalid server or channel ID format' });
+            }
 
-            const result = await messagePostHandler(session?.user?.id, serverId, channelId, fileUrl, content);
+            const params = { 
+                userId: session.user.id,
+                serverId, channelId, fileUrl, content
+            }
+
+            const result = await messagePostHandler(params);
 
             if (result.status === 200) {
                 const channelKey = `chat:${channelId}:messages`

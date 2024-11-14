@@ -1,7 +1,7 @@
 import { getSession } from "@auth/express";
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
-import type { ChatSocket } from "./entities/server-types.js";
+import type { ChatSocket } from "./entities/server-types.ts";
 
 dotenv.config();
 
