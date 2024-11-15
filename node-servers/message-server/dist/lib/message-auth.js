@@ -1,35 +1,31 @@
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
 dotenv.config();
-export async function authenticateSocketSession(
-//@ts-ignore
-socket) {
+export async function authenticateSocketSession(socket) {
     try {
         const cookies = socket.handshake.headers.cookie;
+        // Properly type the headers object
+        const headers = {
+            'Content-Type': 'application/json',
+            'Cookie': cookies || ''
+        };
         const response = await fetch('http://localhost:4000/authenticate', {
             method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-                'Cookie': cookies
-            }
+            headers
         });
         const data = await response.json();
-        //@ts-ignore
-        if (response.ok && data.session.user) {
-            //@ts-ignore
+        if (response.ok && data.session?.user) {
             return data.session;
         }
         else {
-            //@ts-ignore
             throw new Error(data.error || 'Authentication failed');
         }
-        ;
     }
     catch (error) {
         console.log('MESSAGE AUTH FAILURE: ' + error);
+        throw error;
     }
 }
-//@ts-ignore
 export async function socketAuthMiddleware(socket, next) {
     try {
         let session = activeSessions.get(socket.id);
@@ -42,30 +38,42 @@ export async function socketAuthMiddleware(socket, next) {
                 throw new Error('Authentication failed');
             }
         }
-        socket.session = session;
+        socket.data.session = session;
         next();
     }
     catch (error) {
         console.log('MESSAGE AUTH MIDDLEWARE ERROR: ' + error);
-        next(new Error('Unauthorized: ' + error));
+        next(new Error(`Unauthorized: ${error}`));
     }
 }
-//@ts-ignore
+function isSessionExpired(sessionData) {
+    //Null check
+    if (!sessionData?.expires) {
+        return true;
+    }
+    return new Date(sessionData.expires) < new Date();
+}
 export function scheduleSessionRecheck(socket) {
-    socket.sessionInterval = setInterval(async () => {
+    const interval = setInterval(async () => {
         try {
-            const sessionData = await authenticateSocketSession(socket); //@ts-ignore
-            const isSessionExpired = sessionData => new Date() > new Date(sessionData.session.expires);
-            //@ts-ignore
-            if (sessionData && !isSessionExpired)
-                console.log('Session revalidation successful for user ', sessionData.user.id);
-            else
-                throw new Error('Session Invalid or Expired');
+            const currentSession = socket.data.session;
+            if (!currentSession) {
+                socket.disconnect();
+                return;
+            }
+            if (isSessionExpired(currentSession)) {
+                console.log('Session expired for user ', currentSession?.user?.username || 'Unknown User');
+                socket.disconnect();
+                return;
+            }
+            //TODO: insert refresh logic here?  Or maybe call a separate function
+            // Remember to add code on frontend to refresh session if it expires
         }
         catch (error) {
-            console.log('Session revalidation failed: ', error);
-            socket.disconnect(true);
+            console.error('Session revalidation error: ', error);
+            socket.disconnect();
         }
-    }, 1800000); // 30 minutes in milliseconds
+    }, 5 * 60 * 1000); // TODO: Check best practicies (5 mins atm)
+    socket.data.sessionInterval = interval;
 }
 //# sourceMappingURL=message-auth.js.map

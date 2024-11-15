@@ -119,7 +119,7 @@
         credentials: true,
     }))
 
-    // Auth logic here 
+    // Auth logic starts here 
 
     app.post('/authenticate', async (req, res) => {
         try {
@@ -168,6 +168,8 @@
         }
     })
 
+    // Socket logic starts here
+    
     io.use(socketAuthMiddleware);
 
 

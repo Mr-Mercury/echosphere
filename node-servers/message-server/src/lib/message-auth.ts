@@ -1,4 +1,5 @@
 import { getSession } from "@auth/express";
+import { Session } from "@auth/express";
 import activeSessions from "../util/sessionStore.js";
 import dotenv from 'dotenv';
 import type { ChatSocket } from "./entities/server-types.ts";
@@ -60,21 +61,37 @@ export async function socketAuthMiddleware(
   }
 }
 
+function isSessionExpired(sessionData: Session | null): boolean {
+  //Null check
+  if (!sessionData?.expires) {
+    return true;
+  }
+  return new Date(sessionData.expires) < new Date();
+}
 export function scheduleSessionRecheck(socket: ChatSocket) {
-  socket.data.sessionInterval = setInterval(async () => {
+  const interval = setInterval(async () => {
     try {
-      const sessionData = await authenticateSocketSession(socket);
-      const isSessionExpired = (sessionData: any) => 
-        new Date() > new Date(sessionData.session.expires);
+      const currentSession = socket.data.session;
 
-      if (sessionData && !isSessionExpired(sessionData)) {
-        console.log('Session revalidation successful for user ', sessionData.user.id);
-      } else {
-        throw new Error('Session Invalid or Expired');
+      if (!currentSession) {
+        socket.disconnect();
+        return;
       }
+
+      if (isSessionExpired(currentSession)) {
+        console.log('Session expired for user ', currentSession?.user?.username || 'Unknown User');
+        socket.disconnect();
+        return;
+      }
+
+      //TODO: insert refresh logic here?  Or maybe call a separate function
+      // Remember to add code on frontend to refresh session if it expires
+
     } catch (error) {
-      console.log('Session revalidation failed: ', error);
-      socket.disconnect(true);
+      console.error('Session revalidation error: ', error);
+      socket.disconnect();
     }
-  }, 1800000); // 30 minutes in milliseconds
+  }, 5 * 60 * 1000); // TODO: Check best practicies (5 mins atm)
+
+  socket.data.sessionInterval = interval;
 }
