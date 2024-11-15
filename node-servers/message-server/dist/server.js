@@ -14,12 +14,11 @@ import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth
 dotenv.config();
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
-    providers: [
-    // Add the same providers if necessary
-    // TODO: Test with oAuth
-    ],
+    providers: [],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt(params) {
+            let token = params.token;
+            const { user } = params;
             if (user) {
                 token.sub = user.id;
                 token.username = user.username;
@@ -27,18 +26,19 @@ const AuthConfig = {
             }
             if (!token.sub)
                 return token;
-            const existingUser = await messageGetUserById(token.sub); // Ensure this utility is available
+            const existingUser = await messageGetUserById(token.sub);
             if (!existingUser)
                 return token;
             token.human = existingUser.human;
             token.username = existingUser.username;
             return token;
-        }, //@ts-ignore
-        async session({ session, token }) {
+        },
+        async session(params) {
+            const { session, token } = params;
             if (token.sub && session.user) {
                 session.user.id = token.sub;
             }
-            if (token.username && session.user) {
+            if (session.user) {
                 session.user.username = token.username;
                 session.user.human = token.human;
             }
@@ -61,7 +61,7 @@ app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
 }));
-// Auth logic here 
+// Auth logic starts here 
 app.post('/authenticate', async (req, res) => {
     try {
         const session = await getSession(req, AuthConfig);
@@ -86,28 +86,39 @@ app.post('/message', async (req, res) => {
         if (!session)
             return res.status(401).json({ error: 'Session Missing!' });
         if (!serverId)
-            return res.status(400).json({ error: 'Missing server ID!' });
+            return res.status(400).json({ error: 'Missing server ID! ' });
         if (!channelId)
             return res.status(400).json({ error: 'Missing channel ID!' });
-        const result = await messagePostHandler(session?.user?.id, serverId, channelId, fileUrl, content);
+        if (!session?.user?.id)
+            return res.status(400).json({ error: 'Missing User ID!' });
+        if (typeof serverId !== 'string' || typeof channelId !== 'string') {
+            return res.status(400).json({ error: 'Invalid server or channel ID format' });
+        }
+        const params = {
+            userId: session.user.id,
+            serverId, channelId, fileUrl, content
+        };
+        const result = await messagePostHandler(params);
+        if (result.status === 200) {
+            const channelKey = `chat:${channelId}:messages`;
+        }
         res.status(result.status).send(result.message);
     }
     catch (error) {
         console.log('MESSAGE SERVER POST ERROR');
     }
 });
+// Socket logic starts here
 io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
-    //@ts-ignore
-    const session = socket.session;
-    const username = session?.user.username;
+    const session = socket.data.session;
+    const username = session?.user?.username;
     // TODO: Null check here when adding guests
-    const userId = session?.user.id ?? 'Guest';
-    //@ts-ignore
+    const userId = session?.user?.id ?? 'Guest';
     console.log('User ' + (username || 'Unknown') + ' connected');
     scheduleSessionRecheck(socket);
     socket.on('message', async (data) => {
-        console.log('User ' + (session?.user.username || 'Unknown') + ' messaged');
+        console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
         try {
             const { query, values } = data;
             const { serverId, channelId } = query;
@@ -118,8 +129,11 @@ io.on('connection', (socket) => {
                 return { status: 400, error: 'Server Id missing!' };
             if (!channelId)
                 return { status: 400, error: 'Channel Id missing!' };
+            const params = {
+                userId, serverId, channelId, fileUrl, content
+            };
             // Send requred info to message Handler followed by emission & key
-            const result = await messagePostHandler(userId, serverId, channelId, fileUrl, content);
+            const result = await messagePostHandler(params);
             const channelKey = `chat:${channelId}:messages`;
             io.emit(channelKey, result);
             // Emit response from message handler
@@ -130,7 +144,7 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('alter', async (data) => {
-        console.log('User ' + session?.user.username || 'Unknown' + ' edited a message');
+        console.log('User ' + session?.user?.username || 'Unknown' + ' edited a message');
         const { query, content, messageId, method } = data;
         const { serverId, channelId } = query;
         if (!serverId)
@@ -139,14 +153,16 @@ io.on('connection', (socket) => {
             return { status: 400, error: 'Channel Id missing!' };
         if (!content)
             return { status: 400, error: 'No content in replacement!' };
-        const response = messageEditHandler(userId, messageId, serverId, channelId, content, method);
+        const params = {
+            userId, messageId, serverId, channelId, content, method
+        };
+        const response = messageEditHandler(params);
         return response;
     });
     socket.on('disconnect', () => {
-        console.log('User ' + session?.user.username || 'Unknown' + ' disconnected');
+        console.log('User ' + session?.user?.username || 'Unknown' + ' disconnected');
         activeSessions.delete(socket.id);
-        //@ts-ignore
-        clearInterval(socket.sessionInterval);
+        clearInterval(socket.data.sessionInterval);
     });
 });
 server.listen(port, () => {
