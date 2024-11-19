@@ -172,7 +172,8 @@
     
     io.use(socketAuthMiddleware);
 
-
+    // Join socket polling on connection based on user's server membership
+    // TODO: Create file in lib to handle this
     io.on('connection', (socket: ChatSocket) => {
         const session = socket.data.session;
         const username = session?.user?.username;
