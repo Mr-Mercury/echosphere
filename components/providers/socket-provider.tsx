@@ -2,12 +2,12 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io as ClientIo } from 'socket.io-client';
-import { Socket } from 'socket.io';
+import { Socket } from 'socket.io-client';
 // Workaround to access context via socket because context rerenders any dependent
 // components - forces rerenders based on incoming and outgoing data b/c context is updated
 
 type SocketContextType = {
-    socket: any | null;
+    socket: Socket | null;
     isConnected: boolean;
     disconnect: () => void;
 };

@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     const { onOpen } = useModal(); 
-    const { socket, isConnected } = useSocket();
+    const { socket } = useSocket();
     const router = useRouter();
 
 
@@ -41,14 +41,17 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            //TODO - use Querystring again
             const url = qs.stringifyUrl({
                 url: apiUrl,
                 query,
             });
-            
-            socket.emit('message', { query, values });
-            form.reset();
-            router.refresh();
+
+            if (socket) { 
+                socket.emit('message', { query, values });
+                form.reset();
+                router.refresh();
+            };
         } catch(error) {
             console.log(error);
         }
