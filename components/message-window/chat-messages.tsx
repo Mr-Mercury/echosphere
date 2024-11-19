@@ -11,6 +11,16 @@ import { useChatSocket } from "@/hooks/use-chat-socket";
 
 const DATE_FORMAT = 'd MMM yyyy, HH:mm';
 
+const formatMessageDate = (date: Date | string | null) => {
+    if (!date) return '';
+    
+    try {
+        return format(new Date(date), DATE_FORMAT);
+    } catch (error) {
+        console.error('Date formatting error:', error);
+        return '';
+    }
+}
 interface ChatMessagesProps {
     name: string;
     member: Member;
@@ -42,7 +52,7 @@ const ChatMessages = ({
     const queryKey = `chat:${chatId}`;
     const addKey = `chat:${chatId}:messages`;
     const updateKey = `chat:${chatId}:messages:update`;
-    
+
     const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} = useChatQuery({
         queryKey,
         messageApiUrl,
@@ -89,7 +99,7 @@ const ChatMessages = ({
                                 content={message.content}
                                 fileUrl={message.fileUrl}
                                 deleted={message.deleted}
-                                timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+                                timestamp={formatMessageDate(message.createdAt)}
                                 isUpdated={message.updatedAt !== message.createdAt}
                                 messageApiUrl={messageApiUrl}
                                 socketQuery={socketQuery} />
