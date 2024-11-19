@@ -34,7 +34,7 @@ export async function messagePostHandler(
 
     if (!channel) return {status: 404, error: 'Message Handler Error: Channel not found!'};
 
-    const member = server.members.find((member) => member.userId);
+    const member = server.members.find((member) => member.userId === userId);
 
     if (!member) return {status: 404, error: "Message Handler Error: User not found in Member list!"};
 

@@ -2,16 +2,20 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io as ClientIo } from 'socket.io-client';
+import { Socket } from 'socket.io';
 // Workaround to access context via socket because context rerenders any dependent
 // components - forces rerenders based on incoming and outgoing data b/c context is updated
+
 type SocketContextType = {
     socket: any | null;
     isConnected: boolean;
+    disconnect: () => void;
 };
 
-const SocketContext = createContext<SocketContextType>({
+export const SocketContext = createContext<SocketContextType>({
     socket: null,
     isConnected: false,
+    disconnect: () => {},
 })
 
 export const useSocket = () => {
@@ -19,8 +23,16 @@ export const useSocket = () => {
 }
 
 export const SocketProvider = ({children}: { children: React.ReactNode}) => {
-    const [socket, setSocket ] = useState(null);
+    const [socket, setSocket ] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
+
+    const disconnect = () => {
+        if (socket) {
+            socket.disconnect();
+            setSocket(null);
+            setIsConnected(false);
+        }
+    }
 
     useEffect(() => {
         //Sets up the socket instance - env variable so it remains flexible in dev vs deployed
@@ -47,7 +59,7 @@ export const SocketProvider = ({children}: { children: React.ReactNode}) => {
     }, []);
 
     return (
-        <SocketContext.Provider value={{socket, isConnected}}>
+        <SocketContext.Provider value={{socket, isConnected, disconnect}}>
             {children}
         </SocketContext.Provider>
     )
