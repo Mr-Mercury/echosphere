@@ -50,6 +50,8 @@ export const ChatItem = ({
     currentMember, isUpdated,
     messageApiUrl, socketQuery
 }: ChatItemProps) => {
+
+    if (!member || !currentMember) return null;
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const {socket} = useSocket();
@@ -109,8 +111,10 @@ export const ChatItem = ({
             })
 
             // await axios.patch(url, values);
+            if (socket) {
              socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT'});
              setIsEditing(false);
+            }
         } catch (error) {
             console.log(error);
         }
