@@ -223,7 +223,9 @@
                 userId, messageId, serverId, channelId, content, method
             }
 
-            const response = messageEditHandler(params)
+            const response = messageEditHandler(params);
+            const updateKey = `chat:${channelId}:messages:update`;
+            io.emit(updateKey, response);
 
             return response;
 

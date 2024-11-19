@@ -110,6 +110,8 @@ app.post('/message', async (req, res) => {
 });
 // Socket logic starts here
 io.use(socketAuthMiddleware);
+// Join socket polling on connection based on user's server membership
+// TODO: Create file in lib to handle this
 io.on('connection', (socket) => {
     const session = socket.data.session;
     const username = session?.user?.username;
@@ -157,6 +159,8 @@ io.on('connection', (socket) => {
             userId, messageId, serverId, channelId, content, method
         };
         const response = messageEditHandler(params);
+        const updateKey = `chat:${channelId}:messages:update`;
+        io.emit(updateKey, response);
         return response;
     });
     socket.on('disconnect', () => {
