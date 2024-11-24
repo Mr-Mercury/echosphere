@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useSocket } from "../providers/socket-provider";
 import { useRouter, useParams } from "next/navigation";
+import { useQueryClient } from '@tanstack/react-query';
 
 
 
@@ -66,6 +67,7 @@ export const ChatItem = ({
     const isImage = !isPDF && fileUrl;
     const params = useParams();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -104,19 +106,50 @@ export const ChatItem = ({
     const isLoading = form.formState.isSubmitting;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        try {
-            const url = qs.stringifyUrl({
-                url: `${messageApiUrl}/${id}`,
-                query: socketQuery
-            })
+        // Use the channelId from socketQuery as the queryKey
+        const queryKey = [socketQuery.channelId];
+        
+        console.log("About to update query with key:", queryKey);
+        console.log("Current data for this key:", queryClient.getQueryData(queryKey));
 
-            // await axios.patch(url, values);
+        try {
+            // Optimistically update first
+            queryClient.setQueryData(queryKey, (old: any) => {
+                if (!old?.pages) {
+                    console.log("No existing data found");
+                    return old;
+                }
+
+                return {
+                    ...old,
+                    pages: old.pages.map((page: any) => ({
+                        ...page,
+                        items: page.items.map((message: MessageWithMemberWithUser) => 
+                            message.id === id
+                                ? { 
+                                    ...message, 
+                                    content: values.content,
+                                    updatedAt: new Date().toISOString()
+                                  }
+                                : message
+                        )
+                    }))
+                };
+            });
+
+            // Then emit the socket event
             if (socket) {
-             socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT'});
-             setIsEditing(false);
+                socket.emit('alter', {
+                    query: socketQuery, 
+                    messageId: id, 
+                    content: values.content, 
+                    method: 'EDIT'
+                });
+                setIsEditing(false);
             }
         } catch (error) {
-            console.log(error);
+            console.log("Error during edit:", error);
+            // Could add error toast here
         }
     }
 

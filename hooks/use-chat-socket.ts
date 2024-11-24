@@ -8,6 +8,7 @@ type ChatSocketProps = {
     addKey: string;
     updateKey: string;
     queryKey: string;
+    refetch: () => void;
 }
 
 type MessageWithMemberWithUser = Message & {
@@ -17,7 +18,7 @@ type MessageWithMemberWithUser = Message & {
 }
 
 export const useChatSocket = ({
-    addKey, updateKey, queryKey,
+    addKey, updateKey, queryKey, refetch,
 }: ChatSocketProps) => {
     const {socket} = useSocket();
     const queryClient = useQueryClient();
@@ -48,6 +49,7 @@ export const useChatSocket = ({
                     pages: newData,
                 }      
             });
+            refetch();
         });
 
         socket.on(addKey, (message: MessageWithMemberWithUser) => {
@@ -72,6 +74,7 @@ export const useChatSocket = ({
                     pages: newData,
                 }
             });
+            refetch();
         });
         return () => {
             socket.off(updateKey);

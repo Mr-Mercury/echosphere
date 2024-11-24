@@ -39,15 +39,21 @@ export const SocketProvider = ({children}: { children: React.ReactNode}) => {
         // TODO: When deploying, for horizontal scaling, URL should be load balancer
         // Research whether including the path config option is best
         const socketInstance = new (ClientIo as any)(process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL!, {
-            withCredentials: true
+            withCredentials: true,
+            transports: ['websocket'],
         })
 
         socketInstance.on('connect', () => {
+            console.log('Connected to socket');
             setIsConnected(true);
         });
 
         socketInstance.on('disconnect', () => {
             setIsConnected(false);
+        });
+
+        socketInstance.on('error', (error: any) => {
+            console.error('Socket error:', error);
         });
 
         setSocket(socketInstance);

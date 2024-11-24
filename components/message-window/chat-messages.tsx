@@ -8,6 +8,7 @@ import { Fragment } from "react";
 import { ChatItem } from "./chat-item";
 import { format } from 'date-fns';
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { pages } from "next/dist/build/templates/app-page";
 
 const DATE_FORMAT = 'd MMM yyyy, HH:mm';
 
@@ -53,13 +54,13 @@ const ChatMessages = ({
     const addKey = `chat:${chatId}:messages`;
     const updateKey = `chat:${chatId}:messages:update`;
 
-    const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} = useChatQuery({
+    const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch} = useChatQuery({
         queryKey,
         messageApiUrl,
         paramKey,
         paramValue,
     });
-    useChatSocket({ queryKey, addKey, updateKey })
+    useChatSocket({ queryKey, addKey, updateKey, refetch })
 
     if (status === 'pending') {
         return (
@@ -88,24 +89,31 @@ const ChatMessages = ({
             <div className='flex-1'/>
             <ChatWelcome type={type} name={name} />
             <div className='flex flex-col-reverse mt-auto'>
-                {data?.pages?.map((group, index) => (
-                    <Fragment key={index}>
-                        {group.items.map((message: MessageWithMemberWithUser) => (
-                            <ChatItem 
-                                key={message.id}
-                                id={message.id}
-                                currentMember={member}
-                                member={message.member}
-                                content={message.content}
-                                fileUrl={message.fileUrl}
-                                deleted={message.deleted}
-                                timestamp={formatMessageDate(message.createdAt)}
-                                isUpdated={message.updatedAt !== message.createdAt}
-                                messageApiUrl={messageApiUrl}
-                                socketQuery={socketQuery} />
-                        ))}
-                    </Fragment>
-                ) )}
+                {data?.pages?.map((group, index) => {
+                    return (
+                        <Fragment key={index}>
+                            {group.items.map((message: MessageWithMemberWithUser) => {
+                                return (
+                                    message && message.id ? (
+                                        <ChatItem 
+                                            key={message.id}
+                                            id={message.id}
+                                            currentMember={member}
+                                            member={message.member}
+                                            content={message.content}
+                                            fileUrl={message.fileUrl}
+                                            deleted={message.deleted}
+                                            timestamp={formatMessageDate(message.createdAt)}
+                                            isUpdated={message.updatedAt !== message.createdAt}
+                                            messageApiUrl={messageApiUrl}
+                                            socketQuery={socketQuery}
+                                        />
+                                    ) : null
+                                );
+                            })}
+                        </Fragment>
+                    );
+                })}
             </div>
         </div>
     )
