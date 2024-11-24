@@ -145,6 +145,7 @@ export async function messageEditHandler (
                     }
                 }
             })
+            return {status: 200, message};
         }
 
         if (method === 'EDIT') {
@@ -165,12 +166,14 @@ export async function messageEditHandler (
                     }
                 }
             })
+
+            const updateKey = `chat:${channelId}:messages:update`;
+            return {status: 200, updateKey, message};
         }
 
-        const updateKey = `chat:${channelId}:messages:update`;
-
-        return {updateKey, message};
+        return {status: 400, error: 'Invalid method'};
     } catch (error) {
         console.log('EDIT MESSAGE HANDLER ERROR', error);
+        return {status: 500, error: 'Internal server error'};
     }
 }
