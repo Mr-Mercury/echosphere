@@ -50,8 +50,11 @@ export const ChatItem = ({
     currentMember, isUpdated,
     messageApiUrl, socketQuery
 }: ChatItemProps) => {
+    if (!id || !member || !currentMember) {
+        console.error('Missing required props:', { id, member, currentMember });
+        return null;
+    }
 
-    if (!member || !currentMember) return null;
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const {socket} = useSocket();

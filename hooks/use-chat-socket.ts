@@ -8,6 +8,7 @@ type ChatSocketProps = {
     addKey: string;
     updateKey: string;
     queryKey: string;
+    onError?: (error: any) => void;
 }
 
 type MessageWithMemberWithUser = Message & {
@@ -39,6 +40,7 @@ export const useChatSocket = ({
                             if (item.id === message.id) {
                                 return message;
                             }
+                            return item;
                         })
                     }
                 });
