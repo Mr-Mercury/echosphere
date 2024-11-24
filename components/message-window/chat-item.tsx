@@ -19,7 +19,15 @@ import { useSocket } from "../providers/socket-provider";
 import { useRouter, useParams } from "next/navigation";
 import { useQueryClient } from '@tanstack/react-query';
 
-
+interface MessageWithMemberWithUser {
+    id: string;
+    content: string;
+    member: Member & {
+        user: User;
+    };
+    updatedAt: string;
+    // Add other message properties as needed
+}
 
 interface ChatItemProps {
     id: string;
