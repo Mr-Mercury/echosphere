@@ -220,9 +220,14 @@
             if (!content) return { status: 400, error: 'No content in replacement!'};
 
             const params = { 
-                userId, messageId, serverId, channelId, content, method
+                userId, 
+                messageId, 
+                serverId, 
+                channelId, 
+                content, 
+                method
             }
-
+            console.log(params);
             const response = await messageEditHandler(params);
             const updateKey = `chat:${channelId}:messages:update`;
             io.emit(updateKey, response?.message);
