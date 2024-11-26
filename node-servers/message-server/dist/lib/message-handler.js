@@ -122,6 +122,9 @@ export async function messageEditHandler(params) {
                     }
                 }
             });
+            // Note to self - tanstack requires you to return the updateKey to trigger rerenders/updates
+            const updateKey = `chat:${channelId}:messages:update`;
+            return { status: 200, updateKey, message };
         }
         if (method === 'EDIT') {
             if (!isMessageOwner)
@@ -141,12 +144,14 @@ export async function messageEditHandler(params) {
                     }
                 }
             });
+            const updateKey = `chat:${channelId}:messages:update`;
+            return { status: 200, updateKey, message };
         }
-        const updateKey = `chat:${channelId}:messages:update`;
-        return { updateKey, message };
+        return { status: 400, error: 'Invalid method' };
     }
     catch (error) {
         console.log('EDIT MESSAGE HANDLER ERROR', error);
+        return { status: 500, error: 'Internal server error' };
     }
 }
 //# sourceMappingURL=message-handler.js.map

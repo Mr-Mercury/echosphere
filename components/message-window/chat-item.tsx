@@ -123,6 +123,35 @@ export const ChatItem = ({
         }
     }
 
+    const onDelete = async () => {
+        try {
+            console.log('Delete clicked, socket:', socket); 
+            setIsDeleting(true);
+            if (!socket) {
+                console.log('No socket connection!'); 
+                return;
+            }
+
+            console.log('Emitting alter event:', { // Debug log
+                query: socketQuery,
+                messageId: id,
+                method: 'DELETE'
+            });
+
+            socket.emit('alter', {
+                query: socketQuery,
+                messageId: id,
+                method: 'DELETE',
+                content: 'This message has been deleted' // or just leave it undefined since the handler sets it
+            });
+
+            setIsDeleting(false);
+        } catch (error) {
+            console.log('DELETE ERROR:', error);
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className='relative group flex items-center hover:bg-black/5 p-4 transition w-full'>
             <div className='group flex gap-x-2 items-start w-full'>
@@ -218,10 +247,13 @@ export const ChatItem = ({
                         </NavTooltip>
                     )}
                     {canDeleteMessage && (
-                        <NavTooltip label='Edit'>
+                        <NavTooltip label='Delete'>
                             <Trash className='cursor-pointer ml-auto w-4 h-4
                             text-zinc-500 hover:text-zinc-300 transition'
-                            onClick={() => setIsDeleting(true)}/>
+                            onClick={() => {
+                                setIsDeleting(true);
+                                onDelete();
+                            }}/>
                         </NavTooltip>
                     )}
                     

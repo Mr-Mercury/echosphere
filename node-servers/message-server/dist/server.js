@@ -156,11 +156,17 @@ io.on('connection', (socket) => {
         if (!content)
             return { status: 400, error: 'No content in replacement!' };
         const params = {
-            userId, messageId, serverId, channelId, content, method
+            userId,
+            messageId,
+            serverId,
+            channelId,
+            content,
+            method
         };
-        const response = messageEditHandler(params);
+        console.log(params);
+        const response = await messageEditHandler(params);
         const updateKey = `chat:${channelId}:messages:update`;
-        io.emit(updateKey, response);
+        io.emit(updateKey, response?.message);
         return response;
     });
     socket.on('disconnect', () => {

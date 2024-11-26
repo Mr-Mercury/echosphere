@@ -145,7 +145,9 @@ export async function messageEditHandler (
                     }
                 }
             })
-            return {status: 200, message};
+            // Note to self - tanstack requires you to return the updateKey to trigger rerenders/updates
+            const updateKey = `chat:${channelId}:messages:update`;
+            return {status: 200, updateKey, message};
         }
 
         if (method === 'EDIT') {
