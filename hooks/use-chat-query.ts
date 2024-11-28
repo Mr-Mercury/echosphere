@@ -31,12 +31,12 @@ export const useChatQuery = ({queryKey, paramKey, messageApiUrl, paramValue}: Ch
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        status
+        status,
+        isPending
     } = useInfiniteQuery({
         queryKey: [queryKey],
         queryFn: fetchMessages,
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        // Polling for when socket doesn't work
         refetchInterval: isConnected? false: 1000,
         initialPageParam: undefined,
     });
@@ -46,6 +46,7 @@ export const useChatQuery = ({queryKey, paramKey, messageApiUrl, paramValue}: Ch
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        status
+        status,
+        isPending
     }
 }
