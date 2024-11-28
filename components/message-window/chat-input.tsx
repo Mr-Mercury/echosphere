@@ -53,7 +53,7 @@ export const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                 router.refresh();
             };
         } catch(error) {
-            console.log(error);
+                (error);
         }
     }
 

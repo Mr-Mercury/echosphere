@@ -122,6 +122,7 @@ io.on('connection', (socket) => {
     socket.on('message', async (data) => {
         console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
         try {
+            console.log(data);
             const { query, values } = data;
             const { serverId, channelId } = query;
             //TODO: add fileUrl for socket to frontend
@@ -136,8 +137,10 @@ io.on('connection', (socket) => {
             };
             // Send requred info to message Handler followed by emission & key
             const result = await messagePostHandler(params);
+            console.log('This is the result: ', result);
             const channelKey = `chat:${channelId}:messages`;
-            io.emit(channelKey, result);
+            console.log('This is the channel key: ', channelKey);
+            io.emit(channelKey, result.message);
             // Emit response from message handler
         }
         catch (error) {

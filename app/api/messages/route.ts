@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 
 //TODO: CHANGE THIS TO BE HIGHER AFTER TESTING
-const NUMBER_OF_MESSAGES = 15;
+const NUMBER_OF_MESSAGES = 10;
 
 export async function GET(
     req: Request

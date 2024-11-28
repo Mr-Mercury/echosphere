@@ -1,6 +1,8 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 export async function messagePostHandler(params) {
+    console.log('In message post handler');
+    console.log('params: ', params);
     const { userId, serverId, channelId, fileUrl, content } = params;
     // Save to DB
     const server = await db.server.findFirst({
@@ -44,6 +46,7 @@ export async function messagePostHandler(params) {
             }
         }
     });
+    console.log('Message Post Handlermessage: ', message);
     return { status: 200, message };
     // Send back response with message
 }
