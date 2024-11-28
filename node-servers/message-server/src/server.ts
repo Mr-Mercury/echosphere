@@ -200,9 +200,8 @@
                 }  
                 // Send requred info to message Handler followed by emission & key
                 const result = await messagePostHandler(params); 
-
                 const channelKey = `chat:${channelId}:messages`;
-                io.emit(channelKey, result);
+                io.emit(channelKey, result.message);
                 // Emit response from message handler
             } catch (error) {
                 console.log('SOCKET MESSAGE POST ERROR: ', error);
@@ -227,7 +226,6 @@
                 content, 
                 method
             }
-            console.log(params);
             const response = await messageEditHandler(params);
             const updateKey = `chat:${channelId}:messages:update`;
             io.emit(updateKey, response?.message);
