@@ -1,4 +1,6 @@
 import ChatHeader from "@/components/message-window/chat-header";
+import ChatMessages from "@/components/message-window/chat-messages";
+import ChatInput from "@/components/message-window/chat-input";
 import { db } from "@/lib/db/db";
 import { conversationUtil } from "@/lib/utilities/conversation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
@@ -11,6 +13,9 @@ interface MemberIdPageProps {
         serverId: string;
     }
 }
+
+const messageApiUrl = process.env.NEXT_PUBLIC_MESSAGE_API_URL as string;
+
 
 const MemberIdPage = async ({params}: MemberIdPageProps) => {
 
@@ -41,10 +46,27 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
 
     return (
         <div className='bg-[#313338] flex flex-col h-full'>
-            <ChatHeader imageUrl={otherMember.user.image} 
-            name={otherMember.user.username}
+            <ChatHeader imageUrl={otherMember!.user!.image!} 
+            name={otherMember!.user!.username!}
             serverId={params.serverId}
             type='dm'/>
+            <ChatMessages 
+                member={currentMember} 
+                name={otherMember.user.username!}
+                chatId={conversation.id}
+                messageApiUrl={messageApiUrl}
+                /* TODO: START HERE - socketQuery props need to be figured out for individual dms */ 
+                socketQuery={{ conversationId: conversation.id }}
+                paramKey='conversationId'
+                paramValue={conversation.id}
+                type='dm'
+            />
+            <ChatInput 
+                apiUrl={messageApiUrl}
+                query={ {conversationId: conversation.id} }                
+                name={otherMember.user.username!}
+                type='dm'
+            />
         </div>
     )
 }

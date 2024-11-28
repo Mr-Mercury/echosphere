@@ -1,5 +1,5 @@
 import ChatHeader from "@/components/message-window/chat-header";
-import { ChatInput } from "@/components/message-window/chat-input";
+import ChatInput from "@/components/message-window/chat-input";
 import ChatMessages from "@/components/message-window/chat-messages";
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
