@@ -45,7 +45,7 @@ const formSchema = z.object({
     content: z.string().min(1),
 });
 
-export const ChatItem = ({
+const ChatItem = ({
     id, content, member, timestamp, fileUrl, deleted, 
     currentMember, isUpdated,
     messageApiUrl, socketQuery
@@ -262,3 +262,5 @@ export const ChatItem = ({
         </div>
     )
 }
+
+export default ChatItem;

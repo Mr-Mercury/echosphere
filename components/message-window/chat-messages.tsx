@@ -1,13 +1,14 @@
 'use client';
 
+import ChatItem from "./chat-item";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
 import { Loader2, ServerCrash } from "lucide-react";
 import { Member, Message, User } from "@prisma/client";
 import { Fragment, useRef, ElementRef, useEffect } from "react";
-import { ChatItem } from "./chat-item";
 import { format } from 'date-fns';
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 const DATE_FORMAT = 'd MMM yyyy, HH:mm';
 
@@ -79,33 +80,14 @@ const ChatMessages = ({
             console.error("Socket error:", error);
         }
     });
-    // TODO: Replace the useEffect with something less performance intensive - try using
-    // tanstack query's onSettled or onSuccess ! 
 
-    useEffect(() => {
-        const bottomElement = bottomRef?.current;
-        const chatElement = chatRef?.current;
-
-        const shouldAutoScroll = () => {
-            if (!chatElement) return false;
-            
-            if (status === 'pending' || isFetchingNextPage) return false;
-            
-            if (status === 'success' && data?.pages?.[0]?.items?.length) return true;
-
-            const distanceFromBottom = 
-                chatElement.scrollHeight - chatElement.scrollTop - chatElement.clientHeight;
-            return distanceFromBottom <= 100;
-        };
-
-        if (bottomElement && shouldAutoScroll()) {
-            setTimeout(() => {
-                bottomElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }, 100);
-        }
-    }, [status, data, isPending, isFetchingNextPage]);
+    useChatScroll({
+        chatRef,
+        bottomRef,
+        shouldLoadMore: hasNextPage,
+        loadMore: fetchNextPage,
+        count: data?.pages?.[0]?.items?.length || 0,
+    });
 
     if (status === 'pending') {
         return (
