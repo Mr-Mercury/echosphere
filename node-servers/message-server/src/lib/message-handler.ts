@@ -1,14 +1,27 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 import { MessagePostHandlerParams, MessageEditHandlerParams,
-    MessageResponse, MessageUpdateResponse } from "./entities/message-handler-types.js";
+    MessageResponse, MessageUpdateResponse, ChannelPostHandlerParams, DmPostHandlerParams } from "./entities/message-handler-types.js";
+
 
 
 export async function messagePostHandler( 
     params: MessagePostHandlerParams) 
 {
+    const { type } = params;
+    
+    if (type === 'channel') {
+        return channelPostHandler(params as ChannelPostHandlerParams);
+    } else if (type === 'dm') {
+        return dmPostHandler(params as DmPostHandlerParams);
+    }
+
+    return { status: 400, error: 'Invalid message type!'};
+}
+
+async function channelPostHandler(params: ChannelPostHandlerParams) {
     const { userId, serverId, channelId, fileUrl, content } = params;
-    // Save to DB
+
     const server = await db.server.findFirst({
         where: {
             id: serverId as string,
@@ -55,7 +68,11 @@ export async function messagePostHandler(
     });
 
     return {status: 200, message}
-    // Send back response with message
+}
+
+async function dmPostHandler(params: DmPostHandlerParams) {
+    const { userId, conversationId, fileUrl, content } = params;
+    
 }
 
 export async function messageEditHandler ( 

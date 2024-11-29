@@ -10,11 +10,28 @@ interface MessageWithMember extends Message {
 }
 export type MessagePostHandlerParams = {
     userId: string;
-    serverId: string;
-    channelId: string;
+    serverId: string | null;
+    channelId: string | null;
+    conversationId: string | null;
     fileUrl: string | null;
     content: string;
+    type: 'channel' | 'dm';
 }
+
+export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
+    type: 'channel';
+    serverId: string;
+    channelId: string;
+    conversationId: null;
+}
+
+export type DmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
+    type: 'dm';
+    serverId: null;
+    channelId: null;
+    conversationId: string;
+}
+
 // TODO - remove nulls from userId
 export type MessageEditHandlerParams = {
     userId: string;
