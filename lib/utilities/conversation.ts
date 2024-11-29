@@ -1,10 +1,12 @@
 import { db } from "../db/db"
 
 export const conversationUtil = async (memberOneId: string, memberTwoId: string) => {
+
     let conversation = await findConversation(memberOneId, memberTwoId) || 
-    await findConversation(memberTwoId, memberOneId);
+        await findConversation(memberTwoId, memberOneId);
 
     if (!conversation) {
+        console.log('No existing conversation found, creating new one');
         conversation = await createConversation(memberOneId, memberTwoId);
     }
 
