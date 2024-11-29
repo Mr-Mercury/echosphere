@@ -48,7 +48,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
             });
 
             if (socket) { 
-                socket.emit('message', { query, values });
+                socket.emit('message', { query, values, type });
                 form.reset();
                 router.refresh();
             };
