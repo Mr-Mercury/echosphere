@@ -215,18 +215,13 @@
                 if (type === 'dm') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     channelKey = `chat:${conversationId}:messages`;
-                    console.log('in dm')
-                    console.log(data);
-                    console.log(channelKey);
                 }
 
                 const params = { 
                     userId, serverId, channelId, conversationId, fileUrl, content, type 
                 };
-                console.log(params);
                 // Send required info to message Handler followed by emission & key
                 const result = await messagePostHandler(params);
-                console.log(result);
                 if (!channelKey) return { status: 400, error: 'Channel key is undefined!'};
                 io.emit(channelKey, result.message);
             } catch (error) {
@@ -237,8 +232,9 @@
 
         socket.on('alter', async (data) => {
             console.log('User ' + session?.user?.username || 'Unknown' + ' edited a message');
-            const {query, content, messageId, method} = data;
+            const {query, content, messageId, method, type, conversationId} = data;
             const { serverId, channelId } = query;
+            let updateKey;
             
             if (!serverId) return { status: 400, error: 'Server Id missing!'};
             if (!channelId) return { status: 400, error: 'Channel Id missing!'};
@@ -249,12 +245,26 @@
                 messageId, 
                 serverId, 
                 channelId, 
+                conversationId,
                 content, 
-                method
+                method,
+                type
             }
 
+            if (type === 'channel') {
+                if (!serverId) return { status: 400, error: 'Server Id missing!'};
+                if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                updateKey = `chat:${channelId}:messages:update`;
+            }
+
+            if (type === 'dm') {
+                if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                updateKey = `chat:${conversationId}:messages:update`;
+            }
+
+            if (!updateKey) return { status: 400, error: 'Update key is undefined!'};
+
             const response = await messageEditHandler(params);
-            const updateKey = `chat:${channelId}:messages:update`;
             io.emit(updateKey, response?.message);
 
             return response;

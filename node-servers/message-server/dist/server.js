@@ -153,17 +153,12 @@ io.on('connection', (socket) => {
                 if (!conversationId)
                     return { status: 400, error: 'Conversation Id missing!' };
                 channelKey = `chat:${conversationId}:messages`;
-                console.log('in dm');
-                console.log(data);
-                console.log(channelKey);
             }
             const params = {
                 userId, serverId, channelId, conversationId, fileUrl, content, type
             };
-            console.log(params);
             // Send required info to message Handler followed by emission & key
             const result = await messagePostHandler(params);
-            console.log(result);
             if (!channelKey)
                 return { status: 400, error: 'Channel key is undefined!' };
             io.emit(channelKey, result.message);

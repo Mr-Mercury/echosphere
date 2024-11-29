@@ -57,12 +57,6 @@ async function channelPostHandler(params) {
 }
 async function dmPostHandler(params) {
     const { userId, conversationId, fileUrl, content } = params;
-    console.log('DM Post Handler params:', {
-        userId,
-        conversationId,
-        hasFileUrl: !!fileUrl,
-        hasContent: !!content
-    });
     if (!conversationId)
         return { status: 400, error: 'Conversation ID missing!' };
     if (!content && !fileUrl)
@@ -71,8 +65,16 @@ async function dmPostHandler(params) {
         where: {
             id: conversationId,
             OR: [
-                { memberOneId: userId },
-                { memberTwoId: userId },
+                {
+                    memberOne: {
+                        userId: userId
+                    }
+                },
+                {
+                    memberTwo: {
+                        userId: userId
+                    }
+                }
             ]
         },
         include: {
@@ -88,11 +90,6 @@ async function dmPostHandler(params) {
             },
         }
     });
-    console.log('Found conversation:', conversation ? {
-        id: conversation.id,
-        memberOneId: conversation.memberOneId,
-        memberTwoId: conversation.memberTwoId
-    } : null);
     if (!conversation)
         return { status: 404, error: 'Conversation not found!' };
     const member = conversation?.memberOne.userId === userId ?

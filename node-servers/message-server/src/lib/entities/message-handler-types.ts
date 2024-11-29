@@ -36,10 +36,26 @@ export type DmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serve
 export type MessageEditHandlerParams = {
     userId: string;
     messageId: string;
+    serverId: string | null;
+    channelId: string | null;
+    conversationId: string | null;
+    content: string;
+    type: string;
+    method: 'DELETE' | 'EDIT';
+}
+
+export type ChannelEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'channel';
     serverId: string;
     channelId: string;
-    content: string;
-    method: 'DELETE' | 'EDIT';
+    conversationId: null;
+}
+
+export type DmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'dm';
+    serverId: null;
+    channelId: null;
+    conversationId: string;
 }
 
 export interface MessageResponse {
