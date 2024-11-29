@@ -1,6 +1,6 @@
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
-import { Message } from "@prisma/client";
+import { Dm } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const NUMBER_OF_MESSAGES = 10;
@@ -13,22 +13,22 @@ export async function GET(
         const { searchParams } = new URL(req.url);
 
         const cursor = searchParams.get('cursor');
-        const channelId = searchParams.get('channelId');
+        const conversationId = searchParams.get('conversationId');
         
         if (!user) return new NextResponse('Unauthorized', {status: 401});
-        if (!channelId) return new NextResponse('Channel ID missing!', {status: 400});
+        if (!conversationId) return new NextResponse('Conversation ID missing!', {status: 400});
 
-        let messages: Message[] = [];
+        let messages: Dm[] = [];
 
         if (cursor) {
-            messages = await db.message.findMany({
+            messages = await db.dm.findMany({
                 take: NUMBER_OF_MESSAGES,
                 skip: 1,
                 cursor: {
                     id: cursor,
                 },
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -42,10 +42,10 @@ export async function GET(
                 }
             })
         } else {
-            messages = await db.message.findMany({
+            messages = await db.dm.findMany({
                 take: NUMBER_OF_MESSAGES,
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -72,7 +72,7 @@ export async function GET(
         })
 
     } catch (error) {
-        console.log('MESSAGES GET ERROR: ', error);
+        console.log('DIRECT MESSAGES GET ERROR: ', error);
         return new NextResponse('Interal Error', {status: 500})
     }
 }

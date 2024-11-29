@@ -15,7 +15,7 @@ interface MemberIdPageProps {
 }
 
 const messageHandlerApiUrl = process.env.NEXT_PUBLIC_MESSAGE_HANDLER_URL as string;
-const messageApiUrl = process.env.NEXT_PUBLIC_MESSAGE_API_URL as string;
+const dmApiUrl = process.env.NEXT_PUBLIC_DM_API_URL as string;
 
 const MemberIdPage = async ({params}: MemberIdPageProps) => {
 
@@ -54,7 +54,7 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
                 member={currentMember} 
                 name={otherMember.user.username!}
                 chatId={conversation.id}
-                messageApiUrl={messageApiUrl}
+                messageApiUrl={dmApiUrl}
                 socketQuery={{ conversationId: conversation.id }}
                 paramKey='conversationId'
                 paramValue={conversation.id}

@@ -72,7 +72,67 @@ async function channelPostHandler(params: ChannelPostHandlerParams) {
 
 async function dmPostHandler(params: DmPostHandlerParams) {
     const { userId, conversationId, fileUrl, content } = params;
+
+    console.log('DM Post Handler params:', {
+        userId,
+        conversationId,
+        hasFileUrl: !!fileUrl,
+        hasContent: !!content
+    });
+
+    if (!conversationId) return {status: 400, error: 'Conversation ID missing!'};
+    if (!content && !fileUrl) return {status: 400, error: 'No content or file URL provided!'};
+
+    const conversation = await db.conversation.findFirst({
+        where: {
+            id: conversationId as string,
+            OR: [
+                {memberOneId: userId},
+                {memberTwoId: userId},
+            ]
+        }, 
+        include: {
+            memberOne: {
+                include: {
+                    user: true,
+                }
+            },
+            memberTwo: {
+                include: {
+                    user: true,
+                }
+            },
+        }
+    })
+
+    console.log('Found conversation:', conversation ? {
+        id: conversation.id,
+        memberOneId: conversation.memberOneId,
+        memberTwoId: conversation.memberTwoId
+    } : null);
+
+    if (!conversation) return {status: 404, error: 'Conversation not found!'};
+
+    const member = conversation?.memberOne.userId === userId ? 
+    conversation.memberOne : conversation.memberTwo;
     
+    const message = await db.dm.create({
+        data: {
+            content,
+            fileUrl,
+            conversationId: conversationId as string,
+            memberId: member.id,
+        },
+        include: {
+            member: {
+                include: {
+                    user: true,
+                }
+            }
+        }
+    });
+
+    return {status: 200, message};
 }
 
 export async function messageEditHandler ( 
