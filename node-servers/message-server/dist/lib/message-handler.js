@@ -1,10 +1,17 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 export async function messagePostHandler(params) {
-    console.log('In message post handler');
-    console.log('params: ', params);
+    const { type } = params;
+    if (type === 'channel') {
+        return channelPostHandler(params);
+    }
+    else if (type === 'dm') {
+        return dmPostHandler(params);
+    }
+    return { status: 400, error: 'Invalid message type!' };
+}
+async function channelPostHandler(params) {
     const { userId, serverId, channelId, fileUrl, content } = params;
-    // Save to DB
     const server = await db.server.findFirst({
         where: {
             id: serverId,
@@ -46,9 +53,66 @@ export async function messagePostHandler(params) {
             }
         }
     });
-    console.log('Message Post Handlermessage: ', message);
     return { status: 200, message };
-    // Send back response with message
+}
+async function dmPostHandler(params) {
+    const { userId, conversationId, fileUrl, content } = params;
+    console.log('DM Post Handler params:', {
+        userId,
+        conversationId,
+        hasFileUrl: !!fileUrl,
+        hasContent: !!content
+    });
+    if (!conversationId)
+        return { status: 400, error: 'Conversation ID missing!' };
+    if (!content && !fileUrl)
+        return { status: 400, error: 'No content or file URL provided!' };
+    const conversation = await db.conversation.findFirst({
+        where: {
+            id: conversationId,
+            OR: [
+                { memberOneId: userId },
+                { memberTwoId: userId },
+            ]
+        },
+        include: {
+            memberOne: {
+                include: {
+                    user: true,
+                }
+            },
+            memberTwo: {
+                include: {
+                    user: true,
+                }
+            },
+        }
+    });
+    console.log('Found conversation:', conversation ? {
+        id: conversation.id,
+        memberOneId: conversation.memberOneId,
+        memberTwoId: conversation.memberTwoId
+    } : null);
+    if (!conversation)
+        return { status: 404, error: 'Conversation not found!' };
+    const member = conversation?.memberOne.userId === userId ?
+        conversation.memberOne : conversation.memberTwo;
+    const message = await db.dm.create({
+        data: {
+            content,
+            fileUrl,
+            conversationId: conversationId,
+            memberId: member.id,
+        },
+        include: {
+            member: {
+                include: {
+                    user: true,
+                }
+            }
+        }
+    });
+    return { status: 200, message };
 }
 export async function messageEditHandler(params) {
     const { userId, messageId, serverId, channelId, content, method } = params;

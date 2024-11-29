@@ -2,7 +2,7 @@ import { db } from "../db/db"
 
 export const conversationUtil = async (memberOneId: string, memberTwoId: string) => {
     let conversation = await findConversation(memberOneId, memberTwoId) || 
-    await findConversation(memberOneId, memberTwoId);
+    await findConversation(memberTwoId, memberOneId);
 
     if (!conversation) {
         conversation = await createConversation(memberOneId, memberTwoId);

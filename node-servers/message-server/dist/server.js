@@ -77,10 +77,11 @@ app.post('/authenticate', async (req, res) => {
         res.status(401).json({ error: 'Authentication failed' });
     }
 });
+// BOT POSTING ROUTE
 app.post('/message', async (req, res) => {
     try {
         const { content, fileUrl } = req.body;
-        const { channelId, serverId } = req.query;
+        const { channelId, serverId, conversationId } = req.query;
         //TODO: Start here to address message posting issues (this is the route for bots)
         const session = await getSession(req, AuthConfig);
         if (!session)
@@ -96,12 +97,20 @@ app.post('/message', async (req, res) => {
         }
         const params = {
             userId: session.user.id,
-            serverId, channelId, fileUrl, content
+            serverId,
+            channelId,
+            conversationId: conversationId?.toString() || null,
+            fileUrl,
+            content,
+            type: conversationId ? 'dm' : 'channel'
         };
+        //@ts-ignore
         const result = await messagePostHandler(params);
+        //@ts-ignore
         if (result.status === 200) {
             const channelKey = `chat:${channelId}:messages`;
         }
+        //@ts-ignore
         res.status(result.status).send(result.message);
     }
     catch (error) {
@@ -122,26 +131,42 @@ io.on('connection', (socket) => {
     socket.on('message', async (data) => {
         console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
         try {
-            console.log(data);
-            const { query, values } = data;
-            const { serverId, channelId } = query;
+            const { query, values, type } = data;
+            const { serverId, channelId, conversationId } = query;
             //TODO: add fileUrl for socket to frontend
             const fileUrl = values.fileUrl;
             const content = values.content;
-            if (!serverId)
-                return { status: 400, error: 'Server Id missing!' };
-            if (!channelId)
-                return { status: 400, error: 'Channel Id missing!' };
+            let channelKey;
+            if (type !== 'dm' && type !== 'channel')
+                return { status: 400, error: 'Invalid message type!' };
+            if (type === 'channel') {
+                if (!serverId)
+                    return { status: 400, error: 'Server Id missing!' };
+                if (!channelId)
+                    return { status: 400, error: 'Channel Id missing!' };
+                channelKey = `chat:${channelId}:messages`;
+                console.log('in channel');
+                console.log(data);
+                console.log(channelKey);
+            }
+            if (type === 'dm') {
+                if (!conversationId)
+                    return { status: 400, error: 'Conversation Id missing!' };
+                channelKey = `chat:${conversationId}:messages`;
+                console.log('in dm');
+                console.log(data);
+                console.log(channelKey);
+            }
             const params = {
-                userId, serverId, channelId, fileUrl, content
+                userId, serverId, channelId, conversationId, fileUrl, content, type
             };
-            // Send requred info to message Handler followed by emission & key
+            console.log(params);
+            // Send required info to message Handler followed by emission & key
             const result = await messagePostHandler(params);
-            console.log('This is the result: ', result);
-            const channelKey = `chat:${channelId}:messages`;
-            console.log('This is the channel key: ', channelKey);
+            console.log(result);
+            if (!channelKey)
+                return { status: 400, error: 'Channel key is undefined!' };
             io.emit(channelKey, result.message);
-            // Emit response from message handler
         }
         catch (error) {
             console.log('SOCKET MESSAGE POST ERROR: ', error);
@@ -166,7 +191,6 @@ io.on('connection', (socket) => {
             content,
             method
         };
-        console.log(params);
         const response = await messageEditHandler(params);
         const updateKey = `chat:${channelId}:messages:update`;
         io.emit(updateKey, response?.message);
