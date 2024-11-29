@@ -136,10 +136,11 @@
         }
     });
 
+    // BOT POSTING ROUTE
     app.post('/message', async (req, res) => {
         try {
             const { content, fileUrl } = req.body;
-            const { channelId, serverId } = req.query;
+            const { channelId, serverId, conversationId } = req.query;
             //TODO: Start here to address message posting issues (this is the route for bots)
             const session = await getSession(req, AuthConfig);
 
@@ -153,14 +154,21 @@
 
             const params = { 
                 userId: session.user.id,
-                serverId, channelId, fileUrl, content
+                serverId, 
+                channelId, 
+                conversationId: conversationId?.toString() || null, 
+                fileUrl, 
+                content,
+                type: conversationId ? 'dm' : 'channel' as const
             }
-
+            //@ts-ignore
             const result = await messagePostHandler(params);
+            //@ts-ignore
 
             if (result.status === 200) {
                 const channelKey = `chat:${channelId}:messages`
             }
+            //@ts-ignore
 
             res.status(result.status).send(result.message);
         } catch (error) {
@@ -191,25 +199,38 @@
                 //TODO: add fileUrl for socket to frontend
                 const fileUrl = values.fileUrl;
                 const content = values.content;
+                let channelKey;
                 
+                if (type !== 'dm' && type !== 'channel') return { status: 400, error: 'Invalid message type!'};
+
                 if (type === 'channel') {
                     if (!serverId) return { status: 400, error: 'Server Id missing!'};
                     if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                    channelKey = `chat:${channelId}:messages`;
                 }
 
                 if (type === 'dm') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                    channelKey = `chat:${conversationId}:messages`;
                 }
 
                 const params = { 
-                    userId, serverId, channelId, fileUrl, content, type 
-                }  
+                    userId, serverId, channelId, conversationId, fileUrl, content, type 
+                };
 
-                // Send requred info to message Handler followed by emission & key
-                const result = await messagePostHandler(params); 
-                const channelKey = `chat:${channelId}:messages`;
-                io.emit(channelKey, result.message);
-                // Emit response from message handler
+                // Send required info to message Handler followed by emission & key
+                const result = await messagePostHandler(params);
+
+                if (!result) {
+                    throw new Error('Message handler returned no result');
+                }
+                if (!channelKey) {
+                    throw new Error('Channel key is undefined'); 
+                }
+                if ('message' in result) {
+                    // Emit response from message handler
+                    io.emit(channelKey, result.message);
+                }
             } catch (error) {
                 console.log('SOCKET MESSAGE POST ERROR: ', error);
                 io.emit('error', { status: 500, error: 'SOCKET MESSAGE POST ERROR'});
