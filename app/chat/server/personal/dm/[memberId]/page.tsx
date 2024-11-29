@@ -14,8 +14,8 @@ interface MemberIdPageProps {
     }
 }
 
+const messageHandlerApiUrl = process.env.NEXT_PUBLIC_MESSAGE_HANDLER_URL as string;
 const messageApiUrl = process.env.NEXT_PUBLIC_MESSAGE_API_URL as string;
-
 
 const MemberIdPage = async ({params}: MemberIdPageProps) => {
 
@@ -55,14 +55,13 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
                 name={otherMember.user.username!}
                 chatId={conversation.id}
                 messageApiUrl={messageApiUrl}
-                /* TODO: START HERE - socketQuery props need to be figured out for individual dms */ 
                 socketQuery={{ conversationId: conversation.id }}
                 paramKey='conversationId'
                 paramValue={conversation.id}
                 type='dm'
             />
             <ChatInput 
-                apiUrl={messageApiUrl}
+                apiUrl={messageHandlerApiUrl}
                 query={ {conversationId: conversation.id} }                
                 name={otherMember.user.username!}
                 type='dm'

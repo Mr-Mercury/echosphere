@@ -14,6 +14,8 @@ interface ChannelIdPageProps {
 
 const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
     const messageApiUrl = process.env.NEXT_PUBLIC_MESSAGE_API_URL as string;
+    const apiUrl = process.env.NEXT_PUBLIC_MESSAGE_HANDLER_URL as string;
+
     const user = await currentUser();
 
     if (!user) return redirect('/login');
@@ -43,7 +45,7 @@ const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
             paramKey='channelId'
             paramValue={channel.id}
              />
-            <ChatInput name={channel.name} type='channel' apiUrl='http://localhost:4000/message' query={ {channelId: channel.id, serverId: channel.serverId} }/>
+            <ChatInput name={channel.name} type='channel' apiUrl={apiUrl} query={ {channelId: channel.id, serverId: channel.serverId} }/>
         </div>
     )
 }

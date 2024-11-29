@@ -186,18 +186,25 @@
         socket.on('message', async (data) => {
             console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
             try{
-                const { query, values } = data;
-                const { serverId, channelId } = query;
+                const { query, values, type } = data;
+                const { serverId, channelId, conversationId } = query;
                 //TODO: add fileUrl for socket to frontend
                 const fileUrl = values.fileUrl;
                 const content = values.content;
                 
-                if (!serverId) return { status: 400, error: 'Server Id missing!'};
-                if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                if (type === 'channel') {
+                    if (!serverId) return { status: 400, error: 'Server Id missing!'};
+                    if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                }
+
+                if (type === 'dm') {
+                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                }
 
                 const params = { 
-                    userId, serverId, channelId, fileUrl, content 
+                    userId, serverId, channelId, fileUrl, content, type 
                 }  
+
                 // Send requred info to message Handler followed by emission & key
                 const result = await messagePostHandler(params); 
                 const channelKey = `chat:${channelId}:messages`;
