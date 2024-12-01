@@ -10,11 +10,7 @@ export default async function Personal() {
 
     return (
         <div>
-            <section className="flex h-screen">
-                <FriendSidebar friends={user.friends} servers={user.servers}/>
-            </section>
             <PageContainer />
-
             <div className=''>
                     <form action={async () => {
                         "use server";
