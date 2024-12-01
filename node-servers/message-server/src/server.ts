@@ -231,44 +231,47 @@
         })
 
         socket.on('alter', async (data) => {
-            console.log('User ' + session?.user?.username || 'Unknown' + ' edited a message');
-            const {query, content, messageId, method, type, conversationId} = data;
-            const { serverId, channelId } = query;
-            let updateKey;
+            try {
+                console.log('User ' + session?.user?.username || 'Unknown' + ' edited a message');
+                const {query, content, messageId, method, type} = data;
+                const { serverId, channelId, conversationId } = query;
+                let updateKey;
             
-            if (!serverId) return { status: 400, error: 'Server Id missing!'};
-            if (!channelId) return { status: 400, error: 'Channel Id missing!'};
-            if (!content) return { status: 400, error: 'No content in replacement!'};
+                if (!content) return { status: 400, error: 'No content in replacement!'};
 
-            const params = { 
-                userId, 
-                messageId, 
-                serverId, 
-                channelId, 
-                conversationId,
-                content, 
-                method,
-                type
+                const params = { 
+                    userId, 
+                    messageId, 
+                    serverId, 
+                    channelId, 
+                    conversationId,
+                    content, 
+                    method,
+                    type
+                }
+
+                if (type === 'channel') {
+                    if (!serverId) return { status: 400, error: 'Server Id missing!'};
+                    if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                    updateKey = `chat:${channelId}:messages:update`;
+                }
+
+                if (type === 'dm') {
+                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                    updateKey = `chat:${conversationId}:messages:update`;
+                    console.log('updateKey is: ' + updateKey);
+                }
+
+                if (!updateKey) return { status: 400, error: 'Update key is undefined!'};
+
+                const response = await messageEditHandler(params);
+                io.emit(updateKey, response?.message);
+
+                return response;
+            } catch (error) {
+                console.log('SOCKET ALTER ERROR: ', error);
+                io.emit('error', { status: 500, error: 'SOCKET ALTER ERROR'});
             }
-
-            if (type === 'channel') {
-                if (!serverId) return { status: 400, error: 'Server Id missing!'};
-                if (!channelId) return { status: 400, error: 'Channel Id missing!'};
-                updateKey = `chat:${channelId}:messages:update`;
-            }
-
-            if (type === 'dm') {
-                if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
-                updateKey = `chat:${conversationId}:messages:update`;
-            }
-
-            if (!updateKey) return { status: 400, error: 'Update key is undefined!'};
-
-            const response = await messageEditHandler(params);
-            io.emit(updateKey, response?.message);
-
-            return response;
-
         })
         
         socket.on('disconnect', () => {

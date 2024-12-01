@@ -33,6 +33,7 @@ interface ChatItemProps {
     isUpdated: boolean;
     messageApiUrl: string;
     socketQuery: Record<string, string>;
+    type: 'dm' | 'channel';
 }
 
 const roleIconMap = {
@@ -48,7 +49,7 @@ const formSchema = z.object({
 const ChatItem = ({
     id, content, member, timestamp, fileUrl, deleted, 
     currentMember, isUpdated,
-    messageApiUrl, socketQuery
+    messageApiUrl, socketQuery, type
 }: ChatItemProps) => {
     if (!id || !member || !currentMember) {
         console.error('Missing required props:', { id, member, currentMember });
@@ -116,7 +117,7 @@ const ChatItem = ({
 
             // await axios.patch(url, values);
             if (socket) {
-             socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT'});
+             socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT', type: type});
              setIsEditing(false);
             }
         } catch (error) {
@@ -136,14 +137,17 @@ const ChatItem = ({
             console.log('Emitting alter event:', { // Debug log
                 query: socketQuery,
                 messageId: id,
-                method: 'DELETE'
+                method: 'DELETE',
+                type: type,
             });
 
             socket.emit('alter', {
                 query: socketQuery,
                 messageId: id,
                 method: 'DELETE',
-                content: 'This message has been deleted' // or just leave it undefined since the handler sets it
+                content: 'This message has been deleted',
+                type: type, 
+                // or just leave it undefined since the handler sets it
             });
 
             setIsDeleting(false);

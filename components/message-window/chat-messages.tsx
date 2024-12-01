@@ -144,7 +144,8 @@ const ChatMessages = ({
                                 timestamp={formatMessageDate(message.createdAt)}
                                 isUpdated={message.updatedAt !== message.createdAt}
                                 messageApiUrl={messageApiUrl}
-                                socketQuery={socketQuery} />
+                                socketQuery={socketQuery}
+                                type={type} />
                         ))}
                     </Fragment>
                 ) )}

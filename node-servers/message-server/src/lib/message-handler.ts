@@ -136,7 +136,7 @@ export async function messageEditHandler (
     ) 
 {
     const { type } = params;
-    
+
     if (type === 'channel') {
         return channelEditHandler(params as ChannelEditHandlerParams);
     } else if (type === 'dm') {
@@ -231,8 +231,7 @@ async function channelEditHandler(params: ChannelEditHandlerParams) {
                 }
             })
             // Note to self - tanstack requires you to return the updateKey to trigger rerenders/updates
-            const updateKey = `chat:${channelId}:messages:update`;
-            return {status: 200, updateKey, message};
+            return {status: 200, message};
         }
 
         if (method === 'EDIT') {
@@ -254,8 +253,7 @@ async function channelEditHandler(params: ChannelEditHandlerParams) {
                 }
             })
 
-            const updateKey = `chat:${channelId}:messages:update`;
-            return {status: 200, updateKey, message};
+            return {status: 200, message};
         }
 
         return {status: 400, error: 'Invalid method'};
