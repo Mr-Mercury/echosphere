@@ -1,6 +1,11 @@
+'use client'
+
 import { ConversationHeader } from "@/components/islets/section/conversation-header";
+import { ConversationMember } from "@/components/islets/section/conversation-member";
 import { UserAvatar } from "@/components/islets/users/user-avatar";
+import { Separator } from "@/components/ui/separator";
 import { User } from "@prisma/client";
+import { useRouter } from "next/dist/client/components/navigation";
 
 interface activeConversationListType {
     id: string;
@@ -9,14 +14,20 @@ interface activeConversationListType {
 }
 
 export const ConversationSidebar = ({activeConversations}: {activeConversations: activeConversationListType[]}) => {
+    
+    const router = useRouter();
+
+    const onClick = (id: string) => {
+        router.push(`/chat/server/personal/dm/${id}`)
+    }
+    
     return (
-        <section>
+        <section className='h-full bg-[#2B2D31]'>
             <ConversationHeader />
+            <Separator className='h-[2px] bg-zinc-600   
+            rounded-md w-40 mx-auto'/>
             {activeConversations.map((conversation: activeConversationListType) => (
-                <div key={conversation.id}>
-                    <UserAvatar src={conversation.image} className='h-8 w-8 md:h-8 md:w-8 mr-2'/>
-                    <p>{conversation.username}</p>
-                </div>
+                <ConversationMember key={conversation.id} id={conversation.id} avatar={conversation.image} username={conversation.username} />
             ))}
         </section>
     )
