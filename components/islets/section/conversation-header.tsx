@@ -10,7 +10,7 @@ export const ConversationHeader = () => {
 
     return(
         <div className='flex items-center justify-center py-2'>
-            <p className='text-xs uppercase font-semibold text-zinc-400'>
+            <p className='text-xs uppercase font-semibold text-secondary'>
                 Active Conversations
             </p>
             <NavTooltip label='Create DM'>

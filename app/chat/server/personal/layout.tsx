@@ -12,6 +12,7 @@ type ConversationNode = {
 const ConversationLayout = async ({ children }: {
     children: React.ReactNode;
 }) => {    
+    
     let activeConversations: ConversationNode[] = [];
     try {
         const user = await currentUser();

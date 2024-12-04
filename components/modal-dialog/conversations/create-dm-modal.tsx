@@ -8,7 +8,6 @@ const CreateDMModal = () => {
 
     return (
         <div>
-            Hi there
         </div>
     )
 }
