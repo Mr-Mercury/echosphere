@@ -1,5 +1,5 @@
 import { PageContainer } from "@/components/page-container";
-import { FriendSidebar } from "@/components/content-sidebar-components/friend-sidebar/friend-sidebar";
+import { FriendSidebar } from "@/components/content-sidebar-components/conversation-sidebar/conversation-sidebar";
 import { auth, signOut } from "@/auth";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 

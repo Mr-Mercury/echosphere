@@ -8,7 +8,7 @@ import { PERSONAL_ROOM_ROUTE } from "@/routes";
 import { User } from "@prisma/client";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
-type UserWithImage = User & { image: string};
+export type UserWithImage = Omit<User, 'image'> & { image: string };
 
 interface UserButtonProps {
     user: UserWithImage;
