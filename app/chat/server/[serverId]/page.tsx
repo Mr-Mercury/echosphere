@@ -14,6 +14,10 @@ async function ServerPage({ params, }: ServerIdPageProps) {
 
     if (! user) return redirect('/login');
 
+    if (params.serverId === 'personal') {
+        return null;
+    }
+
     const server = await db.server.findUnique({
         where: {
             id: params.serverId,
