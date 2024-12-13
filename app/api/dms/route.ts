@@ -72,7 +72,6 @@ export async function GET(
         })
 
     } catch (error) {
-        console.log('DIRECT MESSAGES GET ERROR: ', error);
         return new NextResponse('Interal Error', {status: 500})
     }
 }

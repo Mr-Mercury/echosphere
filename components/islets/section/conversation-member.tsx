@@ -26,7 +26,7 @@ export const ConversationMember = ({id, avatar, username}: ConversationMemberPro
         )}>
             <UserAvatar src={avatar} className='h-8 w-8 md:h-8 md:w-8 mr-2'/>
             <p className={cn('font-semibold text-sm text-zinc-400 group-hover:text-zinc-300 transition',
-            params?.conversationId === id && 'text-zinc-200 group-hover:text-white')}
+            params?.memberId === id && 'text-zinc-200 group-hover:text-white')}
             >
                 {username}
             </p>

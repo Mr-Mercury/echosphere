@@ -8,7 +8,9 @@ import { User } from "@prisma/client";
 import { useRouter } from "next/dist/client/components/navigation";
 
 interface activeConversationListType {
-    id: string;
+    userId: string;
+    memberId: string;
+    conversationId: string;
     username: string;
     image: string;
 }
@@ -27,7 +29,12 @@ export const ConversationSidebar = ({activeConversations}: {activeConversations:
             <Separator className='h-[2px] bg-zinc-600   
             rounded-md w-40 mx-auto'/>
             {activeConversations.map((conversation: activeConversationListType) => (
-                <ConversationMember key={conversation.id} id={conversation.id} avatar={conversation.image} username={conversation.username} />
+                <ConversationMember 
+                key={conversation.conversationId} 
+                id={conversation.memberId} 
+                avatar={conversation.image} 
+                username={conversation.username} 
+                />
             ))}
         </section>
     )
