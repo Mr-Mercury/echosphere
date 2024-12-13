@@ -1,5 +1,6 @@
 'use client'
 
+import qs from 'query-string';
 import { useState } from "react";
 import { useModal } from "@/hooks/use-modal-store";
 

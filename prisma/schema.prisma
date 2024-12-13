@@ -31,9 +31,44 @@ model User {
   servers Server[]
   members Member[]
   channels Channel[]
+  personalBots PersonalBot[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PersonalBot {
+  id                       String  @id @default(cuid())
+  name                     String
+  profileDescription       String? @db.Text
+  imageUrl                 String? @db.Text
+  modelName                String
+  systemPrompt             String  @db.Text
+  deleted                  Boolean @default(false)
+
+  creatorId                String
+  creator                  User @relation(fields: [creatorId], references: [id])
+
+  messages                 BotMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+}
+
+model BotMessage {
+  id                       String  @id @default(cuid())
+  content                  String  @db.Text
+  deleted                  Boolean @default(false)
+
+  botId                    String
+  bot                      PersonalBot @relation(fields: [botId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([botId])
 }
 
 model Account {
