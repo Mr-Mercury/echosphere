@@ -16,7 +16,7 @@ export const MobileToggle = ({serverId}: {serverId: string}) => {
                 <div className='w-[72px]'>
                     <ChatMainSidebar />
                 </div>
-                <ChannelSidebar serverId={serverId} />
+                {serverId && <ChannelSidebar serverId={serverId} />}\
             </SheetContent>
         </Sheet>
     )

@@ -31,7 +31,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
     const user = await currentUser();
 
     if (!user) return redirect('/');
-
+    
     //I would not be making this kind of request outside of a server component
     //Because it's a waterfall request - but it works out in RSC.  Very nice. 
     const server = await getServerChannelsById(params.serverId, user.id);
