@@ -26,7 +26,7 @@ import { useEffect } from 'react';
 import FileUpload from '@/components/islets/uploads/file-upload';
 
 
-const CreateChannelModal = () => {
+const CreateDmModal = () => {
     const { isOpen, onClose, type } = useModal();
     const router = useRouter();
     const params = useParams();
@@ -154,4 +154,4 @@ const CreateChannelModal = () => {
     )
 }
 
-export default CreateChannelModal;
+export default CreateDmModal;

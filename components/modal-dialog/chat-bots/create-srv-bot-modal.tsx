@@ -1,7 +1,7 @@
 'use client'
 
 import qs from 'query-string';
-import { PersonalBotSchema } from "@/schemas";
+import { ServerBotSchema } from "@/schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import axios from 'axios';
 import * as z from 'zod';
@@ -26,15 +26,15 @@ import { useEffect } from 'react';
 import FileUpload from '@/components/islets/uploads/file-upload';
 
 
-const CreateChannelModal = () => {
+const CreateServerBotModal = () => {
     const { isOpen, onClose, type } = useModal();
     const router = useRouter();
     const params = useParams();
 
-    const isModalOpen = isOpen && type ==='createDM';
+    const isModalOpen = isOpen && type ==='createServerBot';
 
     const form = useForm({
-        resolver: zodResolver(PersonalBotSchema),
+        resolver: zodResolver(ServerBotSchema),
         defaultValues: {
             name: '',
             profileDescription: '',
@@ -46,7 +46,7 @@ const CreateChannelModal = () => {
 
     const isLoading = form.formState.isSubmitting;
 
-    const onSubmit = async (val: z.infer<typeof PersonalBotSchema>) => {
+    const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
             const url = qs.stringifyUrl({
                 url: '/api/personal-bot-creation',
@@ -154,4 +154,4 @@ const CreateChannelModal = () => {
     )
 }
 
-export default CreateChannelModal;
+export default CreateServerBotModal;
