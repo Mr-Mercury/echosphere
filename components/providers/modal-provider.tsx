@@ -13,9 +13,11 @@ import EditChannelModal from "../modal-dialog/channels/edit-channel-modal";
 import MessageFileModal from "../modal-dialog/message-file-modal";
 import CreateDMModal from "../modal-dialog/chat-bots/create-dm-modal";
 import CreateServerBotModal from "../modal-dialog/chat-bots/create-srv-bot-modal";
+import { useModal } from "@/hooks/use-modal-store";
 
 export const ModalProvider = () => {
     const [isMounted, setIsMounted] = useState('false');
+    const { data } = useModal();
 
     useEffect( () => {
         setIsMounted('true');
@@ -43,7 +45,7 @@ export const ModalProvider = () => {
             <EditChannelModal />
             <MessageFileModal />
             <CreateDMModal />
-            <CreateServerBotModal />
+            <CreateServerBotModal data={data}/>
         </>
     )
 }
