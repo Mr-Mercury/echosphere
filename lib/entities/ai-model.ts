@@ -7,4 +7,5 @@ export interface AIModel {
         input: number;
         output: number;
     }
+    maxSystemPromptLength: number;
 }

@@ -45,6 +45,8 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
 
     const isModalOpen = isOpen && type ==='createServerBot';
 
+    
+
     const form = useForm({
         resolver: zodResolver(ServerBotSchema),
         defaultValues: {
@@ -55,6 +57,8 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             modelName: Object.values(AVAILABLE_MODELS)[0].name,
         }
     });
+
+    const selectedModel = form.watch('modelName');
 
     const isLoading = form.formState.isSubmitting;
 
@@ -80,6 +84,15 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
         form.reset()
         onClose();
     }
+
+    const getMaxSystemPromptLength = (modelName: string) => {
+        return AVAILABLE_MODELS[modelName]?.maxSystemPromptLength ?? 1000;
+    };
+
+    const getCharacterCountDisplay = (currentLength: number, maxLength?: number) => {
+        const limit = maxLength ?? getMaxSystemPromptLength(selectedModel);
+        return `${currentLength} / ${limit} characters`;
+    };
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleClose}>
@@ -123,9 +136,16 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                                 className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
                                                 placeholder='Describe this bot'
                                                 {...field}
-                                            />
+                                                maxLength={500}
+                                                />
                                         </FormControl>
                                         <FormMessage />
+                                        <div className="text-xs text-muted-foreground text-right">
+                                            {getCharacterCountDisplay(
+                                                field.value?.length ?? 0,
+                                                300
+                                            )}
+                                        </div>
                                     </FormItem>
                                 )} 
                                 />
@@ -140,8 +160,15 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                                 className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
                                                 placeholder='Enter your prompt here'
                                                 {...field}
-                                            />
+                                                maxLength={AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000}
+                                                />
                                         </FormControl>
+                                        <div className="text-xs text-muted-foreground text-right">
+                                            {getCharacterCountDisplay(
+                                                field.value?.length ?? 0,
+                                                AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000
+                                            )}
+                                        </div>
                                         <FormMessage />
                                     </FormItem>
                                 )} 
