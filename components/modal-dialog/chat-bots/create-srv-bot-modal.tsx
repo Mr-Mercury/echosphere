@@ -49,9 +49,9 @@ const CreateServerBotModal = () => {
     const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
             const url = qs.stringifyUrl({
-                url: '/api/personal-bot-creation',
+                url: '/api/server-bot-creation',
                 query: {
-                    userId: params?.serverId
+                    serverId: params?.serverId
                 }
             })
             await axios.post(url, val);
@@ -74,10 +74,10 @@ const CreateServerBotModal = () => {
             <DialogContent className='bg-black text-white p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Create a new serverless bot
+                        Create a new bot for your server
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>This bot won't be in any servers!</div> 
+                        <div>This bot will only be active in the {params.serverId} context!</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
