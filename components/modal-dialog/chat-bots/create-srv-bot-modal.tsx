@@ -98,8 +98,17 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
         <Dialog open={isModalOpen} onOpenChange={handleClose}>
             <DialogContent className='bg-black text-white p-0 max-w-2xl overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
-                    <DialogTitle className='text-2xl text-center font-bold '>
-                        Create a new bot for <em>{data?.server?.name}</em>
+                    <DialogTitle className='text-2xl text-center font-bold'>
+                        <div className='flex items-center justify-center'>
+                            {data?.server?.imageUrl && (
+                                <img 
+                                    src={data?.server?.imageUrl}
+                                    alt={`${data?.server?.name} image`}
+                                    className='w-8 h-8 outline outline-1 outline-offset-1 outline-gray rounded-full mr-4'
+                                />
+                            )}
+                            <span>Create a new bot for <em>{data?.server?.name}</em></span>
+                        </div>
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
                         <div>This bot will only be active in the <strong>{data?.server?.name}</strong> context!</div> 
