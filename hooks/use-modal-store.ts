@@ -1,4 +1,4 @@
-import { Channel, ChannelType, Server, PersonalBot, User } from '@prisma/client';
+import { Channel, ChannelType, Server, User } from '@prisma/client';
 // TODO: Prisma build lol
 import { create } from 'zustand';
 
@@ -12,7 +12,7 @@ interface ModalData {
     channel?: Channel;
     apiUrl?: string;
     query?: Record<string, any>;
-    bot?: PersonalBot;
+    // bot?: PersonalBot;
     botUser?: User;
 }
 
