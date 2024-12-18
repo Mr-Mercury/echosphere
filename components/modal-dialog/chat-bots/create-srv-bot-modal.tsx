@@ -19,6 +19,7 @@ import {
 
 import { Textarea } from "../../ui/textarea";
 import { ScrollArea} from "../../ui/scroll-area";
+import { Checkbox } from "../../ui/checkbox";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
@@ -55,6 +56,7 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             systemPrompt: '',
             imageUrl: '',
             modelName: Object.values(AVAILABLE_MODELS)[0].name,
+            fullPromptControl: false,
         }
     });
 
@@ -160,25 +162,39 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                 />
                                 <FormField control={form.control} name='systemPrompt' render={({field}) => (
                                     <FormItem>
-                                        <FormLabel className='uppercase text-xs font-bold text-secondary'>
-                                            Bot Prompt
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Textarea 
-                                                disabled={isLoading} 
-                                                className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
-                                                placeholder='Enter your prompt here'
-                                                {...field}
-                                                maxLength={AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000}
+                                        <div className='flex items-center justify-between'>
+                                            <FormLabel className='uppercase text-xs font-bold text-secondary'>
+                                                Bot Prompt
+                                            </FormLabel>
+                                            <div className='flex items-center space-x-2'>
+                                                <Checkbox 
+                                                    id='fullPromptControl'
+                                                    checked={form.watch('fullPromptControl')}
+                                                    onCheckedChange={(checked) => form.setValue('fullPromptControl', checked as boolean)}
+                                                    className='border-[1px] border-white/50 data-[state=checked]:border-white'
                                                 />
-                                        </FormControl>
-                                        <div className="text-xs text-muted-foreground text-right">
-                                            {getCharacterCountDisplay(
-                                                field.value?.length ?? 0,
-                                                AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000
-                                            )}
+                                                <label htmlFor='fullPromptControl' className='text-xs text-muted-foreground cursor-pointer'>
+                                                    Full prompt control
+                                                </label>
+                                            </div>
                                         </div>
-                                        <FormMessage />
+                                            <FormControl>
+                                                <Textarea 
+                                                    disabled={isLoading} 
+                                                    className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
+                                                    placeholder='Enter your prompt here'
+                                                    rows={15}
+                                                    {...field}
+                                                    maxLength={AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000}
+                                                    />
+                                            </FormControl>
+                                            <div className="text-xs text-muted-foreground text-right">
+                                                {getCharacterCountDisplay(
+                                                    field.value?.length ?? 0,
+                                                    AVAILABLE_MODELS[selectedModel]?.maxSystemPromptLength ?? 1000
+                                                )}
+                                            </div>
+                                            <FormMessage />
                                     </FormItem>
                                 )} 
                                 />

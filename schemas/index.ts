@@ -84,7 +84,8 @@ export const ServerBotSchema = z.object({
     }),
     model: z.string().refine((value) => value in AVAILABLE_MODELS, {
         message: 'Invalid model selected'
-    })
+    }),
+    fullPromptControl: z.boolean(),
 })
 
 export const MessageFileUploadSchema = z.object({
