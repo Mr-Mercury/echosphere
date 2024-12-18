@@ -43,6 +43,7 @@ model PersonalBot {
   profileDescription       String? @db.Text
   imageUrl                 String? @db.Text
   modelName                String
+  apiKey                   String?
   systemPrompt             String  @db.Text
   deleted                  Boolean @default(false)
 

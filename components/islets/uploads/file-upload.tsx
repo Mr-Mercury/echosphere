@@ -52,16 +52,20 @@ const FileUpload = ({onChange, value, endpoint}: FileUploadProps) => {
     }
 
     return (
-        <UploadDropzone 
-        endpoint={endpoint}
-        onClientUploadComplete={(res) => {
-            onChange(res?.[0].url);
-        }}
-        onUploadError={(error: Error) => {
-            console.log(error);
-        }}
-        />
+        <div className='flex flex-col items-center'>
+            <p className='text-s text-secondary font-bold'>
+                {endpoint === 'serverImage' ? 'Upload an image' : 'Upload a file'}
+            </p>
+            <UploadDropzone 
+            endpoint={endpoint}
+            onClientUploadComplete={(res) => {
+                onChange(res?.[0].url);
+            }}
+            onUploadError={(error: Error) => {
+                console.log(error);
+            }}
+            />
+        </div>
     )
 }
-
 export default FileUpload;
