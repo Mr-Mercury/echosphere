@@ -82,6 +82,9 @@ export const ServerBotSchema = z.object({
     imageUrl: z.string().min(1, {
         message: 'You need an image for your bot'
     }),
+    model: z.string().refine((value) => value in AVAILABLE_MODELS, {
+        message: 'Invalid model selected'
+    })
 })
 
 export const MessageFileUploadSchema = z.object({
