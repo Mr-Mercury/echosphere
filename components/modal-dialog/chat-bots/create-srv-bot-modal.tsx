@@ -1,6 +1,7 @@
 'use client'
 
 import qs from 'query-string';
+import { Server } from '@prisma/client';
 import { ServerBotSchema } from "@/schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import axios from 'axios';
@@ -18,15 +19,23 @@ import {
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
+
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { useEffect } from 'react';
+import { ServerWithMembersAndProfiles } from '@/lib/entities/servers';
 import FileUpload from '@/components/islets/uploads/file-upload';
 
+interface CreateServerBotModalProps {
+    data?: {
+        server?: ServerWithMembersAndProfiles;
+    }
+}
 
-const CreateServerBotModal = () => {
+
+const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
     const { isOpen, onClose, type } = useModal();
     const router = useRouter();
     const params = useParams();
@@ -77,7 +86,7 @@ const CreateServerBotModal = () => {
                         Create a new bot for your server
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>This bot will only be active in the {params.serverId} context!</div> 
+                        <div>This bot will only be active in the {data?.server?.name} context!</div> 
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
