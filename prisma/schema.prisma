@@ -31,9 +31,45 @@ model User {
   servers Server[]
   members Member[]
   channels Channel[]
+  personalBots PersonalBot[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PersonalBot {
+  id                       String  @id @default(cuid())
+  name                     String
+  profileDescription       String? @db.Text
+  imageUrl                 String? @db.Text
+  modelName                String
+  apiKey                   String?
+  systemPrompt             String  @db.Text
+  deleted                  Boolean @default(false)
+
+  creatorId                String
+  creator                  User @relation(fields: [creatorId], references: [id])
+
+  messages                 BotMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+}
+
+model BotMessage {
+  id                       String  @id @default(cuid())
+  content                  String  @db.Text
+  deleted                  Boolean @default(false)
+
+  botId                    String
+  bot                      PersonalBot @relation(fields: [botId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([botId])
 }
 
 model Account {
@@ -103,6 +139,13 @@ model Member {
   serverId String
   server Server @relation(fields:[serverId], references: [id], onDelete: Cascade)
   
+  messages Message[]
+
+  directMessages Dm[]
+
+  conversationsInitiated Conversation[] @relation("MemberOne")
+  conversationsReceived Conversation[] @relation("MemberTwo")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -127,9 +170,67 @@ model Channel {
   serverId String
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
+  messages Message[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([serverId])
   @@index([userId])
+}
+
+model Message {
+  id String @id @default(uuid())
+  content String @db.Text
+  fileUrl String? @db.Text
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  deleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([channelId])
+  @@index([memberId])
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  memberOneId String
+  memberOne Member @relation("MemberOne", fields: [memberOneId], references:[id], onDelete: Cascade)
+
+  memberTwoId String
+  memberTwo Member @relation("MemberTwo", fields: [memberTwoId], references:[id], onDelete: Cascade)
+
+  directMessages Dm[]
+
+  @@index([memberTwoId])
+
+  @@unique([memberOneId, memberTwoId])
+}
+
+model Dm {
+  id String @id @default(uuid())
+  content String @db.Text
+  fileUrl String? @db.Text
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted Boolean @default(false)
+
+  @@index([memberId])
+  @@index([conversationId])
 }

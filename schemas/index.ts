@@ -1,4 +1,6 @@
 import { ChannelType } from '@prisma/client';
+import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { ChatFrequency } from '@/lib/config/chat-variables';
 import * as z from 'zod';
 
 // Validators
@@ -48,4 +50,48 @@ export const ChannelSchema = z.object({
         message: 'Channel name cannot be "general"'
     }),
     type: z.nativeEnum(ChannelType)
+})
+
+export const PersonalBotSchema = z.object({
+    name: z.string().min(1, {
+        message: 'You need to name your bot'
+    }),
+    profileDescription: z.string().min(1, {
+        message: 'You need a profile description for your bot'
+    }),
+    systemPrompt: z.string().min(1, {
+        message: 'You need to enter a prompt for your bot'
+    }),
+    imageUrl: z.string().min(1, {
+        message: 'You need an image for your bot'
+    }),
+    model: z.string().refine((value) => value in AVAILABLE_MODELS, {
+        message: 'Invalid model selected'
+    })
+})
+
+export const ServerBotSchema = z.object({
+    name: z.string().min(1, {
+        message: 'You need to name your bot'
+    }),
+    profileDescription: z.string().min(1, {
+        message: 'You need a profile description for your bot'
+    }),
+    systemPrompt: z.string().min(1, {
+        message: 'You need to enter a prompt for your bot'
+    }),
+    imageUrl: z.string().min(1, {
+        message: 'You need an image for your bot'
+    }),
+    model: z.string().refine((value) => value in AVAILABLE_MODELS, {
+        message: 'Invalid model selected'
+    }),
+    fullPromptControl: z.boolean(),
+    chatFrequency: z.nativeEnum(ChatFrequency)
+})
+
+export const MessageFileUploadSchema = z.object({
+    fileUrl: z.string().min(1, {
+        message: 'You need a valid filepath'
+    })
 })

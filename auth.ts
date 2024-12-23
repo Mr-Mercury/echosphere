@@ -48,7 +48,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },  
         // Get by ID because it is the PRIMARY KEY, faster query
         // Extract any necessary info for the session token here. 
-        async jwt({ token }) {
+        // currently adding userId to session token
+        async jwt({ token, user }) {
+            
+            if (user) {
+                token.sub = user.id;
+            }
+
             if (!token.sub) return token;
 
             const existingUser = await getUserById(token.sub);

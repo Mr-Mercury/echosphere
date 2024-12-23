@@ -33,7 +33,9 @@ const ServerHeader = ({
             <DropdownMenuContent className='w-56 bg-black text-xs font-medium 
             text-neutral-400 space-y-[2px]'>
                 {isModerator && (
-                    <DropdownMenuItem className='text-indigo-200 hover:bg-sky-600 px-3 py-2 text-sm cursor-pointer'>
+                    <DropdownMenuItem 
+                    onClick={() => onOpen('createServerBot', { server })}
+                    className='text-indigo-200 hover:bg-sky-600 px-3 py-2 text-sm cursor-pointer'>
                         Add New Bot
                         <UserPlus className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>
@@ -74,7 +76,8 @@ const ServerHeader = ({
                     <DropdownMenuSeparator />
                 )}
                 {isAdmin && (
-                    <DropdownMenuItem className='text-rose-500 px-3 py-2 text-sm cursor-pointer'>
+                    <DropdownMenuItem className='text-rose-500 px-3 py-2 text-sm cursor-pointer'
+                    onClick={() => onOpen('deleteServer', { server })}>
                         Manage Server
                         <Archive className='h-4 w-4 ml-auto'/>
                     </DropdownMenuItem>

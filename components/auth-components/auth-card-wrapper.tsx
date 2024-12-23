@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { AuthHeader } from "../islets/auth/auth-header";
+import { AuthHeader } from "./auth-header";
 import { AuthSocial } from "@/components/islets/auth/auth-social";
 import { AuthBackButton } from "./auth-back-button";
 

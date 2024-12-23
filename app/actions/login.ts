@@ -8,7 +8,7 @@ import { generateVerificationToken } from '@/lib/utilities/data/tokens/token-gen
 import { getUserByEmail } from '@/lib/utilities/data/fetching/userData';
 
 
-//Again, type safety for login using zod
+//type safety for login using zod
 export const loginAction = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(values)
 

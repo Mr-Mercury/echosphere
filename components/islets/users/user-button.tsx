@@ -2,13 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utilities/clsx/utils";
-import NavTooltip from "@/components/chat-sidebar-components/chat-nav-tooltip";
+import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
 import { usePathname } from "next/navigation";
 import { PERSONAL_ROOM_ROUTE } from "@/routes";
 import { User } from "@prisma/client";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
-type UserWithImage = User & { image: string};
+export type UserWithImage = Omit<User, 'image'> & { image: string };
 
 interface UserButtonProps {
     user: UserWithImage;

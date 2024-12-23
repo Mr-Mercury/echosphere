@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +22,23 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/chat-sidebar-components/parent-sidebar", "components/jotai/providers.js", "components/chat-sidebar-components/chat-main-sidebar.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "components/chat-sidebar-components/parent-sidebar",
+    "components/jotai/providers.js",
+    "components/chat-sidebar-components/chat-main-sidebar.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "node-servers/message-server/*.ts"
+  ]
 }

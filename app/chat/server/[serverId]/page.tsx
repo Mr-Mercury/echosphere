@@ -1,17 +1,51 @@
+import { db } from "@/lib/db/db";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { redirect } from "next/navigation";
 
-async function ServerPage({ params, }: {params:{id:string}}) {
+interface ServerIdPageProps{
+    params: {
+        serverId: string;
+    }
+};
 
-    // TODO: Pass channels to ChannelSideBar, 
-    // Pass server content to serverChat
-    // Fuck it I'll store everything in state. 
-    return (<div>SERVER
-        {/* <section>
-            <ChannelSideBar channels={server.channels} server={server.id}/>
-        </section>
-        <PageContainer>
-            <ChatWindow />
-        </PageContainer> */}
-    </div>)
+async function ServerPage({ params, }: ServerIdPageProps) {
+    
+    const user = await currentUser();
+
+    if (! user) return redirect('/login');
+
+    if (params.serverId === 'personal') {
+        return null;
+    }
+
+    const server = await db.server.findUnique({
+        where: {
+            id: params.serverId,
+            members: {
+                some: {
+                    userId: user.id,
+                }
+            }
+        },
+        include: {
+            channels: {
+                where: {
+                    name: 'general'
+                },
+                orderBy: {
+                    createdAt: 'asc'
+                }
+            }
+        }
+    })
+
+    const landingChannel = server?.channels[0];
+
+    if (landingChannel?.name !== 'general') {
+        return null;
+    }
+
+    return redirect(`/chat/server/${params.serverId}/${landingChannel?.id}`);
 }
 
 

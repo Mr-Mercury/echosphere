@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import ChatNewButton from './chat-new-button';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import JoinedServers from '../islets/chat-window/joined-servers';
-import UserButton from '../islets/users/user-button';
+import UserButton, { UserWithImage } from '../islets/users/user-button';
 
 // Later on, pass with button component
 export default async function ChatMainSidebar() {
@@ -18,7 +18,7 @@ export default async function ChatMainSidebar() {
     return (
         <div className='space-y-4 flex flex-col items-center h-full text-white
         bg-[#1E1F22] py-3'>
-            <UserButton user={user} />
+            <UserButton user={user as UserWithImage} />
             <Separator className='h-[2px] bg-zinc-600   
             rounded-md w-10 mx-auto'/>
             <ScrollArea className='flex-1 w-full'>

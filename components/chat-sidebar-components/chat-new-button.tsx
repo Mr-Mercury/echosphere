@@ -1,7 +1,7 @@
 'use client'
 
 import { Plus } from "lucide-react";
-import NavTooltip from "./chat-nav-tooltip";
+import NavTooltip from "./nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
 
 const ChatNewButton = () => {
