@@ -4,6 +4,7 @@ import qs from 'query-string';
 import { Server } from '@prisma/client';
 import { ServerBotSchema } from "@/schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { ChatFrequency } from '@/lib/config/chat-variables';
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -57,6 +58,7 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             imageUrl: '',
             modelName: Object.values(AVAILABLE_MODELS)[0].name,
             fullPromptControl: false,
+            chatFrequency: 'average',
         }
     });
 
@@ -167,6 +169,18 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                                 Bot Prompt
                                             </FormLabel>
                                             <div className='flex items-center space-x-2'>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const description = form.getValues('profileDescription');
+                                                    form.setValue('systemPrompt', description);
+                                                }}
+                                                className='text-xs text-muted-foreground hover:text-white'
+                                            >
+                                                Copy Bot Description
+                                            </Button>
                                                 <Checkbox 
                                                     id='fullPromptControl'
                                                     checked={form.watch('fullPromptControl')}
@@ -197,6 +211,37 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                             <FormMessage />
                                     </FormItem>
                                 )} 
+                                />
+                                <FormField control={form.control} name='chatFrequency' render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel className='uppercase text-xs font-bold text-secondary'>Chat Frequency</FormLabel>
+                                        <Select disabled={isLoading} 
+                                        onValueChange={field.onChange} 
+                                        defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger
+                                                    className='border-0
+                                                    focus:ring-0 ring-offset-0
+                                                    focus:ring-offset-0 capitalize outline-none'
+                                                >
+                                                    {/* Un-kill CSS here - likely shadcn or radix issue */}
+                                                    <SelectValue className='text-secondary'
+                                                    placeholder='Select a model'
+                                                    />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className='bg-primary text-secondary'>
+                                                {Object.values(ChatFrequency).map((frequency) => (
+                                                    <SelectItem key={frequency} value={frequency} className='capitalize'>
+                                                        {frequency.toLowerCase().replace('_', ' ')}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                                 />
                                 <FormField control={form.control} name='modelName' render={({field}) => (
                                     <FormItem>
