@@ -1,5 +1,6 @@
 import { ChannelType } from '@prisma/client';
 import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { ChatFrequency } from '@/lib/config/chat-variables';
 import * as z from 'zod';
 
 // Validators
@@ -86,6 +87,7 @@ export const ServerBotSchema = z.object({
         message: 'Invalid model selected'
     }),
     fullPromptControl: z.boolean(),
+    chatFrequency: z.nativeEnum(ChatFrequency)
 })
 
 export const MessageFileUploadSchema = z.object({
