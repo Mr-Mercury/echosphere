@@ -2,12 +2,14 @@
 
 # dependencies
 /node_modules
+**/node_modules/ 
 /.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # rust garbage
 /target
+**/target/ 
 # testing
 /coverage
 
@@ -17,6 +19,7 @@
 
 # production
 /build
+**/build/
 
 # misc
 .DS_Store
@@ -30,6 +33,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+**/.env
 
 # vercel
 .vercel
