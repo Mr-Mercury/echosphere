@@ -26,12 +26,19 @@ model User {
   statusMessage   String?
   status          String?
   activity        String?
-  accounts        Account[]
 
-  servers Server[]
-  members Member[]
-  channels Channel[]
-  personalBots PersonalBot[]
+  // Bot-specific fields
+  botType         String?        // e.g., "SERVER_BOT", "CHANNEL_BOT"
+  systemPrompt    String?        @db.Text
+  apiKey          String?
+  modelName       String?
+
+  accounts                  Account[]
+  servers                   Server[]
+  members                   Member[]
+  channels                  Channel[]
+  personalBots              PersonalBot[]
+  personalBotConversations  PersonalBotConversation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,15 +57,36 @@ model PersonalBot {
   creatorId                String
   creator                  User @relation(fields: [creatorId], references: [id])
 
-  messages                 BotMessage[]
+  conversations            PersonalBotConversation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([creatorId])
+  PersonalBotMessage PersonalBotMessage[]
 }
 
-model BotMessage {
+model PersonalBotConversation {
+  id                       String @id @default(cuid())
+  
+  userId                   String  
+  user                     User @relation(fields: [userId], references: [id])
+  
+  botId                    String
+  bot                      PersonalBot @relation(fields: [botId], references: [id])
+  
+  messages                 PersonalBotMessage[]
+  
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  @@unique([userId, botId])
+  @@index([userId])
+  @@index([botId])
+}
+
+
+model PersonalBotMessage {
   id                       String  @id @default(cuid())
   content                  String  @db.Text
   deleted                  Boolean @default(false)
@@ -66,9 +94,15 @@ model BotMessage {
   botId                    String
   bot                      PersonalBot @relation(fields: [botId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  conversationId           String
+  conversation             PersonalBotConversation @relation(fields: [conversationId], references: [id])
+  
+  fromBot                  Boolean @default(false)
+  
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  
+  @@index([conversationId])
   @@index([botId])
 }
 
