@@ -17,7 +17,9 @@ import {
     DialogFooter, 
     DialogHeader, 
     DialogTitle 
-} from "../../ui/dialog"
+} from "../../ui/dialog";
+
+import { registerServerBotAction } from "@/app/actions/register-server-bot";
 
 import { Textarea } from "../../ui/textarea";
 import { ScrollArea} from "../../ui/scroll-area";
@@ -69,22 +71,18 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
 
     const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
-            const url = qs.stringifyUrl({
-                url: '/api/server-bots',
-                query: {
-                    serverId: params?.serverId
-                }
-            })
-            const userId = await currentUser();
+            const user = await currentUser();
+            const userId = user?.id;
 
             if (!userId) {
                 return { error: "User not found" }
             }
 
-            await axios.post(url, {
-                ...val,
-                userId
-            });
+            const result = await registerServerBotAction(val, userId, params?.serverId as string);
+
+            if (result.error) {
+                return { error: result.error }
+            }
 
             // Clearing 
             form.reset();
