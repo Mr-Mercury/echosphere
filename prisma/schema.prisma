@@ -26,7 +26,7 @@ model User {
   statusMessage  String?
   status         String?
   activity       String?
-  apiKeys        Json?    @db.Json
+  apiKeys        Json?     @db.Json
 
   accounts                 Account[]
   servers                  Server[]
