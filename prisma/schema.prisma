@@ -27,21 +27,36 @@ model User {
   status          String?
   activity        String?
 
-  // Bot-specific fields
-  botType         String?        // e.g., "SERVER_BOT", "CHANNEL_BOT"
-  systemPrompt    String?        @db.Text
-  apiKey          String?
-  modelName       String?
-
   accounts                  Account[]
   servers                   Server[]
   members                   Member[]
   channels                  Channel[]
   personalBots              PersonalBot[]
   personalBotConversations  PersonalBotConversation[]
+  botConfig                 BotConfiguration?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}
+
+model BotConfiguration {
+  id              String        @id @default(cuid())
+  isActive        Boolean       @default(true)
+  botType         String?        // e.g., "SERVER_BOT", "CHANNEL_BOT"
+  systemPrompt    String?       @db.Text
+  apiKey          String?
+  modelName       String?
+  description     String?
+  prompt          String?
+  chatFrequency   String?
+
+  botUserId       String @unique
+  botUser         User   @relation(fields: [botUserId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([botUserId])
 }
 
 model PersonalBot {
@@ -137,6 +152,7 @@ model VerificationToken {
 
   @@unique([email, token])
 }
+
 //TODO: swap to uuid during MVP
 model Server {
   id String @id @default(cuid())
