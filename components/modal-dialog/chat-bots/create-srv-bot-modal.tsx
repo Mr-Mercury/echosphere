@@ -5,6 +5,7 @@ import { Server } from '@prisma/client';
 import { ServerBotSchema } from "@/schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
+import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -69,12 +70,22 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
     const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
             const url = qs.stringifyUrl({
-                url: '/api/server-bot-creation',
+                url: '/api/server-bots',
                 query: {
                     serverId: params?.serverId
                 }
             })
-            await axios.post(url, val);
+            const userId = await currentUser();
+
+            if (!userId) {
+                return { error: "User not found" }
+            }
+
+            await axios.post(url, {
+                ...val,
+                userId
+            });
+
             // Clearing 
             form.reset();
             router.refresh();

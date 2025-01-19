@@ -1,8 +1,8 @@
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  relationMode = "prisma"
+  relationMode      = "prisma"
 }
 
 generator client {
@@ -11,112 +11,113 @@ generator client {
 
 //TODO - Shift to UUID when you don't need to do manual SQL queries anymore
 model User {
-  id              String          @id @default(cuid())
-  human           Boolean         @default(true)
-  initialized     Boolean         @default(false)
-  friendId        String          @unique @default(cuid())
-  currentServer   String?
-  currentChannel  String?         
-  name            String?
-  username        String?         @unique
-  email           String?         @unique
-  emailVerified   DateTime?
-  image           String?         @db.Text
-  password        String?
-  statusMessage   String?
-  status          String?
-  activity        String?
+  id             String    @id @default(cuid())
+  human          Boolean   @default(true)
+  initialized    Boolean   @default(false)
+  friendId       String    @unique @default(cuid())
+  currentServer  String?
+  currentChannel String?
+  name           String?
+  username       String?   @unique
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?   @db.Text
+  password       String?
+  statusMessage  String?
+  status         String?
+  activity       String?
+  apiKeys        Json?    @db.Json
 
-  accounts                  Account[]
-  servers                   Server[]
-  members                   Member[]
-  channels                  Channel[]
-  personalBots              PersonalBot[]
-  personalBotConversations  PersonalBotConversation[]
-  botConfig                 BotConfiguration?
+  accounts                 Account[]
+  servers                  Server[]
+  members                  Member[]
+  channels                 Channel[]
+  personalBots             PersonalBot[]
+  personalBotConversations PersonalBotConversation[]
+  botConfig                BotConfiguration?
 
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BotConfiguration {
-  id              String        @id @default(cuid())
-  isActive        Boolean       @default(true)
-  botType         String?        // e.g., "SERVER_BOT", "CHANNEL_BOT"
-  systemPrompt    String?       @db.Text
-  apiKey          String?
-  modelName       String?
-  description     String?
-  prompt          String?
-  chatFrequency   String?
+  id            String  @id @default(cuid())
+  isActive      Boolean @default(true)
+  botName       String
+  botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
+  systemPrompt  String? @db.Text
+  apiKey        String?
+  modelName     String?
+  description   String?
+  prompt        String?
+  chatFrequency String?
 
-  botUserId       String @unique
-  botUser         User   @relation(fields: [botUserId], references: [id], onDelete: Cascade)
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@index([botUserId])
-}
-
-model PersonalBot {
-  id                       String  @id @default(cuid())
-  name                     String
-  profileDescription       String? @db.Text
-  imageUrl                 String? @db.Text
-  modelName                String
-  apiKey                   String?
-  systemPrompt             String  @db.Text
-  deleted                  Boolean @default(false)
-
-  creatorId                String
-  creator                  User @relation(fields: [creatorId], references: [id])
-
-  conversations            PersonalBotConversation[]
+  botUserId String @unique
+  botUser   User   @relation(fields: [botUserId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([creatorId])
+  @@index([botUserId])
+}
+
+model PersonalBot {
+  id                 String  @id @default(cuid())
+  name               String
+  profileDescription String? @db.Text
+  imageUrl           String? @db.Text
+  modelName          String
+  apiKey             String?
+  systemPrompt       String  @db.Text
+  deleted            Boolean @default(false)
+
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
+  conversations PersonalBotConversation[]
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
   PersonalBotMessage PersonalBotMessage[]
+
+  @@index([creatorId])
 }
 
 model PersonalBotConversation {
-  id                       String @id @default(cuid())
-  
-  userId                   String  
-  user                     User @relation(fields: [userId], references: [id])
-  
-  botId                    String
-  bot                      PersonalBot @relation(fields: [botId], references: [id])
-  
-  messages                 PersonalBotMessage[]
-  
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  botId String
+  bot   PersonalBot @relation(fields: [botId], references: [id])
+
+  messages PersonalBotMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, botId])
   @@index([userId])
   @@index([botId])
 }
 
-
 model PersonalBotMessage {
-  id                       String  @id @default(cuid())
-  content                  String  @db.Text
-  deleted                  Boolean @default(false)
+  id      String  @id @default(cuid())
+  content String  @db.Text
+  deleted Boolean @default(false)
 
-  botId                    String
-  bot                      PersonalBot @relation(fields: [botId], references: [id])
+  botId String
+  bot   PersonalBot @relation(fields: [botId], references: [id])
 
-  conversationId           String
-  conversation             PersonalBotConversation @relation(fields: [conversationId], references: [id])
-  
-  fromBot                  Boolean @default(false)
-  
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  
+  conversationId String
+  conversation   PersonalBotConversation @relation(fields: [conversationId], references: [id])
+
+  fromBot Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([conversationId])
   @@index([botId])
 }
@@ -136,18 +137,18 @@ model Account {
   session_state            String?
   refresh_token_expires_in Int?
   user                     User?   @relation(fields: [userId], references: [id])
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   @@unique([provider, providerAccountId])
   @@index([userId])
 }
 
 model VerificationToken {
-  id String @id @default(cuid())
-  email String
-  token String @unique
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
   expires DateTime
 
   @@unique([email, token])
@@ -155,15 +156,15 @@ model VerificationToken {
 
 //TODO: swap to uuid during MVP
 model Server {
-  id String @id @default(cuid())
-  name String
-  imageUrl String       @db.Text
-  inviteCode String     @unique
+  id         String @id @default(cuid())
+  name       String
+  imageUrl   String @db.Text
+  inviteCode String @unique
 
   userId String
-  user User @relation(fields: [userId], references:[id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  members Member[]
+  members  Member[]
   channels Channel[]
 
   createdAt DateTime @default(now())
@@ -180,21 +181,21 @@ enum MemberRole {
 
 model Member {
   // TODO: replace cuid with uuid after MVP
-  id String           @id @default(cuid())
-  role MemberRole     @default(GUEST)
+  id   String     @id @default(cuid())
+  role MemberRole @default(GUEST)
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   serverId String
-  server Server @relation(fields:[serverId], references: [id], onDelete: Cascade)
-  
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
   messages Message[]
 
   directMessages Dm[]
 
   conversationsInitiated Conversation[] @relation("MemberOne")
-  conversationsReceived Conversation[] @relation("MemberTwo")
+  conversationsReceived  Conversation[] @relation("MemberTwo")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -210,15 +211,15 @@ enum ChannelType {
 
 model Channel {
   //TODO: Switch to uuid in MVP
-  id String          @id @default(cuid())
+  id   String      @id @default(cuid())
   name String
-  type ChannelType   @default(TEXT)
+  type ChannelType @default(TEXT)
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   serverId String
-  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
   messages Message[]
 
@@ -230,15 +231,15 @@ model Channel {
 }
 
 model Message {
-  id String @id @default(uuid())
-  content String @db.Text
+  id      String  @id @default(uuid())
+  content String  @db.Text
   fileUrl String? @db.Text
 
   memberId String
-  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   channelId String
-  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   deleted Boolean @default(false)
 
@@ -253,28 +254,27 @@ model Conversation {
   id String @id @default(uuid())
 
   memberOneId String
-  memberOne Member @relation("MemberOne", fields: [memberOneId], references:[id], onDelete: Cascade)
+  memberOne   Member @relation("MemberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
 
   memberTwoId String
-  memberTwo Member @relation("MemberTwo", fields: [memberTwoId], references:[id], onDelete: Cascade)
+  memberTwo   Member @relation("MemberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
 
   directMessages Dm[]
 
-  @@index([memberTwoId])
-
   @@unique([memberOneId, memberTwoId])
+  @@index([memberTwoId])
 }
 
 model Dm {
-  id String @id @default(uuid())
-  content String @db.Text
+  id      String  @id @default(uuid())
+  content String  @db.Text
   fileUrl String? @db.Text
 
   memberId String
-  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   conversationId String
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
