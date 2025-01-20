@@ -59,13 +59,13 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             profileDescription: '',
             systemPrompt: '',
             imageUrl: '',
-            modelName: Object.values(AVAILABLE_MODELS)[0].name,
+            model: Object.values(AVAILABLE_MODELS)[0].name,
             fullPromptControl: false,
-            chatFrequency: 'average',
+            chatFrequency: ChatFrequency.Average,
         }
     });
 
-    const selectedModel = form.watch('modelName');
+    const selectedModel = form.watch('model');
 
     const isLoading = form.formState.isSubmitting;
 
@@ -98,8 +98,8 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
         onClose();
     }
 
-    const getMaxSystemPromptLength = (modelName: string) => {
-        return AVAILABLE_MODELS[modelName]?.maxSystemPromptLength ?? 1000;
+    const getMaxSystemPromptLength = (model: string) => {
+        return AVAILABLE_MODELS[model]?.maxSystemPromptLength ?? 1000;
     };
 
     const getCharacterCountDisplay = (currentLength: number, maxLength?: number) => {
@@ -252,7 +252,7 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                     </FormItem>
                                 )}
                                 />
-                                <FormField control={form.control} name='modelName' render={({field}) => (
+                                <FormField control={form.control} name='model' render={({field}) => (
                                     <FormItem>
                                         <FormLabel className='uppercase text-xs font-bold text-secondary'>Model </FormLabel>
                                         <Select disabled={isLoading} 
