@@ -2,7 +2,7 @@ import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 import { MessagePostHandlerParams, MessageEditHandlerParams,
     MessageResponse, MessageUpdateResponse, ChannelPostHandlerParams, 
-    DmPostHandlerParams, ChannelEditHandlerParams, DmEditHandlerParams } from "./entities/message-handler-types.js";
+    DmPostHandlerParams, ChannelEditHandlerParams, DmEditHandlerParams } from "../entities/message-handler-types.js";
 
 
 

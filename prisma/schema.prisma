@@ -26,7 +26,6 @@ model User {
   statusMessage  String?
   status         String?
   activity       String?
-  apiKeys        Json?     @db.Json
 
   accounts                 Account[]
   servers                  Server[]
@@ -35,6 +34,7 @@ model User {
   personalBots             PersonalBot[]
   personalBotConversations PersonalBotConversation[]
   botConfig                BotConfiguration?
+  apiKeys                  ApiKey[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -47,11 +47,14 @@ model BotConfiguration {
   homeServerId  String
   botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
   systemPrompt  String? @db.Text
-  apiKey        String?
   modelName     String?
   description   String?
   prompt        String?
   chatFrequency String?
+  useSystemKey  Boolean @default(true)
+
+  apiKeyId String?
+  apiKey   ApiKey? @relation(fields: [apiKeyId], references: [id])
 
   botUserId String @unique
   botUser   User   @relation(fields: [botUserId], references: [id], onDelete: Cascade)
@@ -60,6 +63,25 @@ model BotConfiguration {
   updatedAt DateTime @updatedAt
 
   @@index([botUserId])
+  @@index([apiKeyId])
+}
+
+model ApiKey {
+  id       String  @id @default(cuid())
+  model    String // e.g., "gpt-4", "claude-3"
+  key      String
+  isActive Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  botConfigurations BotConfiguration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, model])
+  @@index([userId])
 }
 
 model PersonalBot {

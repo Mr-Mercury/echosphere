@@ -3,10 +3,10 @@
     import { createServer } from 'http';
     import activeSessions from "./util/sessionStore.js";
     import { Server as IoServer, Socket } from 'socket.io';
-    import { messageGetUserById } from "./lib/messageGetUserById.js";
+    import { messageGetUserById } from "./lib/messages/messageGetUserById.js";
     import dotenv from 'dotenv';
     import cors from 'cors';
-    import {messagePostHandler, messageEditHandler} from "./lib/message-handler.js";
+    import {messagePostHandler, messageEditHandler} from "./lib/messages/message-handler.js";
 
     import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
     import type { Session } from "@auth/express";
@@ -16,9 +16,9 @@
 
 
 
-    import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
+    import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/messages/message-auth.js";
         
-    import { db } from "./lib/messageDbConnection.js";
+    import { db } from "./lib/messages/messageDbConnection.js";
 
     //TYPES - TODO: remove index signatures in final version
 

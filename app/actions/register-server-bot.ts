@@ -67,7 +67,7 @@ export const registerServerBotAction = async (
                        systemPrompt,
                        modelName: model,
                        chatFrequency,
-                       apiKey,
+                       apiKeyId: apiKey.id,
                        homeServerId,
                    }
                }
