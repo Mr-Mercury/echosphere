@@ -71,7 +71,7 @@ export interface MessageUpdateResponse {
     error?: string;
 }
 
-export interface Message {
+export interface MessageData {
     id: string;
     content: string;
     fileUrl: string | null;

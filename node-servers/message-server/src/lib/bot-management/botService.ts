@@ -1,6 +1,7 @@
 import { db } from "../messages/messageDbConnection.js";
 import { Server as IoServer } from 'socket.io';
 import { messagePostHandler } from "../messages/message-handler.js";
+import { llmApi } from "./llm-api/controller.js";
 import { generatePrompt } from "./prompt/generatePrompt.js";
 import { BotConfiguration, BotInstance, ChannelInfo, ChannelTimer } from "../entities/bot-types.js";
 
@@ -92,12 +93,20 @@ export class BotServiceManager {
             where: {
                 channelId
             },
+            include: {
+                member: {
+                    include: {
+                        user: true
+                    }
+                }
+            },
             orderBy: {
                 createdAt: 'desc' 
             },
             take: 30
         });
 
-        const prompt = await this.generatePrompt(config, recentMessages);
+        const prompt = await generatePrompt(config, recentMessages);
+        const message = await llmApi(config.modelName, prompt);
     }
 }
