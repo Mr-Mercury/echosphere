@@ -71,3 +71,12 @@ export interface MessageUpdateResponse {
     error?: string;
 }
 
+export interface Message {
+    id: string;
+    content: string;
+    fileUrl: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    memberId: string;
+    member: MemberWithUser;
+}

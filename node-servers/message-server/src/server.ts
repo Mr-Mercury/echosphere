@@ -7,6 +7,7 @@
     import dotenv from 'dotenv';
     import cors from 'cors';
     import {messagePostHandler, messageEditHandler} from "./lib/messages/message-handler.js";
+    import { BotServiceManager } from "./lib/bot-management/botService.js";
 
     import type { AdapterUser, AdapterSession } from '@auth/core/adapters';
     import type { Session } from "@auth/express";
@@ -111,6 +112,8 @@
             credentials: true 
         }
     });
+
+    const botService = new BotServiceManager(io);
 
     app.use(express.json());
 
@@ -283,4 +286,16 @@
 
     server.listen(port, () => {
         console.log('Socket listening on port ' + port);
+        try {
+            botService.Initialize();
+            console.log('Bot Service Manager Initialized');
+        } catch (error) {
+            console.error('Failed to initialize bot service manager (message server): ', error);
+        }
     })
+
+    // TODO: Add SIGTERM to stop all bots and close server
+    // process.on('SIGTERM', () => {
+    //     botService.stopAll();
+    //     server.close();
+    // });

@@ -1,6 +1,17 @@
 interface BotInstance {
-    config: BotConfig;
+    config: BotConfiguration;
+    channels: ChannelInfo[];
+    channelTimers: Map<string, ChannelTimer>;
+}
+
+interface ChannelInfo {
+    id: string;
+    name: string;
+}
+
+interface ChannelTimer {
     timer: NodeJS.Timeout;
+    lastMessageTime: number;
 }
 
 interface ApiKey {
@@ -11,7 +22,7 @@ interface ApiKey {
     userId: string;
 }
 
-interface BotConfig {
+interface BotConfiguration {
     id: string;
     isActive: boolean;
     botName: string;
@@ -27,4 +38,4 @@ interface BotConfig {
     botUserId: string;
 }
 
-export type { BotConfig, BotInstance, ApiKey };
+export type { BotConfiguration, BotInstance, ApiKey, ChannelTimer, ChannelInfo };

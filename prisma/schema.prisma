@@ -45,6 +45,7 @@ model BotConfiguration {
   isActive      Boolean @default(true)
   botName       String
   homeServerId  String
+
   botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
   systemPrompt  String? @db.Text
   modelName     String?
