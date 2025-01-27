@@ -54,7 +54,7 @@ export class BotServiceManager {
                     const nextMessageDelay = Math.floor(baseFrequency * randomMultiplier);
 
                     const timer = setTimeout( async () => {
-                        await this.sendMessage(config, channel.id);
+                        await this.sendMessage(config, channel.id, channel.name);
                         scheduleChannelMessage();
                     }, nextMessageDelay);
 
@@ -79,16 +79,16 @@ export class BotServiceManager {
         }
     }
 
-    private async sendMessage(config: BotConfiguration, channelId: string) {
+    private async sendMessage(config: BotConfiguration, channelId: string, channelName: string) {
         try {
-            const message = await this.generateMessage(config, channelId);
+            const message = await this.generateMessage(config, channelId, channelName);
             this.io.to(config.homeServerId).emit('botMessage', message);
         } catch (error) {
             console.error('Failed to send message for bot:', config.id, error);
         }
     }
 
-    private async generateMessage(config: BotConfiguration, channelId: string) {
+    private async generateMessage(config: BotConfiguration, channelId: string, channelName: string) {
         const recentMessages = await db.message.findMany({
             where: {
                 channelId
@@ -106,7 +106,7 @@ export class BotServiceManager {
             take: 30
         });
 
-        const prompt = await generatePrompt(config, recentMessages);
-        const message = await llmApi(config.modelName, prompt);
+        const userPrompt = await generatePrompt(recentMessages, channelName);
+        const message = await llmApi(config, userPrompt);
     }
 }
