@@ -41,10 +41,10 @@ model User {
 }
 
 model BotConfiguration {
-  id            String  @id @default(cuid())
-  isActive      Boolean @default(true)
-  botName       String
-  homeServerId  String
+  id           String  @id @default(cuid())
+  isActive     Boolean @default(true)
+  botName      String
+  homeServerId String
 
   botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
   systemPrompt  String? @db.Text

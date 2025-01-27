@@ -226,7 +226,7 @@
                 // Send required info to message Handler followed by emission & key
                 const result = await messagePostHandler(params);
                 if (!channelKey) return { status: 400, error: 'Channel key is undefined!'};
-                io.emit(channelKey, result.message);
+                io.to(channelId).emit(channelKey, result.message); 
             } catch (error) {
                 console.log('SOCKET MESSAGE POST ERROR: ', error);
                 io.emit('error', { status: 500, error: 'SOCKET MESSAGE POST ERROR'});

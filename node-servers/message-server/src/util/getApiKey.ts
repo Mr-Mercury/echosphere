@@ -2,5 +2,5 @@
 // process and send to appropriate LLM)
 
 export function getApiKey(apiKeyId: string) {
-    return process.env[CHATGPT_API_KEY];
+    return process.env['CHATGPT_API_KEY'];
 }

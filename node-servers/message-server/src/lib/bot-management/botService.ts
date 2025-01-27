@@ -22,7 +22,7 @@ export class BotServiceManager {
                 where: {
                     isActive: true
                 }
-            });
+            }) as unknown as BotConfiguration[];
 
             for (const config of botConfigs) {
                 await this.startBot(config);
@@ -82,7 +82,8 @@ export class BotServiceManager {
     private async sendMessage(config: BotConfiguration, channelId: string, channelName: string) {
         try {
             const message = await this.generateMessage(config, channelId, channelName);
-            this.io.to(config.homeServerId).emit('botMessage', message);
+            const channelKey = `chat:${channelId}:messages`;
+            this.io.to(channelId).emit(channelKey, message); 
         } catch (error) {
             console.error('Failed to send message for bot:', config.id, error);
         }
@@ -106,7 +107,9 @@ export class BotServiceManager {
             take: 30
         });
 
-        const userPrompt = await generatePrompt(recentMessages, channelName);
+        const userPrompt = generatePrompt(recentMessages, channelName);
         const message = await llmApi(config, userPrompt);
+
+        return message;
     }
 }
