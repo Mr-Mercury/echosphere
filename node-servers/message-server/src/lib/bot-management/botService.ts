@@ -4,6 +4,7 @@ import { messagePostHandler } from "../messages/message-handler.js";
 import { llmApi } from "./llm-api/controller.js";
 import { generatePrompt } from "./prompt/generatePrompt.js";
 import { BotConfiguration, BotInstance, ChannelInfo, ChannelTimer } from "../entities/bot-types.js";
+import { processMessage } from "./prompt/processMessage.js";
 
 
 
@@ -109,7 +110,34 @@ export class BotServiceManager {
 
         const userPrompt = generatePrompt(recentMessages, channelName);
         const message = await llmApi(config, userPrompt);
+        const processedMessage = processMessage(message, config.botName);
+        console.log(processedMessage);
+        return processedMessage;
+    }
 
-        return message;
+    async deactivateBot(botId: string) {
+        try {
+            const botInstance = this.bots.get(botId);
+
+            if (!botInstance) {
+                return { error: 'Bot not found'};
+            }
+
+            for (const [channelId, timer] of botInstance.channelTimers) {
+                clearTimeout(timer.timer);
+            }
+
+            await db.botConfiguration.update({
+                where: { id: botId},
+                data: { isActive: false }
+            })
+
+            this.bots.delete(botId);
+
+            return true;
+        } catch (error) {
+            console.error('Failed to deactivate bot:', botId, error);
+            throw error;
+        }
     }
 }
