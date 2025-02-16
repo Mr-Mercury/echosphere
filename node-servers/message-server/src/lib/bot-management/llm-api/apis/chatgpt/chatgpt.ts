@@ -12,7 +12,7 @@ export async function chatgpt(config: BotConfiguration, userPrompt: string) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
             model: config.modelName,
