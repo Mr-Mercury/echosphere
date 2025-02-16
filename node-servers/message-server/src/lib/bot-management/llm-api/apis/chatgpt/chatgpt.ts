@@ -1,7 +1,7 @@
 import { BotConfiguration } from "../../../../entities/bot-types.js";
 import { getApiKey } from "../../../../../util/getApiKey.js";
 
-export async function gpt4o(config: BotConfiguration, userPrompt: string) {
+export async function chatgpt(config: BotConfiguration, userPrompt: string) {
     const messages = [
         {role: 'system', content: config.systemPrompt},
         {role: 'user', content: userPrompt}
@@ -15,7 +15,7 @@ export async function gpt4o(config: BotConfiguration, userPrompt: string) {
             'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-            model: 'gpt-4o-latest',
+            model: config.modelName,
             messages: messages,
             temperature: 0.5,
             max_tokens: 4000
