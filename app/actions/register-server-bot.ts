@@ -4,6 +4,7 @@ import { ServerBotSchema } from '@/schemas';
 import { db } from '@/lib/db/db';
 import { serverBotPromptBuilder } from '@/lib/utilities/prompts/systemPromptBuilder';
 import { fetchUserApiKey } from '@/lib/utilities/data/fetching/userApiKey';
+import { sanitizeInput } from '@/lib/utilities/safety/sanitize';
 
 type ActionResult = {
    error?: string;
@@ -15,7 +16,7 @@ export const registerServerBotAction = async (
    userId: string, 
    homeServerId: string
 ): Promise<ActionResult> => {
-    
+
    try {
        if (!userId) {
            throw new Error('User ID is required');
@@ -41,6 +42,10 @@ export const registerServerBotAction = async (
            systemPrompt: rawSystemPrompt,
            ourApiKey
        } = validatedFields.data;
+
+       const sanitizedName = sanitizeInput(name);
+       const sanitizedDescription = sanitizeInput(profileDescription);
+       const sanitizedSystemPrompt = sanitizeInput(rawSystemPrompt);
 
        let apiKey: { id: string | null, key: string | null } = {
            id: null,
@@ -83,9 +88,9 @@ export const registerServerBotAction = async (
                image: imageUrl,
                botConfig: {
                    create: {
-                       botName: name,
-                       description: profileDescription,
-                       systemPrompt,
+                       botName: sanitizedName,
+                       description: sanitizedDescription,
+                       systemPrompt: sanitizedSystemPrompt,
                        modelName: model,
                        chatFrequency,
                        apiKeyId: apiKey.id,

@@ -3,11 +3,12 @@ import express from "express";
 import { createServer } from 'http';
 import activeSessions from "./util/sessionStore.js";
 import { Server as IoServer } from 'socket.io';
-import { messageGetUserById } from "./lib/messageGetUserById.js";
+import { messageGetUserById } from "./lib/messages/messageGetUserById.js";
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { messagePostHandler, messageEditHandler } from "./lib/message-handler.js";
-import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/message-auth.js";
+import { messagePostHandler, messageEditHandler } from "./lib/messages/message-handler.js";
+import { BotServiceManager } from "./lib/bot-management/botService.js";
+import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/messages/message-auth.js";
 //TODO: Env variables for port to enable horizontal scaling 
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
 // postgres adapter later on OR use the Redis adapter (preferred)
@@ -56,6 +57,7 @@ const io = new IoServer(server, {
         credentials: true
     }
 });
+const botService = new BotServiceManager(io);
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:3000',
@@ -161,7 +163,7 @@ io.on('connection', (socket) => {
             const result = await messagePostHandler(params);
             if (!channelKey)
                 return { status: 400, error: 'Channel key is undefined!' };
-            io.emit(channelKey, result.message);
+            io.to(channelId).emit(channelKey, result.message);
         }
         catch (error) {
             console.log('SOCKET MESSAGE POST ERROR: ', error);
@@ -174,11 +176,6 @@ io.on('connection', (socket) => {
             const { query, content, messageId, method, type } = data;
             const { serverId, channelId, conversationId } = query;
             let updateKey;
-            console.log('Type value:', type);
-            console.log('Type check for dm:', type === 'dm');
-            console.log('Type check for channel:', type === 'channel');
-            console.log('Type of type:', typeof type);
-            console.log('conversationId:', conversationId);
             if (!content)
                 return { status: 400, error: 'No content in replacement!' };
             const params = {
@@ -207,7 +204,6 @@ io.on('connection', (socket) => {
             if (!updateKey)
                 return { status: 400, error: 'Update key is undefined!' };
             const response = await messageEditHandler(params);
-            console.log('response is: ' + response);
             io.emit(updateKey, response?.message);
             return response;
         }
@@ -224,5 +220,17 @@ io.on('connection', (socket) => {
 });
 server.listen(port, () => {
     console.log('Socket listening on port ' + port);
+    try {
+        botService.Initialize();
+        console.log('Bot Service Manager Initialized');
+    }
+    catch (error) {
+        console.error('Failed to initialize bot service manager (message server): ', error);
+    }
 });
+// TODO: Add SIGTERM to stop all bots and close server
+// process.on('SIGTERM', () => {
+//     botService.stopAll();
+//     server.close();
+// });
 //# sourceMappingURL=server.js.map
