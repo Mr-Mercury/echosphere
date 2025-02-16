@@ -37,12 +37,32 @@ export const registerServerBotAction = async (
            model, 
            fullPromptControl, 
            chatFrequency,
-           systemPrompt: rawSystemPrompt 
+           systemPrompt: rawSystemPrompt,
+           ourApiKey
        } = validatedFields.data;
 
-       const apiKey = await fetchUserApiKey(userId, model);
-       if (!apiKey) {
-           return { error: `No API key found for model: ${model}` };
+       let apiKey: { id: string | null, key: string | null } = {
+           id: null,
+           key: null
+       };
+       
+       if (ourApiKey === false) {
+           const fetchedKey = await fetchUserApiKey(userId, model);
+           if (!fetchedKey) {
+               return { error: `No API key found for model: ${model}` };
+           }
+           apiKey = {
+               id: fetchedKey.id,
+               key: fetchedKey.key
+           };
+       }
+
+       if (ourApiKey === true) {
+           apiKey.id = 'our-api-key';
+           apiKey.key = process.env.OPENAI_API_KEY ?? null;
+           if (!apiKey.key) {
+               return { error: `No API key found for model: ${model}` };
+           }
        }
 
        let systemPrompt = rawSystemPrompt;

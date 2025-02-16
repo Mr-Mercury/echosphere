@@ -87,7 +87,8 @@ export const ServerBotSchema = z.object({
         message: 'Invalid model selected'
     }),
     fullPromptControl: z.boolean(),
-    chatFrequency: z.nativeEnum(ChatFrequency)
+    chatFrequency: z.nativeEnum(ChatFrequency),
+    ourApiKey: z.boolean()
 })
 
 export const MessageFileUploadSchema = z.object({
