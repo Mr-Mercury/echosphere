@@ -15,6 +15,7 @@ export const registerServerBotAction = async (
    userId: string, 
    homeServerId: string
 ): Promise<ActionResult> => {
+    
    try {
        if (!userId) {
            throw new Error('User ID is required');
@@ -45,7 +46,7 @@ export const registerServerBotAction = async (
            id: null,
            key: null
        };
-       
+
        if (ourApiKey === false) {
            const fetchedKey = await fetchUserApiKey(userId, model);
            if (!fetchedKey) {
