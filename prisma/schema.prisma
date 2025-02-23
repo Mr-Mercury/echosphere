@@ -201,6 +201,7 @@ enum MemberRole {
   ADMIN
   MODERATOR
   GUEST
+  ECHO
 }
 
 model Member {

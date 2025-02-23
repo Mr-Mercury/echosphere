@@ -33,50 +33,89 @@ export class BotServiceManager {
         }
     }
 
-    private async startBot(config: BotConfiguration) {
+    public async startBot(config: BotConfiguration) {
         try {
-            const rawChannels = await db.channel.findMany({
-                where: {
-                    serverId: config.homeServerId
-                }
-            });
+            // Check if bot is already running
+            if (this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} is already running`);
+                return;
+            }
 
-            const channels = rawChannels.map(channel => ({
-                id: channel.id,
-                name: channel.name
-            }));
+            // DB operations and initial setup
+            const botInstance = await this.coldStartBot(config);
+            
+            // Set up timers and start the bot running
+            await this.warmStartBot(botInstance);
 
-            const channelTimers = new Map<string, ChannelTimer>();
+            console.log(`Bot ${config.botName} started successfully`);
+        } catch (error) {
+            console.error(`Failed to start bot ${config.botName}:`, error);
+            await this.cleanupBot(config.id);
+            throw error;
+        }
+    }
 
-            channels.forEach(channel => {
-                const scheduleChannelMessage = () => {
-                    const randomMultiplier = 0.5 + Math.random();
-                    const baseFrequency = parseInt(config.chatFrequency) * 1000;
-                    const nextMessageDelay = Math.floor(baseFrequency * randomMultiplier);
+    private async coldStartBot(config: BotConfiguration): Promise<BotInstance> {
+        // Database operations and initial setup
+        const rawChannels = await db.channel.findMany({
+            where: {
+                serverId: config.homeServerId
+            }
+        });
 
-                    const timer = setTimeout( async () => {
+        const channels = rawChannels.map(channel => ({
+            id: channel.id,
+            name: channel.name
+        }));
+
+        return {
+            config,
+            channels,
+            channelTimers: new Map()
+        };
+    }
+
+    private async warmStartBot(botInstance: BotInstance) {
+        const { config, channels } = botInstance;
+        const channelTimers = new Map<string, ChannelTimer>();
+
+        // Set up message scheduling for each channel
+        channels.forEach(channel => {
+            const scheduleChannelMessage = () => {
+                const randomMultiplier = 0.5 + Math.random();
+                const baseFrequency = parseInt(config.chatFrequency) * 1000;
+                const nextMessageDelay = Math.floor(baseFrequency * randomMultiplier);
+
+                const timer = setTimeout(async () => {
+                    try {
                         await this.sendMessage(config, channel.id, channel.name);
                         scheduleChannelMessage();
-                    }, nextMessageDelay);
+                    } catch (error) {
+                        console.error(`Failed to send message for bot ${config.botName} in channel ${channel.name}:`, error);
+                        scheduleChannelMessage();
+                    }
+                }, nextMessageDelay);
 
-                    channelTimers.set(channel.id, {
-                        timer,
-                        lastMessageTime: Date.now()
-                    });
-                }
-
-                scheduleChannelMessage();
-            });
-
-            const botInstance: BotInstance = {
-                config,
-                channels,
-                channelTimers
+                channelTimers.set(channel.id, {
+                    timer,
+                    lastMessageTime: Date.now()
+                });
             };
 
-            this.bots.set(config.id, botInstance);
-        } catch (error) {
-            console.error('Failed to start bot for config:', config.id, error);
+            scheduleChannelMessage();
+        });
+
+        botInstance.channelTimers = channelTimers;
+        this.bots.set(config.id, botInstance);
+    }
+
+    private async cleanupBot(botId: string) {
+        const existingBot = this.bots.get(botId);
+        if (existingBot) {
+            existingBot.channelTimers.forEach((timer) => {
+                clearTimeout(timer.timer);
+            });
+            this.bots.delete(botId);
         }
     }
 

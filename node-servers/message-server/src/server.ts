@@ -179,6 +179,21 @@
         }
     })
 
+    app.post('/bots/start', async (req, res) => {
+        try {
+            const { botConfig } = req.body;
+
+            if (!botConfig || !botConfig.id) {
+                return res.status(400).json({ error: 'Invalid bot configuration' });
+            }
+
+            await botService.startBot(botConfig);
+            res.status(200).json({ message: 'Bot started successfully' });
+        } catch (error) {
+            console.log('MESSAGE SERVER BOT START ERROR: ', error);
+            res.status(500).json({ error: 'Failed to start bot' });
+        }
+    })  
     // Socket logic starts here
     
     io.use(socketAuthMiddleware);
@@ -274,6 +289,16 @@
             } catch (error) {
                 console.log('SOCKET ALTER ERROR: ', error);
                 io.emit('error', { status: 500, error: 'SOCKET ALTER ERROR'});
+            }
+        })
+
+        socket.on('newBot', async (botConfig) => {
+            try {
+                await botService.startBot(botConfig);
+                console.log('Bot started: ' + botConfig.botName);
+            } catch (error) {
+                console.log('SOCKET NEW BOT ERROR: ', error);
+                io.emit('error', { status: 500, error: 'SOCKET NEW BOT ERROR'});
             }
         })
         
