@@ -32,9 +32,10 @@ import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ServerWithMembersAndProfiles } from '@/lib/entities/servers';
 import FileUpload from '@/components/islets/uploads/file-upload';
+import { Switch } from "../../ui/switch";
 
 interface CreateServerBotModalProps {
     data?: {
@@ -44,6 +45,8 @@ interface CreateServerBotModalProps {
 
 
 const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
+    const [imageUrl, setImageUrl] = useState<string>('');
+    const [useDefaultImage, setUseDefaultImage] = useState(false);
     const { isOpen, onClose, type } = useModal();
     const router = useRouter();
     const params = useParams();
@@ -65,6 +68,13 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             ourApiKey: true
         }
     });
+
+    const setDefaultImage = () => {
+        const defaultImageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg';
+        setImageUrl(defaultImageUrl);
+        form.setValue('imageUrl', defaultImageUrl);
+    }
+    
 
     const selectedModel = form.watch('model');
 
@@ -102,6 +112,16 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
         const limit = maxLength ?? getMaxSystemPromptLength(selectedModel);
         return `${currentLength} / ${limit} characters`;
     };
+
+    const handleImageToggle = (checked: boolean) => {
+        setUseDefaultImage(checked);
+        if (checked) {
+            setDefaultImage();
+        } else {
+            setImageUrl('');
+            form.setValue('imageUrl', '');
+        }
+    }
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleClose}>
@@ -156,7 +176,7 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                                 {...field}
                                                 maxLength={500}
                                                 />
-                                        </FormControl>
+                                        </FormControl> 
                                         <FormMessage />
                                         <div className="text-xs text-muted-foreground text-right">
                                             {getCharacterCountDisplay(
@@ -279,17 +299,46 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                     </FormItem>
                                 )}
                                 />
-                                <div className='flex items-center justify-center text-center'>
-                                    <FormField control={form.control} name='imageUrl' 
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <FileUpload 
-                                                    endpoint='serverImage' value={field.value}
-                                                    onChange={field.onChange} />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}/>
+                                <div className='space-y-4'>
+                                    <div className='flex items-center justify-between px-2'>
+                                        <div className='flex items-center space-x-2'>
+                                            <Switch 
+                                                checked={useDefaultImage}
+                                                onCheckedChange={handleImageToggle}
+                                            />
+                                            <span className='text-xs text-muted-foreground'>
+                                                Use default avatar
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className='flex items-center justify-center text-center'>
+                                        <FormField 
+                                            control={form.control} 
+                                            name='imageUrl' 
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        {useDefaultImage ? (
+                                                            <div className='relative w-24 h-24'>
+                                                                <img 
+                                                                    src={field.value}
+                                                                    alt="Default avatar"
+                                                                    className='rounded-full w-full h-full object-cover'
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <FileUpload 
+                                                                endpoint='serverImage' 
+                                                                value={field.value}
+                                                                onChange={field.onChange} 
+                                                            />
+                                                        )}
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <DialogFooter className='px-6 py-4'>

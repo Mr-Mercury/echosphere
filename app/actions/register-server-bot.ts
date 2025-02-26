@@ -63,6 +63,7 @@ export const registerServerBotAction = async (
         const sanitizedName = sanitizeInput(name);
         const sanitizedDescription = sanitizeInput(profileDescription);
         const sanitizedSystemPrompt = sanitizeInput(rawSystemPrompt);
+        
 
         let apiKey: { id: string | null, key: string | null } = {
             id: null,

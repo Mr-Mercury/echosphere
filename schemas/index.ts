@@ -31,7 +31,8 @@ export const RegistrationSchema = z.object({
     }),
     username: z.string().min(1, {
         message: 'You must enter a username'
-    })
+    }),
+    imageUrl: z.string().optional()
 });
 
 export const ServerSchema = z.object({

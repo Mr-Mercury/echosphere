@@ -18,6 +18,7 @@ export const RegistrationForm = ({}) => {
     const [useError, setError] = useState<string | undefined>('');
     const [useSuccess, setSuccess] = useState<string | undefined>('');
     const [isPending, startTransition] = useTransition();
+    const [imageUrl, setImageUrl] = useState<string>('');
 
     const form = useForm<z.infer<typeof RegistrationSchema>>({
         resolver: zodResolver(RegistrationSchema),
@@ -25,8 +26,16 @@ export const RegistrationForm = ({}) => {
             email: '',
             password: '',
             username: '',
+            imageUrl: '',
         }
     }); 
+    
+    const setDefaultImage = () => {
+        const defaultImageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg';
+        setImageUrl(defaultImageUrl);
+        form.setValue('imageUrl', defaultImageUrl);
+    }
+
 // useTransition here to facilitate smooth caching 
     const onSubmit = (values: z.infer<typeof RegistrationSchema>) => {
         setError('');
