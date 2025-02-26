@@ -64,7 +64,6 @@ export const registerServerBotAction = async (
         const sanitizedDescription = sanitizeInput(profileDescription);
         const sanitizedSystemPrompt = sanitizeInput(rawSystemPrompt);
         
-
         let apiKey: { id: string | null, key: string | null } = {
             id: null,
             key: null
@@ -104,6 +103,8 @@ export const registerServerBotAction = async (
                 human: false,
                 initialized: true,
                 image: imageUrl,
+                name: sanitizedName,
+                username: sanitizedName,
                 botConfig: {
                     create: {
                         botName: sanitizedName,
