@@ -72,17 +72,12 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
 
     const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
-            const user = await currentUser();
-            const userId = user?.id;
-
-            if (!userId) {
-                return { error: "User not found" }
-            }
-
-            const result = await registerServerBotAction(val, userId, params?.serverId as string);
+            const result = await registerServerBotAction(val, params?.serverId as string);
 
             if (result.error) {
-                return { error: result.error }
+                // TODO: Add proper error handling/display here
+                console.error(result.error);
+                return;
             }
 
             // Clearing 

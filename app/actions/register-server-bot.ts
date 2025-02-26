@@ -6,6 +6,7 @@ import { serverBotPromptBuilder } from '@/lib/utilities/prompts/systemPromptBuil
 import { fetchUserApiKey } from '@/lib/utilities/data/fetching/userApiKey';
 import { sanitizeInput } from '@/lib/utilities/safety/sanitize';
 import { MemberRole } from '@prisma/client';
+import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 
 type ActionResult = {
     error?: string;
@@ -14,17 +15,32 @@ type ActionResult = {
 
 export const registerServerBotAction = async (
     values: z.infer<typeof ServerBotSchema>, 
-    userId: string, 
     homeServerId: string
 ): Promise<ActionResult> => {
-
     try {
-        if (!userId) {
-            throw new Error('User ID is required');
+        // Get the current user server-side
+        const user = await currentUser();
+        if (!user) {
+            return { error: "Unauthorized" };
         }
 
         if (!homeServerId) {
-            throw new Error('Server ID is required');
+            return { error: "Server ID is required" };
+        }
+
+        // Verify the user has permission to create bots in this server
+        const serverMember = await db.member.findFirst({
+            where: {
+                serverId: homeServerId,
+                userId: user.id,
+                role: {
+                    in: [MemberRole.ADMIN, MemberRole.MODERATOR]
+                }
+            }
+        });
+
+        if (!serverMember) {
+            return { error: "You don't have permission to create bots in this server" };
         }
 
         const validatedFields = ServerBotSchema.safeParse(values);
@@ -54,7 +70,7 @@ export const registerServerBotAction = async (
         };
 
         if (ourApiKey === false) {
-            const fetchedKey = await fetchUserApiKey(userId, model);
+            const fetchedKey = await fetchUserApiKey(user.id, model);
             if (!fetchedKey) {
                 return { error: `No API key found for model: ${model}` };
             }
