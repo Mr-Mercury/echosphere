@@ -27,6 +27,7 @@ const roleIcons = {
     'GUEST': null,
     'MODERATOR': <ShieldCheck className='h-4 w-4 ml-2 text-indigo-500' />,
     'ADMIN': <ShieldAlert className='h-4 w-4 text-rose-500' />,
+    'ECHO': <Shield className='h-4 w-4 ml-2 text-green-500' />
 }
 
 const MembersModal = () => {
@@ -110,37 +111,47 @@ const MembersModal = () => {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className='bg-black text-xs font-medium 
                                             text-neutral-400' side='left'>
-                                            <DropdownMenuSub>
-                                                <DropdownMenuSubTrigger className='flex items-center'>
-                                                    <ShieldQuestion className='w-4 h-4 mr-2' />
-                                                    <span>Role</span>
-                                                </DropdownMenuSubTrigger>
-                                                <DropdownMenuPortal>
-                                                    <DropdownMenuSubContent className='bg-black text-xs 
-                                                    font-medium text-neutral-400'>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member, 'GUEST')}>
-                                                            <Shield className='h-4 w-4 mr-2' />
-                                                            Guest
-                                                            {member.role === 'GUEST' && 
-                                                            <Check className='h-4 w-4 ml-auto'/>}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onRoleChange(member, 'MODERATOR')}>
-                                                            <ShieldCheck className='h-4 w-4 mr-2' />
-                                                            Moderator
-                                                            {member.role === 'MODERATOR' && 
-                                                            <Check className='h-4 w-4 ml-auto'/>}
-                                                        </DropdownMenuItem>
-                                                        {/*TODO: Add second member modal for bots, conditional on being a bot*/}
-                                                    </DropdownMenuSubContent>
-                                                </DropdownMenuPortal>
-                                            </DropdownMenuSub>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => onDelete(member)}>
-                                                <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
-                                                <div className='text-rose-500'>
-                                                    Remove
-                                                </div>
-                                            </DropdownMenuItem>
+                                            {member.role === 'ECHO' ? (
+                                                <DropdownMenuItem onClick={() => onDelete(member)}>
+                                                    <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
+                                                    <div className='text-rose-500'>
+                                                        Remove Bot
+                                                    </div>
+                                                </DropdownMenuItem>
+                                            ) : (
+                                                <>
+                                                    <DropdownMenuSub>
+                                                        <DropdownMenuSubTrigger className='flex items-center'>
+                                                            <ShieldQuestion className='w-4 h-4 mr-2' />
+                                                            <span>Role</span>
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuPortal>
+                                                            <DropdownMenuSubContent className='bg-black text-xs 
+                                                            font-medium text-neutral-400'>
+                                                                <DropdownMenuItem onClick={() => onRoleChange(member, 'GUEST')}>
+                                                                    <Shield className='h-4 w-4 mr-2' />
+                                                                    Guest
+                                                                    {member.role === 'GUEST' && 
+                                                                    <Check className='h-4 w-4 ml-auto'/>}
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => onRoleChange(member, 'MODERATOR')}>
+                                                                    <ShieldCheck className='h-4 w-4 mr-2' />
+                                                                    Moderator
+                                                                    {member.role === 'MODERATOR' && 
+                                                                    <Check className='h-4 w-4 ml-auto'/>}
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuSubContent>
+                                                        </DropdownMenuPortal>
+                                                    </DropdownMenuSub>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onClick={() => onDelete(member)}>
+                                                        <Trash2 className='h-4 w-4 mr-2 text-rose-500'/>
+                                                        <div className='text-rose-500'>
+                                                            Remove
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </>
+                                            )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>

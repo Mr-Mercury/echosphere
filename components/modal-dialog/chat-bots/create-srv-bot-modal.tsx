@@ -59,9 +59,10 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
             profileDescription: '',
             systemPrompt: '',
             imageUrl: '',
-            model: Object.values(AVAILABLE_MODELS)[0].name,
+            model: Object.keys(AVAILABLE_MODELS)[0],
             fullPromptControl: false,
             chatFrequency: ChatFrequency.Average,
+            ourApiKey: true
         }
     });
 
@@ -272,9 +273,9 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className='bg-primary text-secondary'>
-                                                {Object.values(AVAILABLE_MODELS).map((model) => (
-                                                    <SelectItem key={model.name} value={model.name} className='capitalize'>
-                                                        {model.name.toLowerCase()}
+                                                {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
+                                                    <SelectItem key={key} value={key} className='capitalize'>
+                                                        {model.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

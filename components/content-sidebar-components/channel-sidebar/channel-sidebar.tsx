@@ -5,7 +5,7 @@ import { getServerChannelsById } from "@/lib/utilities/data/fetching/serverData"
 import { ChannelType, MemberRole } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ServerSearch from "@/components/islets/search/server-search";
-import { Hash, Mic2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Hash, Mic2, ShieldAlert, ShieldCheck, Bot } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ServerListing } from "@/components/islets/section/server-listing";
 import { ChannelItem } from "@/components/islets/chat-window/channel-item";
@@ -24,8 +24,10 @@ const roleIconMap = {
     [MemberRole.GUEST]: null,
     [MemberRole.MODERATOR]: <ShieldCheck className='h-4 w-4 mr-2 text-indigo-500' />,
     [MemberRole.ADMIN]: <ShieldAlert className='h-4 w-4 mr-2 text-rose-500' />,
-}
+    [MemberRole.ECHO]: <Bot className='h-4 w-4 mr-2 text-green-500' />,
+} as const;
 
+// TODO: Split into two components - one for the sidebar and one for the members list - members list should be client & have socket listener for live updates
 export const ChannelSidebar = async (params: ChannelSidebarProps) => {
 
     const user = await currentUser();
