@@ -104,12 +104,6 @@ const ChatItem = ({
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            const url = qs.stringifyUrl({
-                url: `${messageApiUrl}/${id}`,
-                query: socketQuery
-            })
-
-            // await axios.patch(url, values);
             if (socket) {
                 socket.emit('alter', { query: socketQuery, messageId: id, content: values.content, method: 'EDIT', type: type });
                 setIsEditing(false);
@@ -159,13 +153,13 @@ const ChatItem = ({
                 </div>
                 <div className='flex flex-col w-full'>
                     <div className='flex items-center gap-x-2'>
-                        <div className='flex items-center'>
-                            <p onClick={onMemberClick} className='font-semibold text-sm hover:underline cursor-pointer'>
-                                {member.user.username}
-                            </p>
+                        <div className='flex items-center -ml-2'>
                             <NavTooltip label={member.role}>
                                 {roleIconMap[member.role]}
                             </NavTooltip>
+                            <p onClick={onMemberClick} className='font-semibold text-sm hover:underline cursor-pointer ml-1'>
+                                {member.user.username}
+                            </p>
                         </div>
                         <span className='text-xs text-zinc-400'>
                             {timestamp}
