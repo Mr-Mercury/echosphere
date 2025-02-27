@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import { Form, FormControl, FormField, FormItem } from "../ui/form";
 import qs from "query-string";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +16,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useSocket } from "../providers/socket-provider";
 import { useRouter, useParams } from "next/navigation";
+import { roleIconMap } from "@/lib/utilities/role-icons";
 
 
 
@@ -36,18 +36,12 @@ interface ChatItemProps {
     type: 'dm' | 'channel';
 }
 
-const roleIconMap = {
-    'GUEST': null,
-    'MODERATOR': <ShieldCheck className='w-4 h-4 ml-2 text-indigo-500' />,
-    'ADMIN': <ShieldAlert className='w-4 h-4 ml-2 text-rose-500' />,
-}
-
 const formSchema = z.object({
     content: z.string().min(1),
 });
 
 const ChatItem = ({
-    id, content, member, timestamp, fileUrl, deleted, 
+    id, content, member, timestamp, fileUrl, deleted,
     currentMember, isUpdated,
     messageApiUrl, socketQuery, type
 }: ChatItemProps) => {
@@ -58,8 +52,8 @@ const ChatItem = ({
 
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const {socket} = useSocket();
-    
+    const { socket } = useSocket();
+
     const fileType = fileUrl?.split('.').pop();
     const isAdmin = currentMember.role === MemberRole.ADMIN;
     const isModerator = currentMember.role === MemberRole.MODERATOR;
@@ -91,7 +85,7 @@ const ChatItem = ({
     //Prevents previous message from showing when triggering isEditing (e.g. during live messaging)
     useEffect(() => {
         const handleKeyDown = (event: any) => {
-            if (event.key === 'Escape' || event.keyCode=== 27) {
+            if (event.key === 'Escape' || event.keyCode === 27) {
                 setIsEditing(false);
             }
         };
@@ -117,8 +111,8 @@ const ChatItem = ({
 
             // await axios.patch(url, values);
             if (socket) {
-             socket.emit('alter', {query: socketQuery, messageId:id, content: values.content, method: 'EDIT', type: type});
-             setIsEditing(false);
+                socket.emit('alter', { query: socketQuery, messageId: id, content: values.content, method: 'EDIT', type: type });
+                setIsEditing(false);
             }
         } catch (error) {
             console.log(error);
@@ -127,10 +121,10 @@ const ChatItem = ({
 
     const onDelete = async () => {
         try {
-            console.log('Delete clicked, socket:', socket); 
+            console.log('Delete clicked, socket:', socket);
             setIsDeleting(true);
             if (!socket) {
-                console.log('No socket connection!'); 
+                console.log('No socket connection!');
                 return;
             }
 
@@ -146,7 +140,7 @@ const ChatItem = ({
                 messageId: id,
                 method: 'DELETE',
                 content: 'This message has been deleted',
-                type: type, 
+                type: type,
                 // or just leave it undefined since the handler sets it
             });
 
@@ -161,7 +155,7 @@ const ChatItem = ({
         <div className='relative group flex items-center hover:bg-black/5 p-4 transition w-full'>
             <div className='group flex gap-x-2 items-start w-full'>
                 <div onClick={onMemberClick} className='cursor-pointer hover:drop-shadow-md transition'>
-                    <UserAvatar src={member.user.image!}/>
+                    <UserAvatar src={member.user.image!} />
                 </div>
                 <div className='flex flex-col w-full'>
                     <div className='flex items-center gap-x-2'>
@@ -181,7 +175,7 @@ const ChatItem = ({
                         <a href={fileUrl} target='_blank' rel='noopener noreferrer'
                             className='relative aspect-square rounded-md mt-2 overflow-hidden border 
                             flex items-center bg-primary h-48 w-48'>
-                            <Image src={fileUrl} alt={content} layout='fill' className='object-cover'/>
+                            <Image src={fileUrl} alt={content} layout='fill' className='object-cover' />
                         </a>
                     )}
                     {isPDF && (
@@ -209,19 +203,19 @@ const ChatItem = ({
                     {!fileUrl && isEditing && (
                         <Form {...form}>
                             <form className='flex items-center w-full gap-x-2 pt-2'
-                            onSubmit={form.handleSubmit(onSubmit)}>
-                                <FormField 
+                                onSubmit={form.handleSubmit(onSubmit)}>
+                                <FormField
                                     control={form.control}
                                     name='content'
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem className='flex-1'>
                                             <FormControl>
                                                 <div className='relative w-full'>
                                                     <Input disabled={isLoading}
-                                                    className='p-2 bg-zinc-700/75 border-none border-0 focus-visible:ring-0
+                                                        className='p-2 bg-zinc-700/75 border-none border-0 focus-visible:ring-0
                                                     focus-visible:ring-offset-0 text-zinc-200'
-                                                    placeholder='Edited message'
-                                                    {...field}
+                                                        placeholder='Edited message'
+                                                        {...field}
                                                     />
                                                 </div>
 
@@ -248,20 +242,20 @@ const ChatItem = ({
                         <NavTooltip label='Edit'>
                             <Edit className='cursor-pointer ml-auto w-4 h-4
                             text-zinc-500 hover:text-zinc-300 transition'
-                            onClick={() => setIsEditing(true)}/>
+                                onClick={() => setIsEditing(true)} />
                         </NavTooltip>
                     )}
                     {canDeleteMessage && (
                         <NavTooltip label='Delete'>
                             <Trash className='cursor-pointer ml-auto w-4 h-4
                             text-zinc-500 hover:text-zinc-300 transition'
-                            onClick={() => {
-                                setIsDeleting(true);
-                                onDelete();
-                            }}/>
+                                onClick={() => {
+                                    setIsDeleting(true);
+                                    onDelete();
+                                }} />
                         </NavTooltip>
                     )}
-                    
+
                 </div>
             )}
         </div>

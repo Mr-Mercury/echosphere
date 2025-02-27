@@ -81,7 +81,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                         border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
                                         placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
                                         {...field}/>
-                                         <div className='absolute top-7 right-8'>
+                                        <div className='absolute top-7 right-8'>
                                             <EmojiMenu onChange={(emoji:string) => {
                                                 field.onChange(`${field.value} ${emoji}`)
                                             }}/>
