@@ -30,13 +30,15 @@ export async function chatgpt(config: BotConfiguration, userPrompt: string) {
         }
 
         const data = await response.json();
+        console.log('API Response:', JSON.stringify(data, null, 2)); // Debug log
         
-        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        if (!data?.choices?.[0]?.message?.content) {
             console.error('Unexpected API response format:', data);
             throw new Error('Invalid API response format');
         }
 
-        return data.choices[0].message.content;
+        const messageContent = data.choices[0].message.content;
+        return messageContent;
     } catch (error) {
         console.error('ChatGPT API call failed:', error);
         return `I apologize, but I'm having trouble responding right now. Please try again later.`;
