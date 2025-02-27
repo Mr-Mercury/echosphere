@@ -15,20 +15,14 @@ import axios from "axios";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ScrollArea } from "../ui/scroll-area";
 import { UserAvatar } from "../islets/users/user-avatar";
-import { Check, Loader2, MoreVertical, Shield, ShieldAlert, ShieldCheck, ShieldQuestion, Trash2 } from "lucide-react";
+import { Check, Loader2, MoreVertical, Bot, ShieldAlert, ShieldCheck, ShieldQuestion, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
     DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSubContent, 
     DropdownMenuTrigger, DropdownMenuSubTrigger } from "../ui/dropdown-menu";
 import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 import { Member, MemberRole } from "@prisma/client";
 import { useRouter } from 'next/navigation';
-
-const roleIcons = {
-    'GUEST': null,
-    'MODERATOR': <ShieldCheck className='h-4 w-4 ml-2 text-indigo-500' />,
-    'ADMIN': <ShieldAlert className='h-4 w-4 text-rose-500' />,
-    'ECHO': <Shield className='h-4 w-4 ml-2 text-green-500' />
-}
+import { roleIconMap } from "@/lib/utilities/role-icons";
 
 const MembersModal = () => {
     const router = useRouter();
@@ -93,7 +87,7 @@ const MembersModal = () => {
                             <UserAvatar src={member.user.image}/> 
                             <div className='flex flex-col gap-y-1'>
                                 <div className='text-xs gap-x-1 font-semibold flex items-center'>
-                                    {roleIcons[member.role]}
+                                    {roleIconMap[member.role]}
                                     {member.user.username}: {member.role}
                                 </div>
                                 <p className='text-xs px-6 text-zinc-500'>
@@ -129,7 +123,7 @@ const MembersModal = () => {
                                                             <DropdownMenuSubContent className='bg-black text-xs 
                                                             font-medium text-neutral-400'>
                                                                 <DropdownMenuItem onClick={() => onRoleChange(member, 'GUEST')}>
-                                                                    <Shield className='h-4 w-4 mr-2' />
+                                                                    <Bot className='h-4 w-4 mr-2' />
                                                                     Guest
                                                                     {member.role === 'GUEST' && 
                                                                     <Check className='h-4 w-4 ml-auto'/>}

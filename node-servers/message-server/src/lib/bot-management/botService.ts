@@ -149,7 +149,11 @@ export class BotServiceManager {
             });
 
             const userPrompt = generatePrompt(recentMessages, channelName);
-            const message = await llmApi(config, userPrompt);
+            const message = userPrompt;
+            
+
+            // TESTING COMMENTED OUT
+            // const message = await llmApi(config, userPrompt);
             
             if (!message) {
                 throw new Error('No message generated from LLM API');

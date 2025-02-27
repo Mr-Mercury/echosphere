@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { ServerListing } from "@/components/islets/section/server-listing";
 import { ChannelItem } from "@/components/islets/chat-window/channel-item";
 import { MemberList } from "@/components/islets/section/member-list";
+import { roleIconMap } from "@/lib/utilities/role-icons";
 
 interface ChannelSidebarProps {
     serverId: string;
@@ -19,13 +20,6 @@ const iconMap = {
     [ChannelType.TEXT]: <Hash className='mr-2 h-4 w-4' />,
     [ChannelType.AUDIO]: <Mic2 className='mr-2 h-4 w-4' />,
 }
-
-const roleIconMap = {
-    [MemberRole.GUEST]: null,
-    [MemberRole.MODERATOR]: <ShieldCheck className='h-4 w-4 mr-2 text-indigo-500' />,
-    [MemberRole.ADMIN]: <ShieldAlert className='h-4 w-4 mr-2 text-rose-500' />,
-    [MemberRole.ECHO]: <Bot className='h-4 w-4 mr-2 text-green-500' />,
-} as const;
 
 // TODO: Split into two components - one for the sidebar and one for the members list - members list should be client & have socket listener for live updates
 export const ChannelSidebar = async (params: ChannelSidebarProps) => {
