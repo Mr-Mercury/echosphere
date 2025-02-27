@@ -7,6 +7,7 @@ import { fetchUserApiKey } from '@/lib/utilities/data/fetching/userApiKey';
 import { sanitizeInput } from '@/lib/utilities/safety/sanitize';
 import { MemberRole } from '@prisma/client';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
+import { ChatFrequencyMsgPerMinute } from "@/lib/config/chat-variables";
 
 type ActionResult = {
     error?: string;
@@ -112,6 +113,7 @@ export const registerServerBotAction = async (
                         systemPrompt: sanitizedSystemPrompt,
                         modelName: model,
                         chatFrequency,
+                        messagesPerMinute: ChatFrequencyMsgPerMinute[chatFrequency as keyof typeof ChatFrequencyMsgPerMinute],
                         apiKeyId: apiKey.id,
                         homeServerId,
                     }

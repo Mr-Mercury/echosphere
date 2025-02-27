@@ -154,9 +154,14 @@ io.use(socketAuthMiddleware);
 io.on('connection', (socket) => {
     const session = socket.data.session;
     const username = session?.user?.username;
-    // TODO: Null check here when adding guests
     const userId = session?.user?.id ?? 'Guest';
     console.log('User ' + (username || 'Unknown') + ' connected');
+    // Join the channel room based on socketQuery
+    socket.on('subscribe_to_channel', (channelId) => {
+        console.log(`User ${username} subscribing to channel: ${channelId}`);
+        socket.join(channelId);
+        console.log(`Room ${channelId} members:`, io.sockets.adapter.rooms.get(channelId)?.size);
+    });
     scheduleSessionRecheck(socket);
     socket.on('message', async (data) => {
         console.log('User ' + (session?.user?.username || 'Unknown') + ' messaged');
@@ -175,9 +180,8 @@ io.on('connection', (socket) => {
                 if (!channelId)
                     return { status: 400, error: 'Channel Id missing!' };
                 channelKey = `chat:${channelId}:messages`;
-                console.log('in channel');
-                console.log(data);
-                console.log(channelKey);
+                // Join the channel room when sending a message
+                socket.join(channelId);
             }
             if (type === 'dm') {
                 if (!conversationId)

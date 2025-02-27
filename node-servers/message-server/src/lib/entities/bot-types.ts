@@ -32,7 +32,7 @@ interface BotConfiguration {
     modelName: string;
     description: string;
     prompt: string;
-    chatFrequency: string;
+    messagesPerMinute: number;
     useSystemKey: boolean;
     apiKeyId: string;
     botUserId: string;

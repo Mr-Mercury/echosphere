@@ -9,6 +9,7 @@ import { Fragment, useRef, ElementRef, useEffect } from "react";
 import { format } from 'date-fns';
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
+import { useSocket } from "@/components/providers/socket-provider";
 
 const DATE_FORMAT = 'd MMM yyyy, HH:mm';
 
@@ -49,10 +50,18 @@ const ChatMessages = ({
     paramValue,
     type
 }: ChatMessagesProps) => {
+    const { socket } = useSocket();
 
     const queryKey = `chat:${chatId}`;
     const addKey = `chat:${chatId}:messages`;
     const updateKey = `chat:${chatId}:messages:update`;
+
+    console.log('Chat component listening for messages on:', {
+        queryKey,
+        addKey,
+        updateKey,
+        socketQuery
+    });
 
     const chatRef = useRef<ElementRef<'div'>>(null);
     const bottomRef = useRef<ElementRef<'div'>>(null);
@@ -88,6 +97,18 @@ const ChatMessages = ({
         loadMore: fetchNextPage,
         count: data?.pages?.[0]?.items?.length || 0,
     });
+
+    useEffect(() => {
+        if (socket && chatId) {
+            // Subscribe to the channel
+            socket.emit('subscribe_to_channel', chatId);
+            
+            return () => {
+                // Optionally unsubscribe when component unmounts
+                socket.emit('unsubscribe_from_channel', chatId);
+            };
+        }
+    }, [socket, chatId]);
 
     if (status === 'pending') {
         return (

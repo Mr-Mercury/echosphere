@@ -6,8 +6,6 @@ import { generatePrompt } from "./prompt/generatePrompt.js";
 import { BotConfiguration, BotInstance, ChannelInfo, ChannelTimer } from "../entities/bot-types.js";
 import { processMessage } from "./prompt/processMessage.js";
 
-
-
 export class BotServiceManager {
     private bots: Map<string, BotInstance> = new Map();
     private io: IoServer;
@@ -83,11 +81,15 @@ export class BotServiceManager {
         channels.forEach(channel => {
             const scheduleChannelMessage = () => {
                 const randomMultiplier = 0.5 + Math.random();
-                // Convert chatFrequency from seconds to milliseconds after calculation
-                const baseFrequencyInSeconds = parseInt(config.chatFrequency);
-                const nextMessageDelay = Math.floor(baseFrequencyInSeconds * randomMultiplier * 60 * 1000); // Convert to minutes and then milliseconds
+                
+                // Get messages per minute from the config
+                const messagesPerMinute = config.messagesPerMinute || 3; // Default to 3 if not set
 
-                console.log(`Scheduling next message for ${config.botName} in ${nextMessageDelay/1000} seconds`);
+                // Convert messages per minute to delay in milliseconds
+                const baseFrequencyInSeconds = 60 / messagesPerMinute;
+                const nextMessageDelay = Math.floor(baseFrequencyInSeconds * randomMultiplier * 1000);
+
+                console.log(`Scheduling next message for ${config.botName} in ${Math.floor(nextMessageDelay/1000)} seconds (frequency: ${config.messagesPerMinute}, msgs/min: ${messagesPerMinute})`);
 
                 const timer = setTimeout(async () => {
                     try {
@@ -125,16 +127,36 @@ export class BotServiceManager {
     private async sendMessage(config: BotConfiguration, channelId: string, channelName: string) {
         try {
             const message = await this.generateMessage(config, channelId, channelName);
+            
+            // First save to DB using messagePostHandler
+            const params = {
+                userId: config.botUserId,
+                serverId: config.homeServerId,
+                channelId,
+                conversationId: null,
+                fileUrl: null,
+                content: message.content,
+                type: 'channel' as const
+            };
+
+            const result = await messagePostHandler(params);
+            
+            if (!result.message) {
+                throw new Error('Failed to save message to database');
+            }
+
             const channelKey = `chat:${channelId}:messages`;
             
-            // Log to verify message is being sent
-            console.log('Bot sending message:', {
+            console.log('Bot attempting to send message:', {
                 channelId,
                 channelKey,
-                message
+                messageContent: typeof result.message === 'string' ? result.message : result.message.content,
+                socketRoomSize: (await this.io.in(channelId).allSockets()).size,
+                message: result.message
             });
-            
-            this.io.to(channelId).emit(channelKey, message); 
+            // Emit the saved message from the DB
+            this.io.to(channelId).emit(channelKey, result.message);
+
         } catch (error) {
             console.error('Failed to send message for bot:', config.id, error);
         }

@@ -53,6 +53,7 @@ model BotConfiguration {
   prompt        String?
   chatFrequency String?
   useSystemKey  Boolean @default(true)
+  messagesPerMinute Int @default(3)
 
   apiKeyId String?
   apiKey   ApiKey? @relation(fields: [apiKeyId], references: [id])
