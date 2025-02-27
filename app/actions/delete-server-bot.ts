@@ -52,12 +52,22 @@ export const deleteServerBotAction = async (
             })
         });
 
-        // Delete the bot from the database
-        await db.user.delete({
-            where: {
-                id: botId
-            }
-        });
+        // Delete all related data in a transaction
+        await db.$transaction([
+            // Delete the bot configuration
+            db.botConfiguration.delete({
+                where: {
+                    id: botConfig.id
+                }
+            }),
+            // Delete the bot user
+            db.user.delete({
+                where: {
+                    id: botId
+                }
+            }),
+            // TODO - add deleted bot record here, trigger (isDeleted) on bot messages
+        ]);
 
         return { success: true };
 

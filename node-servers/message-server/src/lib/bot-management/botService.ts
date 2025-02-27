@@ -201,20 +201,19 @@ export class BotServiceManager {
             const botInstance = this.bots.get(botId);
 
             if (!botInstance) {
-                return { error: 'Bot not found'};
+                console.log(`Bot ${botId} not found in active bots`);
+                return true; // Return true since the bot is already not active
             }
 
+            // Clear all channel timers
             for (const [channelId, timer] of botInstance.channelTimers) {
                 clearTimeout(timer.timer);
             }
 
-            await db.botConfiguration.update({
-                where: { id: botId},
-                data: { isActive: false }
-            })
-
+            // Remove the bot from the active bots map
             this.bots.delete(botId);
 
+            console.log(`Bot ${botId} successfully removed from bot map`);
             return true;
         } catch (error) {
             console.error('Failed to deactivate bot:', botId, error);
