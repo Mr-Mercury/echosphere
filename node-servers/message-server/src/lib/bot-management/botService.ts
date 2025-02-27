@@ -130,28 +130,37 @@ export class BotServiceManager {
     }
 
     private async generateMessage(config: BotConfiguration, channelId: string, channelName: string) {
-        const recentMessages = await db.message.findMany({
-            where: {
-                channelId
-            },
-            include: {
-                member: {
-                    include: {
-                        user: true
+        try {
+            const recentMessages = await db.message.findMany({
+                where: {
+                    channelId
+                },
+                include: {
+                    member: {
+                        include: {
+                            user: true
+                        }
                     }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc' 
-            },
-            take: 30
-        });
+                },
+                orderBy: {
+                    createdAt: 'desc' 
+                },
+                take: 30
+            });
 
-        const userPrompt = generatePrompt(recentMessages, channelName);
-        const message = await llmApi(config, userPrompt);
-        const processedMessage = processMessage(message, config.botName);
-        console.log(processedMessage);
-        return processedMessage;
+            const userPrompt = generatePrompt(recentMessages, channelName);
+            const message = await llmApi(config, userPrompt);
+            
+            if (!message) {
+                throw new Error('No message generated from LLM API');
+            }
+
+            const processedMessage = processMessage(message, config.botName);
+            return processedMessage;
+        } catch (error) {
+            console.error(`Failed to generate message for bot ${config.botName}:`, error);
+            return processMessage("I'm having trouble generating a response right now.", config.botName);
+        }
     }
 
     async deactivateBot(botId: string) {
