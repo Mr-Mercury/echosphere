@@ -1,3 +1,18 @@
 export function processMessage(message: string, botName: string) {
-    return `${botName}: ${message}`;
+    return {
+        id: Date.now().toString(), // Generate a unique ID
+        content: message,
+        fileUrl: null,
+        deleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        member: {
+            id: botName, // Using botName as member ID for now
+            user: {
+                id: botName,
+                username: botName,
+                human: false
+            }
+        }
+    };
 }

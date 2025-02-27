@@ -83,8 +83,11 @@ export class BotServiceManager {
         channels.forEach(channel => {
             const scheduleChannelMessage = () => {
                 const randomMultiplier = 0.5 + Math.random();
-                const baseFrequency = parseInt(config.chatFrequency) * 1000;
-                const nextMessageDelay = Math.floor(baseFrequency * randomMultiplier);
+                // Convert chatFrequency from seconds to milliseconds after calculation
+                const baseFrequencyInSeconds = parseInt(config.chatFrequency);
+                const nextMessageDelay = Math.floor(baseFrequencyInSeconds * randomMultiplier * 60 * 1000); // Convert to minutes and then milliseconds
+
+                console.log(`Scheduling next message for ${config.botName} in ${nextMessageDelay/1000} seconds`);
 
                 const timer = setTimeout(async () => {
                     try {
@@ -123,6 +126,14 @@ export class BotServiceManager {
         try {
             const message = await this.generateMessage(config, channelId, channelName);
             const channelKey = `chat:${channelId}:messages`;
+            
+            // Log to verify message is being sent
+            console.log('Bot sending message:', {
+                channelId,
+                channelKey,
+                message
+            });
+            
             this.io.to(channelId).emit(channelKey, message); 
         } catch (error) {
             console.error('Failed to send message for bot:', config.id, error);
@@ -149,11 +160,7 @@ export class BotServiceManager {
             });
 
             const userPrompt = generatePrompt(recentMessages, channelName);
-            const message = userPrompt;
-            
-
-            // TESTING COMMENTED OUT
-            // const message = await llmApi(config, userPrompt);
+            const message = await llmApi(config, userPrompt);
             
             if (!message) {
                 throw new Error('No message generated from LLM API');

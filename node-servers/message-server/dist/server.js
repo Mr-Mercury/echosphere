@@ -133,6 +133,20 @@ app.post('/bots/start', async (req, res) => {
         res.status(500).json({ error: 'Failed to start bot' });
     }
 });
+app.post('/bots/stop', async (req, res) => {
+    try {
+        const { botId } = req.body;
+        if (!botId) {
+            return res.status(400).json({ error: 'Invalid bot ID' });
+        }
+        await botService.deactivateBot(botId);
+        res.status(200).json({ message: 'Bot stopped successfully' });
+    }
+    catch (error) {
+        console.log('MESSAGE SERVER BOT STOP ERROR: ', error);
+        res.status(500).json({ error: 'Failed to stop bot' });
+    }
+});
 // Socket logic starts here
 io.use(socketAuthMiddleware);
 // Join socket polling on connection based on user's server membership
