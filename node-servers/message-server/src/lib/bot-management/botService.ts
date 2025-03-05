@@ -166,7 +166,8 @@ export class BotServiceManager {
         try {
             const recentMessages = await db.message.findMany({
                 where: {
-                    channelId
+                    channelId,
+                    deleted: false
                 },
                 include: {
                     member: {

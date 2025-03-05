@@ -26,7 +26,7 @@ export const getRoleIcon = (role: MemberRole, className?: string) => {
             return <ShieldAlert className={cn('h-4 w-4', baseStyle, className)} />;
         case 'ECHO':
             // Using inline style because Bot icon uses strokes while Shield icons use fills
-            // text-green-500 class doesn't work well with stroke-based SVG icons
+            // text-green-500 class doesn't work with stroke-based SVG icons
             return <Bot className={cn('h-4 w-4', baseStyle, className)} style={{color: '#22c55e'}} />;
         default:
             return null;
