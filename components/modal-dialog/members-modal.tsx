@@ -22,7 +22,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem,
 import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 import { Member, MemberRole } from "@prisma/client";
 import { useRouter } from 'next/navigation';
-import { roleIconMap } from "@/lib/utilities/role-icons";
+import { getRoleIcon } from "@/lib/utilities/role-icons";
 
 const MembersModal = () => {
     const router = useRouter();
@@ -87,7 +87,7 @@ const MembersModal = () => {
                             <UserAvatar src={member.user.image}/> 
                             <div className='flex flex-col gap-y-1'>
                                 <div className='text-xs gap-x-1 font-semibold flex items-center'>
-                                    {roleIconMap[member.role]}
+                                    {getRoleIcon(member.role)}
                                     {member.user.username}: {member.role}
                                 </div>
                                 <p className='text-xs px-6 text-zinc-500'>
