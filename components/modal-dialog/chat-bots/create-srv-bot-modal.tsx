@@ -130,7 +130,7 @@ const CreateServerBotModal = ({ data }: CreateServerBotModalProps) => {
                     <DialogTitle className='text-2xl text-center font-bold'>
                         <div className='flex items-center justify-center'>
                             {data?.server?.imageUrl && (
-                                <img 
+                                <img  
                                     src={data?.server?.imageUrl}
                                     alt={`${data?.server?.name} image`}
                                     className='w-8 h-8 outline outline-1 outline-offset-1 outline-gray rounded-full mr-4'

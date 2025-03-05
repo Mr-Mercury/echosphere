@@ -5,12 +5,12 @@ import { getServerChannelsById } from "@/lib/utilities/data/fetching/serverData"
 import { ChannelType, MemberRole } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ServerSearch from "@/components/islets/search/server-search";
-import { Hash, Mic2, ShieldAlert, ShieldCheck, Bot } from "lucide-react";
+import { Hash, Mic2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ServerListing } from "@/components/islets/section/server-listing";
 import { ChannelItem } from "@/components/islets/chat-window/channel-item";
 import { MemberList } from "@/components/islets/section/member-list";
-import { roleIconMap } from "@/lib/utilities/role-icons";
+import { getRoleIcon } from "@/lib/utilities/role-icons";
 
 interface ChannelSidebarProps {
     serverId: string;
@@ -80,11 +80,14 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             {
                                 label: 'Members',
                                 type: 'member',
-                                data: server.members?.map((member) => ({
-                                    id: member.id,
-                                    name: member.user.username!,
-                                    icon: roleIconMap[member.role],
-                                }))
+                                data: server.members?.map((member) => {
+                                    console.log('Member role:', member.role);
+                                    return {
+                                        id: member.id,
+                                        name: member.user.username!,
+                                        icon: getRoleIcon(member.role),
+                                    };
+                                })
                             }
                         ]}/>
                 </div>

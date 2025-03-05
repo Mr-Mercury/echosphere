@@ -16,7 +16,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useSocket } from "../providers/socket-provider";
 import { useRouter, useParams } from "next/navigation";
-import { roleIconMap } from "@/lib/utilities/role-icons";
+import { getRoleIcon } from "@/lib/utilities/role-icons";
 
 
 
@@ -153,9 +153,9 @@ const ChatItem = ({
                 </div>
                 <div className='flex flex-col w-full'>
                     <div className='flex items-center gap-x-2'>
-                        <div className='flex items-center -ml-2'>
+                        <div className='flex items-center'>
                             <NavTooltip label={member.role}>
-                                {roleIconMap[member.role]}
+                                {getRoleIcon(member.role)}
                             </NavTooltip>
                             <p onClick={onMemberClick} className='font-semibold text-sm hover:underline cursor-pointer ml-1'>
                                 {member.user.username}

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utilities/clsx/utils";
 // DASHBOARD OR RESPONSE TABLES IF USER HAS A PREVIOUS SESSION
 
 const Home = () => {
+
     return (
         <main className='flex h-full h-screen flex-col items-center 
         justify-center bg-[#313338] text-white'>
