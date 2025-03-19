@@ -2,7 +2,7 @@ import { Menu } from "lucide-react"
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { ChannelSidebar } from "@/components/content-sidebar-components/channel-sidebar/channel-sidebar"
+import { ChannelSidebar } from "@/components/inside-server-sidebar-components/channel-sidebar/channel-sidebar"
 import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar"
 export const MobileToggle = ({serverId}: {serverId: string}) => {
     return (

@@ -1,10 +1,14 @@
-import { Server, Member, User } from "@prisma/client"
+import { Server, Member, User, BotConfiguration } from "@prisma/client"
 import { Server as NetServer, Socket } from 'net';
 import { NextApiResponse } from "next";
 import { Server as SocketIoServer } from 'socket.io'; 
 
 export type ServerWithMembersAndProfiles = Server & {
-    members: (Member & { user: User })[];
+    members: (Member & { 
+        user: User & { 
+            botConfig: BotConfiguration | null 
+        }
+    })[];
 };
 
 export type NextApiResponseIoServer = NextApiResponse & {

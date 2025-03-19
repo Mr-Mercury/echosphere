@@ -1,8 +1,8 @@
-import { ConversationSidebar } from "@/components/content-sidebar-components/conversation-sidebar/conversation-sidebar";
+import { ConversationSidebar } from "@/components/inside-server-sidebar-components/conversation-sidebar/conversation-sidebar";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { getConversationsByUserId } from "@/lib/utilities/data/fetching/userConversations";
 import { redirect } from "next/navigation";
-import { DmSidebar } from "@/components/content-sidebar-components/dm-sidebar/dm-sidebar";
+import { DmSidebar } from "@/components/inside-server-sidebar-components/dm-sidebar/dm-sidebar";
 
 type ConversationNode = {
     userId: string;

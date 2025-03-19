@@ -30,7 +30,11 @@ export const getServerChannelsById = async (serverId: string, userId: string) =>
             },
             members: {
                 include: {
-                    user: true,
+                    user: {
+                        include: {
+                            botConfig: true
+                        }
+                    },
                 },
                 orderBy: {
                     role: 'asc'

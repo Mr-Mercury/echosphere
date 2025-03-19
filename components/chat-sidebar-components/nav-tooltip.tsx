@@ -26,5 +26,4 @@ const NavTooltip = ({ label, children, side, align }: NavTooltipProps) => {
         </TooltipProvider>
     )
 }
-
 export default NavTooltip;
