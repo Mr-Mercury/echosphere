@@ -1,4 +1,4 @@
-import ChatNavItem from "@/components/chat-sidebar-components/chat-nav-item";
+import ChatNavItem from "@/components/server-listing-sidebar-components/chat-nav-item";
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";

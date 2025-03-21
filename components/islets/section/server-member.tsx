@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { UserAvatar } from "../users/user-avatar";
 import { getRoleIcon } from "@/lib/utilities/role-icons";
 import { useState, useEffect } from "react";
-import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
+import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { Pause, Play } from "lucide-react";
 
 interface ServerMemberProps {
@@ -89,8 +89,8 @@ export const ServerMember = ({
                 src={member.user.image}
                 className='h-8 w-8 md:h-8 md:w-8 flex-shrink-0'
             />
-            <div className='flex items-center min-w-0 flex-1 justify-between'>
-                <div className='flex items-center min-w-0'>
+            <div className='flex items-center w-full min-w-0'>
+                <div className='flex items-center min-w-0 flex-1'>
                     {getRoleIcon(member.role, 'mr-1 flex-shrink-0')}
                     <p className={cn(
                         'font-semibold text-sm text-zinc-400 group-hover:text-zinc-300 transition truncate',
@@ -100,25 +100,27 @@ export const ServerMember = ({
                     </p>
                 </div>
                 {member.role === 'ECHO' && (
-                    <NavTooltip label={botActive ? 'Deactivate Bot' : 'Activate Bot'} side='top'>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isLoading) {
-                                    const newState = !botActive;
-                                    setBotActive(newState);
-                                    onBotToggle(newState);
-                                }
-                            }}
-                            disabled={isLoading}
-                            className={cn(
-                                'ml-1 p-1 rounded-md transition',
-                                botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600',
-                                isLoading && 'opacity-50 cursor-not-allowed'
-                            )}>
-                            {botActive ? <Play size={16} /> : <Pause size={16} />}
-                        </button>
-                    </NavTooltip>
+                    <div className='flex-shrink-0 ml-2'>
+                        <NavTooltip label={botActive ? 'Deactivate Bot' : 'Activate Bot'} side='top'>
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (!isLoading) {
+                                        const newState = !botActive;
+                                        setBotActive(newState);
+                                        onBotToggle(newState);
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className={cn(
+                                    'p-1 rounded-md transition',
+                                    botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600',
+                                    isLoading && 'opacity-50 cursor-not-allowed'
+                                )}>
+                                {botActive ? <Play size={16} /> : <Pause size={16} />}
+                            </button>
+                        </NavTooltip>
+                    </div>
                 )}
             </div>
         </button>

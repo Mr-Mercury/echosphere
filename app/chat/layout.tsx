@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";
 
-import ChatMainSidebar from "@/components/chat-sidebar-components/chat-main-sidebar";
+import ChatMainSidebar from "@/components/server-listing-sidebar-components/chat-main-sidebar";
 
 interface ChatLayoutProps {
     children?: React.ReactNode;

@@ -1,6 +1,6 @@
 import { getServerById } from "@/lib/utilities/data/fetching/serverData";
 import { redirect } from "next/navigation";
-import { ChannelSidebar } from "@/components/inside-server-sidebar-components/channel-sidebar/channel-sidebar";
+import { ChannelSidebar } from "@/components/chat-sidebar-components/channel-sidebar/channel-sidebar";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
 const ChannelSidebarLayout = async ({

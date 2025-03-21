@@ -2,7 +2,7 @@
 
 import { Member, MemberRole, User } from "@prisma/client";
 import { UserAvatar } from "../islets/users/user-avatar";
-import NavTooltip from "../chat-sidebar-components/nav-tooltip";
+import NavTooltip from "../server-listing-sidebar-components/nav-tooltip";
 import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";

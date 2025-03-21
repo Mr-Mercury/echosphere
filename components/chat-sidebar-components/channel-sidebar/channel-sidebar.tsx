@@ -125,7 +125,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                             channel={channel}
                             role={role}
                             server={server} 
-                            />
+                        />
                         ))}
                         </div>
                     </div>

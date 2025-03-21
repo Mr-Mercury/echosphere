@@ -1,6 +1,6 @@
 'use client'
 
-import NavTooltip from "@/components/chat-sidebar-components/nav-tooltip";
+import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
 import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
 import { ChannelType, MemberRole } from "@prisma/client";
