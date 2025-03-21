@@ -63,10 +63,6 @@ const ChatMessages = ({
         socketQuery
     });
 
-    const chatRef = useRef<ElementRef<'div'>>(null);
-    const bottomRef = useRef<ElementRef<'div'>>(null);
-
-
     const {
         data, 
         fetchNextPage, 
@@ -80,6 +76,42 @@ const ChatMessages = ({
         paramKey,
         paramValue,
     });
+
+
+    const chatRef = useRef<ElementRef<'div'>>(null);
+    const bottomRef = useRef<ElementRef<'div'>>(null);
+
+    const isNearBottom = () => {
+        if (!chatRef.current) return false;
+        
+        const container = chatRef.current;
+        const threshold = 100; // pixels from bottom to trigger auto-scroll
+        
+        return (
+            container.scrollHeight - container.scrollTop - container.clientHeight 
+            <= threshold
+        );
+    };
+
+    const shouldAutoScroll = useRef(true);
+
+    useEffect(() => {
+        const container = chatRef.current;
+        if (!container) return;
+
+        const handleScroll = () => {
+            shouldAutoScroll.current = isNearBottom();
+        };
+
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        if (shouldAutoScroll.current) {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [data?.pages?.[0]?.items]);
 
     useChatSocket({ 
         queryKey, 

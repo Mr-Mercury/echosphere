@@ -6,6 +6,11 @@ export async function chatgpt(config, userPrompt) {
     ];
     try {
         const apiKey = getApiKey(config.apiKeyId);
+        if (!apiKey) {
+            throw new Error('API key retrieval failed or no API key found in chatgpt.ts');
+        }
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController.abort(), 30000);
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -17,11 +22,17 @@ export async function chatgpt(config, userPrompt) {
                 messages: messages,
                 temperature: 0.5,
                 max_tokens: 4000
-            })
+            }),
+            signal: abortController.signal
         });
+        clearTimeout(timeoutId);
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('ChatGPT API Error:', errorData);
+            console.error('ChatGPT API Error:', {
+                status: response.status,
+                statusText: response.statusText,
+                errorData
+            });
             throw new Error(`API request failed with status ${response.status}: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
@@ -34,7 +45,7 @@ export async function chatgpt(config, userPrompt) {
         return messageContent;
     }
     catch (error) {
-        console.error('ChatGPT API call failed:', error);
+        console.error(`ChatGPT API call failed for bot ${config.botName}:`, error);
         return `I apologize, but I'm having trouble responding right now. Please try again later.`;
     }
 }
