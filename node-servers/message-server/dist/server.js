@@ -289,9 +289,26 @@ server.listen(port, () => {
         console.error('Failed to initialize bot service manager (message server): ', error);
     }
 });
-// TODO: Add SIGTERM to stop all bots and close server
-// process.on('SIGTERM', () => {
-//     botService.stopAll();
-//     server.close();
-// });
+// Add this near the end of the file, before server.listen
+process.on('SIGTERM', async () => {
+    console.log('Received SIGTERM signal, cleaning up...');
+    // Stop all bots using the public method
+    for (const botId of botService.getBotIds()) {
+        try {
+            await botService.deactivateBot(botId);
+        }
+        catch (error) {
+            console.error(`Failed to cleanup bot ${botId}:`, error);
+        }
+    }
+    // Close server
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+// Add similar handling for SIGINT
+process.on('SIGINT', () => {
+    process.emit('SIGTERM');
+});
 //# sourceMappingURL=server.js.map

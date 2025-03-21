@@ -41,6 +41,12 @@ export const deleteServerBotAction = async (
             return { error: "Bot not found in this server" };
         }
 
+        // First deactivate the bot to stop message generation
+        await db.botConfiguration.update({
+            where: { id: botConfig.id },
+            data: { isActive: false }
+        });
+
         // Notify message server to stop the bot
         await fetch(`${process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL}/bots/stop`, {
             method: 'POST',
@@ -52,15 +58,24 @@ export const deleteServerBotAction = async (
             })
         });
 
+        // Wait a moment to ensure the bot has stopped
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         // Delete all related data in a transaction
         await db.$transaction([
-            // Delete the bot configuration
+            // First delete the bot configuration due to foreign key relationship
             db.botConfiguration.delete({
                 where: {
-                    id: botConfig.id
+                    botUserId: botId
                 }
             }),
-            // Delete the bot user
+            // Then delete the member entries
+            db.member.deleteMany({
+                where: {
+                    userId: botId
+                }
+            }),
+            // Finally delete the bot user
             db.user.delete({
                 where: {
                     id: botId

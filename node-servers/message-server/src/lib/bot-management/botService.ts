@@ -57,7 +57,8 @@ export class BotServiceManager {
         // Database operations and initial setup
         const rawChannels = await db.channel.findMany({
             where: {
-                serverId: config.homeServerId
+                serverId: config.homeServerId,
+                type: 'TEXT' // Only get TEXT channels
             }
         });
 
@@ -242,14 +243,21 @@ export class BotServiceManager {
                 clearTimeout(timer.timer);
             }
 
+            // Clear the timers map
+            botInstance.channelTimers.clear();
+
             // Remove the bot from the active bots map
             this.bots.delete(botId);
 
-            console.log(`Bot ${botId} successfully removed from bot map`);
+            console.log(`Bot ${botId} successfully deactivated and removed from bot map`);
             return true;
         } catch (error) {
             console.error('Failed to deactivate bot:', botId, error);
             throw error;
         }
+    }
+
+    public getBotIds(): IterableIterator<string> {
+        return this.bots.keys();
     }
 }
