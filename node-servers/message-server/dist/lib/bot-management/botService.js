@@ -93,6 +93,35 @@ export class BotServiceManager {
         botInstance.channelTimers = channelTimers;
         this.bots.set(config.id, botInstance);
     }
+    async toggleBot(botId, desiredState) {
+        try {
+            console.log('BotService toggleBot called:', { botId, desiredState });
+            if (!desiredState) {
+                console.log('Deactivating bot...');
+                const updatedConfig = await db.botConfiguration.update({
+                    where: { id: botId },
+                    data: { isActive: false }
+                });
+                console.log('Database updated for deactivation:', updatedConfig);
+                await this.deactivateBot(botId);
+                console.log('Bot deactivated successfully');
+            }
+            else {
+                console.log('Activating bot...');
+                const config = await db.botConfiguration.update({
+                    where: { id: botId },
+                    data: { isActive: true }
+                });
+                console.log('Database updated for activation:', config);
+                await this.startBot(config);
+                console.log('Bot activated successfully');
+            }
+        }
+        catch (error) {
+            console.error('Failed to toggle bot:', error);
+            throw error;
+        }
+    }
     async cleanupBot(botId) {
         const existingBot = this.bots.get(botId);
         if (existingBot) {
@@ -138,7 +167,8 @@ export class BotServiceManager {
         try {
             const recentMessages = await db.message.findMany({
                 where: {
-                    channelId
+                    channelId,
+                    deleted: false
                 },
                 include: {
                     member: {
@@ -170,7 +200,7 @@ export class BotServiceManager {
             const botInstance = this.bots.get(botId);
             if (!botInstance) {
                 console.log(`Bot ${botId} not found in active bots`);
-                return true; // Return true since the bot is already not active
+                return true;
             }
             // Clear all channel timers
             for (const [channelId, timer] of botInstance.channelTimers) {

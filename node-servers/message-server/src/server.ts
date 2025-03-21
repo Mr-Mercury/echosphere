@@ -211,6 +211,28 @@
         }
     })
 
+    app.post('/bots/toggle', async (req, res) => {
+        try {
+            const { botId, isActive } = req.body;
+            console.log('Received bot toggle request:', { botId, isActive });
+
+            if (!botId) {
+                console.log('Invalid bot ID received');
+                return res.status(400).json({ error: 'Invalid bot ID' });
+            }
+
+            console.log('Attempting to toggle bot with botService');
+            await botService.toggleBot(botId, isActive);
+            console.log('Bot toggle successful');
+            
+            res.status(200).json({ message: 'Bot toggled successfully' });
+        } catch (error) {
+            console.error('MESSAGE SERVER BOT TOGGLE ERROR: ', error);
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ error: 'Failed to toggle bot', details: message });
+        }
+    })
+
     // Socket logic starts here
     
     io.use(socketAuthMiddleware);

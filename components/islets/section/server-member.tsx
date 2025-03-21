@@ -27,14 +27,52 @@ export const ServerMember = ({
     // Hydration error mismatch fix - do not remove the mounted & state pattern 
     const [mounted, setMounted] = useState(false);
     const [botActive, setBotActive] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         setBotActive(member.user.botConfig?.isActive ?? false);
         setMounted(true);
     }, [member.user.botConfig?.isActive]);
 
-    const onClick = () => {
+    const onMemberClick = () => {
         router.push(`/chat/server/personal/dm/${member.id}`)
+    }
+
+    const onBotToggle = async (newState: boolean) => {
+        try {
+            setIsLoading(true);
+            console.log('Attempting to toggle bot:', {
+                botId: member.user.botConfig?.id,
+                newState,
+                url: `${process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL}/bots/toggle`
+            });
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_MESSAGE_SERVER_URL}/bots/toggle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    botId: member.user.botConfig?.id,
+                    isActive: newState
+                })
+            });
+
+            const data = await response.json();
+            console.log('Toggle response:', data);
+
+            if (!response.ok) {
+                throw new Error(`Failed to toggle bot: ${data.error || 'Unknown error'}`);
+            }
+
+            setBotActive(newState);
+        } catch (error) {
+            console.error('Failed to toggle bot:', error);
+            setBotActive(!newState);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     if (!mounted) return null;
@@ -42,7 +80,7 @@ export const ServerMember = ({
     if(!member.user.image) return null;
 
     return (
-        <button onClick={onClick}
+        <button onClick={onMemberClick}
             className={cn(
             'group px-2 py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/50 transition mb-1',
             params?.memberId === member.id && 'bg-zinc-700'
@@ -66,11 +104,17 @@ export const ServerMember = ({
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
-                                setBotActive(!botActive);
+                                if (!isLoading) {
+                                    const newState = !botActive;
+                                    setBotActive(newState);
+                                    onBotToggle(newState);
+                                }
                             }}
+                            disabled={isLoading}
                             className={cn(
                                 'ml-1 p-1 rounded-md transition',
-                                botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600'
+                                botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600',
+                                isLoading && 'opacity-50 cursor-not-allowed'
                             )}>
                             {botActive ? <Play size={16} /> : <Pause size={16} />}
                         </button>
