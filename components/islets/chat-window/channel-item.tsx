@@ -9,7 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 
 interface ChannelItemProps {
     channel: Channel;
-    server: Server;
+    server: Server & { members: any[] };
     role?: MemberRole;
 }
 

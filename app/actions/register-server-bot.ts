@@ -99,6 +99,17 @@ export const registerServerBotAction = async (
             }
         }
 
+        const existingBot = await db.botConfiguration.findFirst({
+            where: {
+                botName: sanitizedName,
+                homeServerId: homeServerId
+            }
+        });
+
+        if (existingBot) {
+            return { error: `A bot with the name "${sanitizedName}" already exists in this server` };
+        }
+
         const newBot = await db.user.create({
             data: {
                 human: false,
@@ -159,7 +170,12 @@ export const registerServerBotAction = async (
         }
 
         if (error instanceof Error) {
+            // Update error handling to catch the unique constraint violation
             if (error.message.includes('Unique constraint')) {
+                // This catches both username uniqueness and the new botName+homeServerId constraint
+                if (error.message.includes('botName')) {
+                    return { error: 'A bot with this name already exists in this server' };
+                }
                 return { error: 'A bot with this name already exists' };
             }
 

@@ -23,6 +23,7 @@ import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 import { Member, MemberRole } from "@prisma/client";
 import { useRouter } from 'next/navigation';
 import { getRoleIcon } from "@/lib/utilities/role-icons";
+import { deleteServerBotAction } from "@/app/actions/delete-server-bot";
 
 const MembersModal = () => {
     const router = useRouter();
@@ -35,12 +36,25 @@ const MembersModal = () => {
     const onDelete = async (member: Member) => {
         try {
             setLoadingId(member.userId);
+            
+            // Handle bot deletion differently
+            if (member.role === 'ECHO') {
+                const result = await deleteServerBotAction(member.userId, server.id);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                router.refresh();
+                onOpen('members', { server });
+                return;
+            }
+
+            // Regular member deletion
             const url = qs.stringifyUrl({
                 url: `/api/members/${member.id}`,
                 query: {
                     serverId: server.id,
                 }
-            })
+            });
             const res = await axios.delete(url);
             router.refresh();
             onOpen('members', {server: res.data});
@@ -84,7 +98,9 @@ const MembersModal = () => {
                 <ScrollArea className='mt-8 max-h-[420] pr-6'>
                     {server?.members?.map((member) => (
                         <div key={member.id} className='flex items-center gap-x-2 mb-6'>
-                            <UserAvatar src={member.user.image}/> 
+                            <UserAvatar 
+                                src={member.user.image || 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg'} 
+                            /> 
                             <div className='flex flex-col gap-y-1'>
                                 <div className='text-xs gap-x-1 font-semibold flex items-center'>
                                     {getRoleIcon(member.role)}

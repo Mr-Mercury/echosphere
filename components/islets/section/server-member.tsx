@@ -82,25 +82,27 @@ export const ServerMember = ({
     return (
         <button onClick={onMemberClick}
             className={cn(
-            'group px-2 py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/50 transition mb-1',
+            'group px-2 py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/50 transition mb-1 relative',
             params?.memberId === member.id && 'bg-zinc-700'
         )}>
             <UserAvatar 
                 src={member.user.image}
                 className='h-8 w-8 md:h-8 md:w-8 flex-shrink-0'
             />
-            <div className='flex items-center w-full min-w-0'>
-                <div className='flex items-center min-w-0 flex-1'>
+            <div className='flex items-center w-full pr-8'>
+                <div className='flex items-center min-w-0 w-full'>
                     {getRoleIcon(member.role, 'mr-1 flex-shrink-0')}
                     <p className={cn(
-                        'font-semibold text-sm text-zinc-400 group-hover:text-zinc-300 transition truncate',
+                        'font-semibold text-sm text-zinc-400 group-hover:text-zinc-300 transition',
                         params?.memberId === member.id && 'text-zinc-200 group-hover:text-white'
                     )}>
-                        {member.user.username}
+                        {member.user.username!.length > 10 
+                            ? `${member.user.username!.slice(0, 10)}...` 
+                            : member.user.username}
                     </p>
                 </div>
                 {member.role === 'ECHO' && (
-                    <div className='flex-shrink-0 ml-2'>
+                    <div className='absolute right-2'>
                         <NavTooltip label={botActive ? 'Deactivate Bot' : 'Activate Bot'} side='top'>
                             <button 
                                 onClick={(e) => {

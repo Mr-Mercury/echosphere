@@ -66,6 +66,7 @@ model BotConfiguration {
 
   @@index([botUserId])
   @@index([apiKeyId])
+  @@unique([botName, homeServerId])
 }
 
 model ApiKey {

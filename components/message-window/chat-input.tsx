@@ -76,11 +76,14 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                             p-1 flex items-center justify-center'>
                                             <Plus className='text-[#313338]'/>
                                         </button>
-                                        <Input disabled={isLoading} 
-                                        className='px-14 py-6 bg-zinc-700/70 border-none 
-                                        border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
-                                        placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
-                                        {...field}/>
+                                        <Input 
+                                            disabled={isLoading} 
+                                            className='px-14 py-6 bg-zinc-700/70 border-none 
+                                            border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
+                                            placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
+                                            autoComplete="off"
+                                            {...field}
+                                        />
                                         <div className='absolute top-7 right-8'>
                                             <EmojiMenu onChange={(emoji:string) => {
                                                 field.onChange(`${field.value} ${emoji}`)

@@ -181,7 +181,7 @@ export class BotServiceManager {
                 orderBy: {
                     createdAt: 'desc'
                 },
-                take: 30
+                take: 15
             });
             const userPrompt = generatePrompt(recentMessages, channelName);
             const message = await llmApi(config, userPrompt);
