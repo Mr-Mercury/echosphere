@@ -8,6 +8,7 @@ import { sanitizeInput } from '@/lib/utilities/safety/sanitize';
 import { MemberRole } from '@prisma/client';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import { ChatFrequencyMsgPerMinute } from "@/lib/config/chat-variables";
+import { generateUniqueUsername } from '@/lib/utilities/user-generation/generateUniqueUsername';
 
 type ActionResult = {
     error?: string;
@@ -65,6 +66,9 @@ export const registerServerBotAction = async (
         const sanitizedDescription = sanitizeInput(profileDescription);
         const sanitizedSystemPrompt = sanitizeInput(rawSystemPrompt);
         
+        // Generate unique username with sequential number
+        const uniqueUsername = await generateUniqueUsername(sanitizedName);
+
         let apiKey: { id: string | null, key: string | null } = {
             id: null,
             key: null
@@ -116,7 +120,7 @@ export const registerServerBotAction = async (
                 initialized: true,
                 image: imageUrl,
                 name: sanitizedName,
-                username: sanitizedName,
+                username: uniqueUsername,
                 botConfig: {
                     create: {
                         botName: sanitizedName,
