@@ -47,13 +47,18 @@ export class BotServiceManager {
                 return;
             }
 
+            console.log(`Starting bot ${config.botName} (${config.id})...`);
+
             // DB operations and initial setup
             const botInstance = await this.coldStartBot(config);
+            
+            console.log(`Bot ${config.botName} cold start complete, proceeding to warm start...`);
             
             // Set up timers and start the bot running
             await this.warmStartBot(botInstance);
 
-            console.log(`Bot ${config.botName} started successfully`);
+            console.log(`Bot ${config.botName} started successfully with ${botInstance.channels.length} channels`);
+            console.log(`Active bots: ${Array.from(this.bots.keys()).length}`);
         } catch (error) {
             console.error(`Failed to start bot ${config.botName}:`, error);
             await this.cleanupBot(config.id);
@@ -85,6 +90,10 @@ export class BotServiceManager {
     private async warmStartBot(botInstance: BotInstance) {
         const { config, channels } = botInstance;
         const channelTimers = new Map<string, ChannelTimer>();
+
+        // CRITICAL: Add the bot to the map BEFORE any scheduling logic
+        this.bots.set(config.id, botInstance);
+        botInstance.channelTimers = channelTimers;
 
         // Set up message scheduling for each channel
         channels.forEach(channel => {
@@ -132,9 +141,6 @@ export class BotServiceManager {
 
             scheduleChannelMessage();
         });
-
-        botInstance.channelTimers = channelTimers;
-        this.bots.set(config.id, botInstance);
     }
 
     public async toggleBot(botId: string, desiredState: boolean) {
@@ -197,6 +203,8 @@ export class BotServiceManager {
 
     private async sendMessage(config: BotConfiguration, channelId: string, channelName: string) {
         try {
+            console.log(`Attempting to send message for bot ${config.botName} in channel ${channelName}`);
+            
             // Add check to see if bot is still active
             if (!this.bots.has(config.id)) {
                 console.log(`Bot ${config.botName} is no longer active, skipping message send`);
@@ -223,6 +231,8 @@ export class BotServiceManager {
                 type: 'channel' as const
             };
 
+            console.log(`Bot ${config.botName} sending message: "${message.content.substring(0, 30)}..."`);
+
             const result = await messagePostHandler(params);
             
             if (!result.message) {
@@ -232,17 +242,19 @@ export class BotServiceManager {
             const channelKey = `chat:${channelId}:messages`;
             
             console.log('Bot attempting to send message:', {
+                botName: config.botName,
                 channelId,
                 channelKey,
-                messageContent: typeof result.message === 'string' ? result.message : result.message.content,
-                socketRoomSize: (await this.io.in(channelId).allSockets()).size,
-                message: result.message
+                messageContent: typeof result.message === 'string' ? result.message.substring(0, 30) : result.message.content.substring(0, 30),
+                socketRoomSize: (await this.io.in(channelId).allSockets()).size
             });
+            
             // Emit the saved message from the DB
             this.io.to(channelId).emit(channelKey, result.message);
+            console.log(`Bot ${config.botName} message sent successfully`);
 
         } catch (error) {
-            console.error('Failed to send message for bot:', config.id, error);
+            console.error(`Failed to send message for bot ${config.botName}:`, error);
         }
     }
 
@@ -267,17 +279,26 @@ export class BotServiceManager {
             });
 
             const userPrompt = generatePrompt(recentMessages, channelName);
-            const { message, modelName } = await llmApi(config, userPrompt);
+            console.log(`Generated prompt for ${config.botName}:`, userPrompt.substring(0, 100) + "...");
             
-            if (!message) {
-                throw new Error('No message generated from LLM API');
+            const response = await llmApi(config, userPrompt);
+            
+            console.log(`LLM API response object for ${config.botName}:`, response);
+            
+            // Direct check for message property
+            if (response && response.message) {
+                console.log(`Using standard response format for ${config.botName}`);
+                const processedMessage = processMessage(response.message, config.botName, response.modelName);
+                return processedMessage;
+            } 
+            // Fallback to default message
+            else {
+                console.log(`Using fallback message for ${config.botName}`);
+                return processMessage("I'm having trouble generating a response right now.", config.botName, config.modelName);
             }
-
-            const processedMessage = processMessage(message, config.botName, modelName);
-            return processedMessage;
         } catch (error) {
             console.error(`Failed to generate message for bot ${config.botName}:`, error);
-            return processMessage("I'm having trouble generating a response right now.", config.botName);
+            return processMessage("I'm having trouble generating a response right now.", config.botName, config.modelName);
         }
     }
 
@@ -351,5 +372,21 @@ export class BotServiceManager {
 
     public getBotIds(): IterableIterator<string> {
         return this.bots.keys();
+    }
+
+    public async stopAll() {
+        console.log('Stopping all bots...');
+        const botIds = Array.from(this.bots.keys());
+        
+        for (const botId of botIds) {
+            try {
+                await this.deactivateBot(botId);
+                console.log(`Bot ${botId} stopped successfully`);
+            } catch (error) {
+                console.error(`Failed to stop bot ${botId}:`, error);
+            }
+        }
+        
+        console.log(`All bots stopped: ${botIds.length} bots`);
     }
 }

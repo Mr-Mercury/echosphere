@@ -42,11 +42,19 @@ export async function chatgpt(config, userPrompt) {
             throw new Error('Invalid API response format');
         }
         const messageContent = data.choices[0].message.content;
-        return messageContent;
+        // Return an object with message and modelName instead of just the message string
+        return {
+            message: messageContent,
+            modelName: config.modelName
+        };
     }
     catch (error) {
         console.error(`ChatGPT API call failed for bot ${config.botName}:`, error);
-        return `I apologize, but I'm having trouble responding right now. Please try again later.`;
+        // Return an object with the error message and modelName
+        return {
+            message: `I apologize, but I'm having trouble responding right now. Please try again later.`,
+            modelName: config.modelName
+        };
     }
 }
 //# sourceMappingURL=chatgpt.js.map

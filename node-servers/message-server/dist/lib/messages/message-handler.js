@@ -11,7 +11,7 @@ export async function messagePostHandler(params) {
     return { status: 400, error: 'Invalid message type!' };
 }
 async function channelPostHandler(params) {
-    const { userId, serverId, channelId, fileUrl, content } = params;
+    const { userId, serverId, channelId, fileUrl, content, modelName } = params;
     const server = await db.server.findFirst({
         where: {
             id: serverId,
@@ -44,6 +44,7 @@ async function channelPostHandler(params) {
             fileUrl,
             channelId: channelId,
             memberId: member.id,
+            modelName,
         },
         include: {
             member: {

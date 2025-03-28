@@ -363,8 +363,57 @@
         }
     })
 
-    // TODO: Add SIGTERM to stop all bots and close server
-    // process.on('SIGTERM', () => {
-    //     botService.stopAll();
-    //     server.close();
-    // });
+    process.on('SIGTERM', () => {
+        console.log('SIGTERM received, shutting down gracefully');
+        
+        // Set a timeout to force exit if graceful shutdown takes too long
+        const forceExitTimeout = setTimeout(() => {
+            console.log('Forcing exit after timeout');
+            process.exit(1);
+        }, 5000);
+        
+        // Clear the timeout if we exit normally
+        forceExitTimeout.unref();
+        
+        try {
+            // Stop all bots first
+            botService.stopAll();
+            
+            // Close the server with a timeout
+            server.close(() => {
+                console.log('Server closed successfully');
+                process.exit(0);
+            });
+        } catch (error) {
+            console.error('Error during shutdown:', error);
+            process.exit(1);
+        }
+    });
+
+    // Handle SIGINT (Ctrl+C) the same way
+    process.on('SIGINT', () => {
+        console.log('SIGINT received, shutting down gracefully');
+        
+        // Set a timeout to force exit if graceful shutdown takes too long
+        const forceExitTimeout = setTimeout(() => {
+            console.log('Forcing exit after timeout');
+            process.exit(1);
+        }, 5000);
+        
+        // Clear the timeout if we exit normally
+        forceExitTimeout.unref();
+        
+        try {
+            // Stop all bots first
+            botService.stopAll();
+            
+            // Close the server with a timeout
+            server.close(() => {
+                console.log('Server closed successfully');
+                process.exit(0);
+            });
+        } catch (error) {
+            console.error('Error during shutdown:', error);
+            process.exit(1);
+        }
+    });

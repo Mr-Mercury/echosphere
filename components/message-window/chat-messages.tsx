@@ -41,7 +41,8 @@ type MessageWithMemberWithUser = Message & {
                 model: string;
             } | null;
         }
-    }
+    };
+    modelName?: string;
 }
 
 const ChatMessages = ({
@@ -202,6 +203,7 @@ const ChatMessages = ({
                                 isUpdated={message.updatedAt !== message.createdAt}
                                 messageApiUrl={messageApiUrl}
                                 socketQuery={socketQuery}
+                                modelName={message.modelName}
                                 type={type} />
                         ))}
                     </Fragment>
