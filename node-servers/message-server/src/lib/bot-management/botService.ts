@@ -89,6 +89,12 @@ export class BotServiceManager {
         // Set up message scheduling for each channel
         channels.forEach(channel => {
             const scheduleChannelMessage = () => {
+                // Only schedule next message if bot is still active
+                if (!this.bots.has(config.id)) {
+                    console.log(`Bot ${config.botName} is deactivated, stopping message scheduling`);
+                    return;
+                }
+
                 const randomMultiplier = 0.5 + Math.random();
                 
                 // Get messages per minute from the config
@@ -98,15 +104,23 @@ export class BotServiceManager {
                 const baseFrequencyInSeconds = 60 / messagesPerMinute;
                 const nextMessageDelay = Math.floor(baseFrequencyInSeconds * randomMultiplier * 1000);
 
-                console.log(`Scheduling next message for ${config.botName} in ${Math.floor(nextMessageDelay/1000)} seconds (frequency: ${config.messagesPerMinute}, msgs/min: ${messagesPerMinute})`);
+                console.log(`Scheduling next message for ${config.botName} in ${Math.floor(nextMessageDelay/1000)} seconds`);
 
                 const timer = setTimeout(async () => {
                     try {
-                        await this.sendMessage(config, channel.id, channel.name);
-                        scheduleChannelMessage();
+                        // Double check bot is still active before sending and scheduling next
+                        if (this.bots.has(config.id)) {
+                            await this.sendMessage(config, channel.id, channel.name);
+                            scheduleChannelMessage();
+                        } else {
+                            console.log(`Bot ${config.botName} is no longer active, stopping schedule chain`);
+                        }
                     } catch (error) {
-                        console.error(`Failed to send message for bot ${config.botName} in channel ${channel.name}:`, error);
-                        scheduleChannelMessage();
+                        console.error(`Failed to send message for bot ${config.botName}:`, error);
+                        // Only reschedule on error if bot is still active
+                        if (this.bots.has(config.id)) {
+                            scheduleChannelMessage();
+                        }
                     }
                 }, nextMessageDelay);
 
