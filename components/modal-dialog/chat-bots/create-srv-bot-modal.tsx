@@ -2,7 +2,7 @@
 
 import qs from 'query-string';
 import { Server } from '@prisma/client';
-import { ServerBotSchema } from "@/schemas";
+import { ServerBotSchema } from "@/zod-schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';

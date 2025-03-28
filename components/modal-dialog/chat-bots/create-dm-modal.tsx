@@ -1,7 +1,7 @@
 'use client'
 
 import qs from 'query-string';
-import { PersonalBotSchema } from "@/schemas";
+import { PersonalBotSchema } from "@/zod-schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import axios from 'axios';
 import * as z from 'zod';

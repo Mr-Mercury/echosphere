@@ -1,6 +1,6 @@
 'use server';
 import * as z from 'zod';
-import { ServerBotSchema } from '@/schemas';
+import { ServerBotSchema } from '@/zod-schemas';
 import { db } from '@/lib/db/db';
 import { serverBotPromptBuilder } from '@/lib/utilities/prompts/systemPromptBuilder';
 import { fetchUserApiKey } from '@/lib/utilities/data/fetching/userApiKey';

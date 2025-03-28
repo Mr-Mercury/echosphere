@@ -1,7 +1,7 @@
 'use client'
 
 import qs from 'query-string';
-import { ChannelSchema } from "@/schemas";
+import { ChannelSchema } from "@/zod-schemas";
 import { ChannelType } from "@prisma/client";
 import axios from 'axios';
 import * as z from 'zod';

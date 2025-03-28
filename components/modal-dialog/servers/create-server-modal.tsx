@@ -1,6 +1,6 @@
 'use client'
 
-import { ServerSchema } from "@/schemas";
+import { ServerSchema } from "@/zod-schemas";
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

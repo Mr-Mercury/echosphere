@@ -1,6 +1,6 @@
 'use server';
 import * as z from 'zod';
-import { LoginSchema } from '@/schemas';
+import { LoginSchema } from '@/zod-schemas';
 
 
 //Again, type safety for login using zod

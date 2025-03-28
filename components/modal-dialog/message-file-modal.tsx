@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageFileUploadSchema } from "@/schemas";
+import { MessageFileUploadSchema } from "@/zod-schemas";
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
