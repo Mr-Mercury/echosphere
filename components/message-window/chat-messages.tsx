@@ -36,7 +36,11 @@ interface ChatMessagesProps {
 
 type MessageWithMemberWithUser = Message & {
     member: Member & {
-        user: User
+        user: User & {
+            botConfig: {
+                model: string;
+            } | null;
+        }
     }
 }
 

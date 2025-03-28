@@ -95,7 +95,7 @@ export const ServerMember = ({
             />
             <div className='flex items-center w-full pr-8'>
                 <div className='flex items-center min-w-0 w-full'>
-                    {getRoleIcon(member.role, 'mr-1 flex-shrink-0')}
+                    {getRoleIcon(member.role, 'mr-1 flex-shrink-0', member.user.botConfig?.modelName)}
                     <p className={cn(
                         'font-semibold text-sm text-zinc-400 group-hover:text-zinc-300 transition',
                         params?.memberId === member.id && 'text-zinc-200 group-hover:text-white'

@@ -1,5 +1,26 @@
 import { AIModel } from "../entities/ai-model";
 
+// Define color scheme for providers
+export const PROVIDER_COLORS = {
+    'openai': {
+        primary: '#10b981', // emerald-500
+        secondary: '#6366f1', // indigo-500
+    },
+    'anthropic': {
+        primary: '#8b5cf6', // violet-500
+        secondary: '#a78bfa', // violet-400
+    },
+    'google': {
+        primary: '#f97316', // orange-500
+        secondary: '#fb923c', // orange-400
+    },
+    'other': {
+        primary: '#22c55e',
+        secondary: '#22c55e',
+    },
+    'default': '#22c55e', // green-500
+} as const;
+
 export const AVAILABLE_MODELS: Record<string, AIModel> = {
     'gpt-4o': {
         name: 'GPT-4o',

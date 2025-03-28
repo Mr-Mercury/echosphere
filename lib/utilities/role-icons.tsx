@@ -1,6 +1,7 @@
 import { Bot, ShieldAlert, ShieldCheck } from "lucide-react";
 import { MemberRole } from "@prisma/client";
 import { cn } from "@/lib/utilities/clsx/utils";
+import { AVAILABLE_MODELS, PROVIDER_COLORS } from "@/lib/config/models";
 
 // For message window - no margin since parent div has -ml-2
 export const roleIconMap = {
@@ -10,8 +11,17 @@ export const roleIconMap = {
     'ECHO': <Bot className='h-4 w-4 ml-2 !text-green-500' />
 } as const;
 
+const getModelColor = (modelId: string | null): string => {
+    if (!modelId) return PROVIDER_COLORS.default;
+    
+    const model = AVAILABLE_MODELS[modelId];
+    if (!model) return PROVIDER_COLORS.default;
+    
+    return PROVIDER_COLORS[model.provider]?.primary || PROVIDER_COLORS.default;
+};
+
 // For components that need the margin built in (like channel members list)
-export const getRoleIcon = (role: MemberRole, className?: string) => {
+export const getRoleIcon = (role: MemberRole, className?: string, modelId: string | null = null) => {
     const baseStyle = {
         'GUEST': '',
         'MODERATOR': 'text-indigo-500',
@@ -25,9 +35,11 @@ export const getRoleIcon = (role: MemberRole, className?: string) => {
         case 'ADMIN':
             return <ShieldAlert className={cn('h-4 w-4', baseStyle, className)} />;
         case 'ECHO':
-            // Using inline style because Bot icon uses strokes while Shield icons use fills
-            // text-green-500 class doesn't work with stroke-based SVG icons
-            return <Bot className={cn('h-4 w-4', baseStyle, className)} style={{color: '#22c55e'}} />;
+            const modelColor = getModelColor(modelId);
+            return <Bot 
+                className={cn('h-4 w-4', baseStyle, className)} 
+                style={{color: modelColor}} 
+            />;
         default:
             return null;
     }
