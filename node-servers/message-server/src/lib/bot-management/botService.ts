@@ -219,6 +219,7 @@ export class BotServiceManager {
                 conversationId: null,
                 fileUrl: null,
                 content: message.content,
+                modelName: message.modelName,
                 type: 'channel' as const
             };
 
@@ -266,13 +267,13 @@ export class BotServiceManager {
             });
 
             const userPrompt = generatePrompt(recentMessages, channelName);
-            const message = await llmApi(config, userPrompt);
+            const { message, modelName } = await llmApi(config, userPrompt);
             
             if (!message) {
                 throw new Error('No message generated from LLM API');
             }
 
-            const processedMessage = processMessage(message, config.botName);
+            const processedMessage = processMessage(message, config.botName, modelName);
             return processedMessage;
         } catch (error) {
             console.error(`Failed to generate message for bot ${config.botName}:`, error);

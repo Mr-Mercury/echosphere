@@ -1,4 +1,4 @@
-export function processMessage(message: string, botName: string) {
+export function processMessage(message: string, botName: string, modelName?: string) {
     return {
         id: Date.now().toString(), // Generate a unique ID
         content: message,
@@ -6,6 +6,7 @@ export function processMessage(message: string, botName: string) {
         deleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
+        modelName,
         member: {
             id: botName, // Using botName as member ID for now
             user: {

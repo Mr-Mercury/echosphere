@@ -21,7 +21,7 @@ export async function messagePostHandler(
 }
 
 async function channelPostHandler(params: ChannelPostHandlerParams) {
-    const { userId, serverId, channelId, fileUrl, content } = params;
+    const { userId, serverId, channelId, fileUrl, content, modelName } = params;
 
     const server = await db.server.findFirst({
         where: {
@@ -58,6 +58,7 @@ async function channelPostHandler(params: ChannelPostHandlerParams) {
             fileUrl,
             channelId: channelId as string,
             memberId: member.id,
+            modelName,
         },
         include: {
             member: {

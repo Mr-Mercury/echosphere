@@ -23,6 +23,7 @@ export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | '
     serverId: string;
     channelId: string;
     conversationId: null;
+    modelName: string | null;
 }
 
 export type DmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
