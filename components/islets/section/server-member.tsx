@@ -8,6 +8,7 @@ import { getRoleIcon } from "@/lib/utilities/role-icons";
 import { useState, useEffect } from "react";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { Pause, Play } from "lucide-react";
+import { useBotToggleStore } from '@/hooks/use-bot-toggle-store';
 
 interface ServerMemberProps {
     member: Member & { 
@@ -24,6 +25,7 @@ export const ServerMember = ({
 }: ServerMemberProps) => {
     const params = useParams();
     const router = useRouter();
+    const { isTogglingAny, setIsTogglingAny } = useBotToggleStore();
     // Hydration error mismatch fix - do not remove the mounted & state pattern 
     const [mounted, setMounted] = useState(false);
     const [botActive, setBotActive] = useState(false);
@@ -41,6 +43,7 @@ export const ServerMember = ({
     const onBotToggle = async (newState: boolean) => {
         try {
             setIsLoading(true);
+            setIsTogglingAny(true);
             console.log('Attempting to toggle bot:', {
                 botId: member.user.botConfig?.id,
                 newState,
@@ -72,6 +75,7 @@ export const ServerMember = ({
             setBotActive(!newState);
         } finally {
             setIsLoading(false);
+            setIsTogglingAny(false);
         }
     }
 
@@ -107,17 +111,17 @@ export const ServerMember = ({
                             <button 
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    if (!isLoading) {
+                                    if (!isLoading && !isTogglingAny) {
                                         const newState = !botActive;
                                         setBotActive(newState);
                                         onBotToggle(newState);
                                     }
                                 }}
-                                disabled={isLoading}
+                                disabled={isLoading || isTogglingAny}
                                 className={cn(
                                     'p-1 rounded-md transition',
                                     botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600',
-                                    isLoading && 'opacity-50 cursor-not-allowed'
+                                    (isLoading || isTogglingAny) && 'opacity-50 cursor-not-allowed'
                                 )}>
                                 {botActive ? <Play size={16} /> : <Pause size={16} />}
                             </button>

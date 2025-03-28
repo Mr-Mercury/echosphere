@@ -5,6 +5,14 @@ import { generatePrompt } from "./prompt/generatePrompt.js";
 import { processMessage } from "./prompt/processMessage.js";
 export class BotServiceManager {
     constructor(io) {
+        /* TODO: Scaling Optimization
+         * Current: In-memory Map for bot configs
+         * Future: Implement hybrid approach:
+         * - Keep Map for fast access
+         * - Add Redis shared cache between instances
+         * - Use pub/sub for config updates
+         * - Add periodic DB sync
+         */
         this.bots = new Map();
         this.io = io;
     }
@@ -148,7 +156,17 @@ export class BotServiceManager {
     }
     async sendMessage(config, channelId, channelName) {
         try {
+            // Add check to see if bot is still active
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} is no longer active, skipping message send`);
+                return;
+            }
             const message = await this.generateMessage(config, channelId, channelName);
+            // Second check in case bot was deactivated while generating message
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} was deactivated while generating message, skipping send`);
+                return;
+            }
             // First save to DB using messagePostHandler
             const params = {
                 userId: config.botUserId,
