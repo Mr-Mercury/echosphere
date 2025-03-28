@@ -6,12 +6,10 @@ const SettingsPage = async () => {
     const session = await auth();
 
     return (
-        <div>
+        <div className="h-full flex items-center justify-center">
             <div>
                 <SettingsContent />
             </div>
-            {JSON.stringify(session)}
-            
         </div>
     );
 }

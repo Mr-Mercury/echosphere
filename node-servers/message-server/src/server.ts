@@ -203,7 +203,7 @@
                 return res.status(400).json({ error: 'Invalid bot ID' });
             }
 
-            await botService.deactivateBot(botId);
+            await botService.toggleBot(botId, false);
             res.status(200).json({ message: 'Bot stopped successfully' });
         } catch (error) {
             console.log('MESSAGE SERVER BOT STOP ERROR: ', error);

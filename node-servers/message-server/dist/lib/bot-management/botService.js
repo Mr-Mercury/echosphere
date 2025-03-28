@@ -97,29 +97,43 @@ export class BotServiceManager {
     async toggleBot(botId, desiredState) {
         try {
             console.log('BotService toggleBot called:', { botId, desiredState });
-            if (!desiredState) {
-                console.log('Deactivating bot...');
-                const updatedConfig = await db.botConfiguration.update({
-                    where: { id: botId },
-                    data: { isActive: false }
-                });
-                console.log('Database updated for deactivation:', updatedConfig);
-                await this.deactivateBot(botId);
-                console.log('Bot deactivated successfully');
+            // First check if current state matches desired state to avoid unnecessary operations
+            const isCurrentlyActive = this.bots.has(botId);
+            if (isCurrentlyActive === desiredState) {
+                console.log(`Bot ${botId} is already in desired state (${desiredState})`);
+                return;
             }
-            else {
-                console.log('Activating bot...');
-                const config = await db.botConfiguration.update({
+            // Start transaction to ensure DB and runtime state stay in sync
+            const updatedConfig = await db.$transaction(async (tx) => {
+                // Update DB first
+                const config = await tx.botConfiguration.update({
                     where: { id: botId },
-                    data: { isActive: true }
+                    data: { isActive: desiredState }
                 });
-                console.log('Database updated for activation:', config);
-                await this.startBot(config);
-                console.log('Bot activated successfully');
-            }
+                if (desiredState) {
+                    // Activation
+                    await this.startBot(config);
+                    console.log('Bot activated successfully');
+                }
+                else {
+                    // Deactivation
+                    const deactivated = await this.deactivateBot(botId);
+                    if (!deactivated) {
+                        throw new Error(`Failed to deactivate bot ${botId}`);
+                    }
+                    console.log('Bot deactivated successfully');
+                }
+                return config;
+            });
+            console.log(`Bot ${botId} successfully toggled to ${desiredState}`);
+            return updatedConfig;
         }
         catch (error) {
             console.error('Failed to toggle bot:', error);
+            // Attempt recovery - ensure bot is stopped if we hit an error
+            if (!desiredState) {
+                await this.forceCleanupBot(botId);
+            }
             throw error;
         }
     }
@@ -181,7 +195,7 @@ export class BotServiceManager {
                 orderBy: {
                     createdAt: 'desc'
                 },
-                take: 15
+                take: 30
             });
             const userPrompt = generatePrompt(recentMessages, channelName);
             const message = await llmApi(config, userPrompt);
@@ -198,25 +212,63 @@ export class BotServiceManager {
     }
     async deactivateBot(botId) {
         try {
+            console.log(`Attempting to deactivate bot ${botId}`);
             const botInstance = this.bots.get(botId);
             if (!botInstance) {
-                console.log(`Bot ${botId} not found in active bots`);
+                console.log(`Bot ${botId} not found in active bots map`);
                 return true;
             }
             // Clear all channel timers
             for (const [channelId, timer] of botInstance.channelTimers) {
-                clearTimeout(timer.timer);
+                try {
+                    clearTimeout(timer.timer);
+                    console.log(`Cleared timer for channel ${channelId}`);
+                }
+                catch (error) {
+                    console.error(`Failed to clear timer for channel ${channelId}:`, error);
+                }
             }
-            // Clear the timers map
             botInstance.channelTimers.clear();
-            // Remove the bot from the active bots map
-            this.bots.delete(botId);
+            const removed = this.bots.delete(botId);
+            if (!removed) {
+                console.error(`Failed to remove bot ${botId} from bot map`);
+                return false;
+            }
             console.log(`Bot ${botId} successfully deactivated and removed from bot map`);
             return true;
         }
         catch (error) {
             console.error('Failed to deactivate bot:', botId, error);
-            throw error;
+            return false;
+        }
+    }
+    // STRICTLY for error scenarios - do not use for normal bot deactivation
+    async forceCleanupBot(botId) {
+        try {
+            console.log(`Forcing cleanup of bot ${botId}`);
+            const botInstance = this.bots.get(botId);
+            if (botInstance) {
+                // Force clear all timers
+                botInstance.channelTimers.forEach((timer) => {
+                    try {
+                        clearTimeout(timer.timer);
+                    }
+                    catch (e) {
+                        console.error(`Failed to clear timer during force cleanup:`, e);
+                    }
+                });
+                botInstance.channelTimers.clear();
+                this.bots.delete(botId);
+            }
+            // Ensure DB is in correct state
+            await db.botConfiguration.update({
+                where: { id: botId },
+                data: { isActive: false }
+            });
+            console.log(`Forced cleanup of bot ${botId} completed`);
+        }
+        catch (error) {
+            console.error(`Critical: Failed force cleanup of bot ${botId}:`, error);
         }
     }
     getBotIds() {

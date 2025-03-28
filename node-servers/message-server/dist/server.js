@@ -139,7 +139,7 @@ app.post('/bots/stop', async (req, res) => {
         if (!botId) {
             return res.status(400).json({ error: 'Invalid bot ID' });
         }
-        await botService.deactivateBot(botId);
+        await botService.toggleBot(botId, false);
         res.status(200).json({ message: 'Bot stopped successfully' });
     }
     catch (error) {
