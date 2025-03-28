@@ -34,6 +34,7 @@ interface ChatItemProps {
     messageApiUrl: string;
     socketQuery: Record<string, string>;
     type: 'dm' | 'channel';
+    modelName?: string;
 }
 
 const formSchema = z.object({
@@ -42,7 +43,7 @@ const formSchema = z.object({
 
 const ChatItem = ({
     id, content, member, timestamp, fileUrl, deleted,
-    currentMember, isUpdated,
+    currentMember, isUpdated, modelName,
     messageApiUrl, socketQuery, type
 }: ChatItemProps) => {
     if (!id || !member || !currentMember) {
@@ -155,7 +156,7 @@ const ChatItem = ({
                     <div className='flex items-center gap-x-2'>
                         <div className='flex items-center'>
                             <NavTooltip label={member.role}>
-                                {getRoleIcon(member.role)}
+                                {getRoleIcon(member.role, undefined, member.role === 'ECHO' ? modelName : null)}
                             </NavTooltip>
                             <p onClick={onMemberClick} className='font-semibold text-sm hover:underline cursor-pointer ml-1'>
                                 {member.user.username}
