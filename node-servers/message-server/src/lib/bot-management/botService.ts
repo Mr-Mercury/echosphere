@@ -389,4 +389,36 @@ export class BotServiceManager {
         
         console.log(`All bots stopped: ${botIds.length} bots`);
     }
+    
+    public async stopAllServerBots(serverId: string) {
+        console.log(`Stopping all bots for server ${serverId}...`);
+        const botIds = Array.from(this.bots.keys());
+        let stopCount = 0;
+        
+        const stopPromises = botIds.map(async (botId) => {
+            const botInstance = this.bots.get(botId);
+            
+            // Check if bot belongs to the specified server
+            if (botInstance && botInstance.config.homeServerId === serverId) {
+                try {
+                    await this.deactivateBot(botId);
+                    console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
+                    stopCount++;
+                    
+                    // Also update the database to mark bot as inactive
+                    await db.botConfiguration.update({
+                        where: { id: botId },
+                        data: { isActive: false }
+                    });
+                } catch (error) {
+                    console.error(`Failed to stop bot ${botId}:`, error);
+                }
+            }
+        });
+        
+        await Promise.all(stopPromises);
+        console.log(`All bots for server ${serverId} stopped: ${stopCount} bots`);
+        
+        return stopCount;
+    }
 }

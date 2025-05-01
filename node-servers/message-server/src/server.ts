@@ -233,6 +233,31 @@
         }
     })
 
+    app.post('/bots/stop-server', async (req, res) => {
+        try {
+            const { serverId } = req.body;
+            console.log('Received server stop all bots request:', { serverId });
+
+            if (!serverId) {
+                console.log('Invalid server ID received');
+                return res.status(400).json({ error: 'Invalid server ID' });
+            }
+
+            console.log('Attempting to stop all bots for server with botService');
+            const stoppedCount = await botService.stopAllServerBots(serverId);
+            console.log('Server bots stop successful');
+            
+            res.status(200).json({ 
+                message: 'All server bots stopped successfully', 
+                count: stoppedCount 
+            });
+        } catch (error) {
+            console.error('MESSAGE SERVER STOP ALL SERVER BOTS ERROR: ', error);
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ error: 'Failed to stop all server bots', details: message });
+        }
+    })
+
     // Socket logic starts here
     
     io.use(socketAuthMiddleware);
