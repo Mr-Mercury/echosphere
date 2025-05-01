@@ -30,7 +30,7 @@ export async function PATCH(req: Request) {
 
         const parsedBody = await req.json();
 
-        const { modelName, systemPrompt, description, prompt, chatFrequency, useSystemKey, messagesPerMinute, apiKeyId, image, botName} = parsedBody;
+        const { modelName, description, systemPrompt, chatFrequency, useSystemKey, messagesPerMinute, apiKeyId, image, botName} = parsedBody;
 
         // Update both botConfiguration and the corresponding botUser in a transaction
         const [updatedBotConfig, updatedBotUser] = await db.$transaction([
@@ -40,9 +40,8 @@ export async function PATCH(req: Request) {
                 },
                 data: {
                     modelName,
-                    systemPrompt,
                     description,
-                    prompt,
+                    systemPrompt,
                     chatFrequency,
                     useSystemKey,
                     messagesPerMinute,
