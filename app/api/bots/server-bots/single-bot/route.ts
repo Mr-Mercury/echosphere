@@ -1,6 +1,8 @@
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { NextResponse } from "next/server";
+import { serverBotPromptBuilder } from '@/lib/utilities/prompts/systemPromptBuilder';
+import { sanitizeInput } from '@/lib/utilities/safety/sanitize';
 
 export async function PATCH(req: Request) {
     try {
@@ -30,7 +32,35 @@ export async function PATCH(req: Request) {
 
         const parsedBody = await req.json();
 
-        const { modelName, description, systemPrompt, chatFrequency, useSystemKey, messagesPerMinute, apiKeyId, image, botName} = parsedBody;
+        const { 
+            modelName, 
+            description, 
+            systemPrompt, 
+            chatFrequency, 
+            useSystemKey, 
+            messagesPerMinute, 
+            apiKeyId, 
+            image, 
+            botName,
+            fullPromptControl
+        } = parsedBody;
+
+        // Sanitize the system prompt
+        const sanitizedSystemPrompt = sanitizeInput(systemPrompt);
+        
+        // Handle prompt field update logic based on fullPromptControl
+        let updatedSystemPrompt = sanitizedSystemPrompt;
+        let updatedPrompt = undefined; // By default, don't change the prompt field
+
+        if (!fullPromptControl) {
+            // Save original prompt and generate the modified system prompt
+            updatedPrompt = sanitizedSystemPrompt;
+            try {
+                updatedSystemPrompt = serverBotPromptBuilder(sanitizedSystemPrompt, botName);
+            } catch (error) {
+                return new NextResponse(`Failed to build system prompt: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 400 });
+            }
+        }
 
         // Update both botConfiguration and the corresponding botUser in a transaction
         const [updatedBotConfig, updatedBotUser] = await db.$transaction([
@@ -41,7 +71,8 @@ export async function PATCH(req: Request) {
                 data: {
                     modelName,
                     description,
-                    systemPrompt,
+                    systemPrompt: updatedSystemPrompt,
+                    prompt: updatedPrompt, // Will only be set when !fullPromptControl
                     chatFrequency,
                     useSystemKey,
                     messagesPerMinute,
@@ -96,7 +127,16 @@ export async function GET(req: Request) {
             return new NextResponse('Server bot not found', { status: 404 });
         }
         
-        return NextResponse.json(botConfig);
+        // Determine if the bot is using full prompt control by checking the prompt field
+        // If prompt exists, it means fullPromptControl was false when it was saved
+        // If prompt is null/undefined, it means fullPromptControl was true
+        const fullPromptControl = !botConfig.prompt;
+        
+        // Return the bot config with the derived fullPromptControl property
+        return NextResponse.json({
+            ...botConfig,
+            fullPromptControl
+        });
     } catch (error) {
         console.log(error);
         return new NextResponse('Failed to fetch server bot data', { status: 500 });

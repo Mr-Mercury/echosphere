@@ -94,9 +94,12 @@ export const registerServerBotAction = async (
         }
 
         let systemPrompt = sanitizedSystemPrompt;
+        let originalPrompt = null;
 
         if (!fullPromptControl) {
             try {
+                // Save the original prompt before modifying it
+                originalPrompt = sanitizedSystemPrompt;
                 systemPrompt = serverBotPromptBuilder(systemPrompt, sanitizedName);
             } catch (error) {
                 return { error: `Failed to build system prompt: ${error instanceof Error ? error.message : 'Unknown error'}` };
@@ -131,6 +134,7 @@ export const registerServerBotAction = async (
                         messagesPerMinute: ChatFrequencyMsgPerMinute[chatFrequency as keyof typeof ChatFrequencyMsgPerMinute],
                         apiKeyId: apiKey.id,
                         homeServerId,
+                        prompt: originalPrompt,
                     }
                 },
                 members: {

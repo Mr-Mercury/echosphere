@@ -49,8 +49,8 @@ model BotConfiguration {
   botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
   systemPrompt  String? @db.Text
   modelName     String?
-  description   String?
-  prompt        String?
+  description   String? @db.Text
+  prompt        String? @db.Text
   chatFrequency String?
   useSystemKey  Boolean @default(true)
   messagesPerMinute Int @default(3)

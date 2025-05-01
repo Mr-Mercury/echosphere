@@ -18,7 +18,7 @@ type MessageWithMemberWithUser = Message & {
 }
 
 export const useChatSocket = ({
-    addKey, updateKey, queryKey,
+    addKey, updateKey, queryKey, onError
 }: ChatSocketProps) => {
     const {socket} = useSocket();
     const queryClient = useQueryClient();
@@ -27,57 +27,85 @@ export const useChatSocket = ({
         if (!socket) { return };
 
         socket.on(updateKey, (message: MessageWithMemberWithUser) => {
-            queryClient.setQueryData([queryKey], (oldData: any) => {
-                
-                if (!oldData || !oldData.pages || oldData.pages.length === 0) {
-                    return oldData;
-                }
-                
-                const newData = oldData.pages.map((page: any) => {
-                    return {
-                        ...page,
-                        items: page.items.map((item: MessageWithMemberWithUser) => {
-                            if (item.id === message.id) {
-                                return message;
-                            }
-                            return item;
-                        })
+            try {
+                queryClient.setQueryData([queryKey], (oldData: any) => {
+                    
+                    if (!oldData || !oldData.pages || oldData.pages.length === 0) {
+                        return oldData;
                     }
+                    
+                    const newData = oldData.pages.map((page: any) => {
+                        return {
+                            ...page,
+                            items: page.items.map((item: MessageWithMemberWithUser) => {
+                                if (item.id === message.id) {
+                                    return message;
+                                }
+                                return item;
+                            })
+                        }
+                    });
+                    
+                    return {
+                        ...oldData,
+                        pages: newData,
+                    }      
                 });
-                
-                return {
-                    ...oldData,
-                    pages: newData,
-                }      
-            });
+            } catch (error) {
+                if (onError) {
+                    onError(error);
+                } else {
+                    console.error("Error in socket updateKey handler:", error);
+                }
+            }
         });
 
         socket.on(addKey, (message: MessageWithMemberWithUser) => {
-            queryClient.setQueryData([queryKey], (oldData: any) => {
-                if (!oldData || !oldData.pages || oldData.pages.length === 0) {
-                    return {
-                        pages: [{
-                            items: [message]
-                        }]
+            try {
+                queryClient.setQueryData([queryKey], (oldData: any) => {
+                    if (!oldData || !oldData.pages || oldData.pages.length === 0) {
+                        return {
+                            pages: [{
+                                items: [message]
+                            }]
+                        }
                     }
-                }
 
-                const newData = [...oldData.pages];
+                    const newData = [...oldData.pages];
 
-                newData[0] = {
-                    ...newData[0],
-                    items: [message, ...newData[0].items],
-                }
+                    if (!newData[0]) {
+                        return {
+                            ...oldData,
+                            pages: [{
+                                items: [message]
+                            }, ...newData.slice(1)]
+                        };
+                    }
 
-                return {
-                    ...oldData,
-                    pages: newData,
+                    const existingItems = newData[0].items || [];
+
+                    newData[0] = {
+                        ...newData[0],
+                        items: [message, ...existingItems],
+                    }
+
+                    return {
+                        ...oldData,
+                        pages: newData,
+                    }
+                });
+            } catch (error) {
+                if (onError) {
+                    onError(error);
+                } else {
+                    console.error("Error in socket addKey handler:", error);
                 }
-            });
+            }
         });
+        
         return () => {
             socket.off(updateKey);
             socket.off(addKey);
         }
-    }, [queryClient, addKey, updateKey, queryKey, socket]);
+    }, [queryClient, addKey, updateKey, queryKey, socket, onError]);
 }

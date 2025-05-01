@@ -29,10 +29,12 @@ import { useParams, useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { useEffect, useState } from 'react';
 import FileUpload from '@/components/islets/uploads/file-upload';
+import { Loader2 } from "lucide-react";
 
 const EditBotModal = () => {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [useDefaultImage, setUseDefaultImage] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
     const { isOpen, onClose, type, data } = useModal();
     const router = useRouter();
     const params = useParams();
@@ -70,6 +72,7 @@ const EditBotModal = () => {
     useEffect(() => {
         if (isModalOpen && botId) {
             const loadBotData = async () => {
+                setIsFetching(true);
                 try {
                     const query = qs.stringifyUrl({
                         url: '/api/bots/server-bots/single-bot',
@@ -93,6 +96,8 @@ const EditBotModal = () => {
                     setUseDefaultImage(data.botUser.image === 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg');
                 } catch (error) {
                     console.error("Failed to load bot data:", error);
+                } finally {
+                    setIsFetching(false);
                 }
             };
 
@@ -167,6 +172,12 @@ const EditBotModal = () => {
                         <div>Update your bot's settings and personality</div> 
                     </DialogDescription>
                 </DialogHeader>
+                {isFetching ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+                        <p className="text-xs text-zinc-500 mt-2">Loading bot configuration...</p>
+                    </div>
+                ) : (
                 <ScrollArea className='max-h-[80vh] px-6'>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -365,12 +376,20 @@ const EditBotModal = () => {
                             </div>
                             <DialogFooter className='px-6 py-4'>
                                 <Button disabled={isLoading} variant='secondary'>
-                                    Update Bot
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        "Update Bot"
+                                    )}
                                 </Button>
                             </DialogFooter>
                         </form>
                     </Form>
                 </ScrollArea>
+                )}
             </DialogContent>
         </Dialog>
     )
