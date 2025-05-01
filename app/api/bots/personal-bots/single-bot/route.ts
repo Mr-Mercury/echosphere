@@ -7,6 +7,20 @@ export async function PATCH(req: Request) {
         const user = await currentUser();
         if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
+        const url = new URL(req.url);
+        const id = url.searchParams.get('id');
+
+        if (!id) {
+            return new NextResponse('Missing bot ID', { status: 400 });
+        }
+
+        const personalBot = await db.personalBot.findUnique({
+            where: {
+                id,
+                creatorId: user.id
+            }
+        });
+
         // Implementation for updating personal bots
         
     } catch (error) {
