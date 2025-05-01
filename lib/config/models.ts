@@ -56,8 +56,8 @@ export const AVAILABLE_MODELS: Record<string, AIModel> = {
         },
         maxSystemPromptLength: 3000,
     },
-    'gemini-1.5-flash-002': {
-        name: 'Gemini 1.5 Flash',
+    'gemini-2.0-flash-lite': {
+        name: 'Gemini 2.0 Flash Lite',
         maxTokens: 128000,
         isAvailable: true,
         provider: 'google',

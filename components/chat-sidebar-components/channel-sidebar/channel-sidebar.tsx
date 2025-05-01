@@ -131,6 +131,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                     </div>
                 )}
                 <div className='space-y-[2px]'>
+                    {/* TODO: Add start all/stop all bot button here */}
                     <MemberList server={server} role={role} />
                 </div>
             </ScrollArea>
