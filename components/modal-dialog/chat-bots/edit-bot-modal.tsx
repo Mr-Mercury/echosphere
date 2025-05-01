@@ -30,18 +30,20 @@ import { useModal } from "@/hooks/use-modal-store";
 import { useEffect, useState } from 'react';
 import FileUpload from '@/components/islets/uploads/file-upload';
 
-interface EditBotModalProps {
-    botId: string;
-}
-
-const EditBotModal = ({ botId }: EditBotModalProps) => {
+const EditBotModal = () => {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [useDefaultImage, setUseDefaultImage] = useState(false);
-    const { isOpen, onClose, type } = useModal();
+    const { isOpen, onClose, type, data } = useModal();
     const router = useRouter();
     const params = useParams();
     
     const isModalOpen = isOpen && type === 'editBot';
+    const botId = data.botUser?.id;
+
+    useEffect(() => {
+        console.log("Modal data:", data);
+        console.log("Bot ID:", botId);
+    }, [data, botId]);
 
     const form = useForm({
         resolver: zodResolver(ServerBotSchema),
