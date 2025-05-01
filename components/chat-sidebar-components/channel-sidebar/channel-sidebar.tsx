@@ -55,8 +55,8 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                 )))}
             </ul> */}
             {/* TODO: MOVE THIS TO UPPER BAR LIKE DISCORD? */}
-            <ScrollArea className='flex-1 px-3'>
-                <div className='mt-2'>
+            <ScrollArea className='flex-1 px-2 pb-3'>
+                <div className='mt-2 px-1'>
                     <ServerSearch 
                         data={[
                             {

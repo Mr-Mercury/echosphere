@@ -21,7 +21,7 @@ export const ServerListing = ({
     const {onOpen} = useModal();
 
     return (
-        <div className='flex items-center justify-between py-2'>
+        <div className='flex items-center justify-between py-2 pr-3'>
             <p className='text-xs uppercase font-semibold text-zinc-400'>
                 {label}
             </p>
@@ -29,7 +29,7 @@ export const ServerListing = ({
                 <NavTooltip label='Create Channel' side='top'>
                     <button 
                         onClick={() => onOpen('createChannel', { channelType })}
-                        className='text-zinc-400 hover:text-zinc-300 transition'>
+                        className='text-zinc-400 hover:text-zinc-300 transition relative z-10 overflow-visible rounded-md p-1'>
                         <Plus className='h-4 w-4'/>
                     </button>
                 </NavTooltip>
@@ -38,7 +38,7 @@ export const ServerListing = ({
                 <NavTooltip label='Manage Members' side='top'>
                     <button 
                         onClick={() => onOpen('members', { server })}
-                        className='text-zinc-400 hover:text-zinc-300 transition'>
+                        className='text-zinc-400 hover:text-zinc-300 transition relative z-10 overflow-visible rounded-md p-1'>
                         <Settings className='h-4 w-4'/>
                     </button>
                 </NavTooltip>

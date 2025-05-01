@@ -102,7 +102,7 @@ export const ServerMember = ({
                 src={member.user.image}
                 className='h-8 w-8 md:h-8 md:w-8 flex-shrink-0'
             />
-            <div className='flex items-center w-full pr-8'>
+            <div className='flex items-center w-full pr-10'>
                 <DropdownMenu>
                     <DropdownMenuTrigger className='focus:outline-none w-full' asChild>
                         <button className='flex items-center min-w-0 w-full text-left'>
@@ -137,7 +137,7 @@ export const ServerMember = ({
                 </DropdownMenu>
                 
                 {isBot && (
-                    <div className='ml-auto'>
+                    <div className='absolute right-2 z-10'>
                         <NavTooltip label={botActive ? 'Deactivate Bot' : 'Activate Bot'} side='top'>
                             <button 
                                 onClick={(e) => {
@@ -150,7 +150,7 @@ export const ServerMember = ({
                                 }}
                                 disabled={isLoading || isTogglingAny}
                                 className={cn(
-                                    'p-1 rounded-md transition',
+                                    'p-1 rounded-md transition overflow-visible',
                                     botActive ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600',
                                     (isLoading || isTogglingAny) && 'opacity-50 cursor-not-allowed'
                                 )}>
