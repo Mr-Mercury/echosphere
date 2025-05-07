@@ -4,16 +4,16 @@ import React from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Users } from "lucide-react";
+import { UserPlus, Users, Copy } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
-import { PROVIDER_COLORS } from "@/lib/config/models";
+import { CATEGORY_COLORS } from "@/lib/config/categories";
 
 interface ServerCardProps {
   id?: string;
   name: string;
   description: string;
-  provider: keyof typeof PROVIDER_COLORS;
+  category: keyof typeof CATEGORY_COLORS;
   memberCount: number;
   activeMembers: number;
   imageUrl: string;
@@ -25,15 +25,15 @@ const ServerCard = ({
   id = 'sample-server-id',
   name = 'Sample Server',
   description = 'This is a sample server description that explains what the server is about.',
-  provider = 'openai',
+  category = 'Movies',
   memberCount = 120,
   activeMembers = 42,
   imageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
   createdAt = '2023-04-01',
   onJoinServer
 }: ServerCardProps) => {
-  // Get provider color for the border
-  const providerColor = PROVIDER_COLORS[provider]?.primary || PROVIDER_COLORS.default;
+  // Get category color for the border
+  const categoryColor = CATEGORY_COLORS[category] || '#888888';
 
   return (
     <Card className="w-72 h-full overflow-hidden flex flex-col bg-black border-2 border-zinc-600 shadow-lg shadow-zinc-900/20">
@@ -42,7 +42,7 @@ const ServerCard = ({
           <div className="flex items-center gap-2">
             <div 
               className="relative w-14 h-14 rounded-full overflow-hidden border-2"
-              style={{ borderColor: providerColor }}
+              style={{ borderColor: categoryColor }}
             >
               <img
                 src={imageUrl}
@@ -56,9 +56,10 @@ const ServerCard = ({
                 <Badge 
                   variant="outline" 
                   className="text-xs bg-black border-zinc-800" 
-                  style={{ color: providerColor, borderColor: providerColor }}
+                  style={{ color: categoryColor, borderColor: categoryColor }}
                 >
-                  {provider}
+                  <Users className="w-3 h-3 mr-1" style={{ color: categoryColor }} />
+                  {category}
                 </Badge>
               </div>
             </div>
@@ -70,12 +71,12 @@ const ServerCard = ({
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium text-zinc-400 flex items-center gap-1">
-              <Users className="h-3 w-3" /> Members
+              <Copy className="h-3 w-3" /> Times Copied
             </span>
             <span className="text-xs text-zinc-100">{memberCount}</span>
           </div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-medium text-zinc-400">Active Now</span>
+            <span className="text-xs font-medium text-zinc-400">Number of Echoes</span>
             <span className="text-xs text-zinc-100">{activeMembers}</span>
           </div>
           <div className="text-xs text-zinc-400 mb-3">Created: {createdAt}</div>

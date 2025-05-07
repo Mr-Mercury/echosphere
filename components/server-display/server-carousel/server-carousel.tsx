@@ -4,14 +4,15 @@ import React from 'react';
 import ServerCard from '@/components/server-display/server-card/server-card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CATEGORY_COLORS } from "@/lib/config/categories";
 
 // Sample data for demonstration - this would come from a real API in production
 export const SAMPLE_SERVERS = [
   {
     id: 'server-1',
-    name: 'Gaming Hub',
-    description: 'A community for gamers to discuss their favorite games, find teammates, and share gaming news and tips.',
-    category: 'Gaming',
+    name: 'Movie Buffs',
+    description: 'A community for movie enthusiasts to discuss their favorite films, share reviews, and discover new releases.',
+    category: 'Movies',
     rating: 9.2,
     memberCount: 1587,
     activeMembers: 342,
@@ -20,9 +21,9 @@ export const SAMPLE_SERVERS = [
   },
   {
     id: 'server-2',
-    name: 'Code Masters',
-    description: 'A server for developers to collaborate, share resources, and help each other with coding challenges.',
-    category: 'Technology',
+    name: 'TV Series Club',
+    description: 'A server for TV show fans to discuss episodes, share theories, and keep up with the latest series.',
+    category: 'TV',
     rating: 9.5,
     memberCount: 2104,
     activeMembers: 487,
@@ -31,9 +32,9 @@ export const SAMPLE_SERVERS = [
   },
   {
     id: 'server-3',
-    name: 'Digital Artists',
-    description: 'Connect with digital artists, get feedback on your work, and discover new techniques and tools.',
-    category: 'Art',
+    name: 'Comic Book Universe',
+    description: 'Connect with comic book fans, discuss storylines, and explore the world of graphic novels.',
+    category: 'Comics',
     rating: 8.9,
     memberCount: 1372,
     activeMembers: 210,
@@ -42,9 +43,9 @@ export const SAMPLE_SERVERS = [
   },
   {
     id: 'server-4',
-    name: 'Study Group',
-    description: 'A collaborative learning environment for students to study together, share notes, and prepare for exams.',
-    category: 'Education',
+    name: 'Anime World',
+    description: 'A community for anime fans to discuss their favorite shows, share recommendations, and explore Japanese animation.',
+    category: 'Anime',
     rating: 9.3,
     memberCount: 918,
     activeMembers: 145,
@@ -53,9 +54,9 @@ export const SAMPLE_SERVERS = [
   },
   {
     id: 'server-5',
-    name: 'Bookworms Club',
-    description: 'A community for book lovers to discuss literature, recommend books, and join virtual book clubs.',
-    category: 'Community',
+    name: 'News & Events',
+    description: 'Stay updated with the latest news, discuss current events, and engage in meaningful conversations.',
+    category: 'Current Events',
     rating: 9.1,
     memberCount: 892,
     activeMembers: 178,
@@ -98,11 +99,11 @@ const ServerCarousel = ({
   };
 
   return (
-    <div className="w-full py-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="w-full px-6 py-6">
+      <div className="flex justify-center text-center items-center mb-4">
         <h2 className="text-2xl font-bold">{title}</h2>
         {onViewAll && (
-          <Button variant="link" onClick={onViewAll}>
+          <Button variant="link" onClick={onViewAll} className="absolute right-6">
             View all
           </Button>
         )}

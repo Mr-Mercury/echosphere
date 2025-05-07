@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ServerCard from '@/components/server-display/server-card/server-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, List, Grid3X3, Star, Users } from 'lucide-react';
+import { Search, Filter, List, Grid3X3, Star, Users, Copy } from 'lucide-react';
+import { CATEGORY_COLORS } from "@/lib/config/categories";
 
 // Category filter options
-const CATEGORY_OPTIONS = ['All Categories', 'Gaming', 'Technology', 'Education', 'Art', 'Community'];
+const CATEGORY_OPTIONS = ['All Categories', ...Object.keys(CATEGORY_COLORS)];
 
 // Sort options
 const SORT_OPTIONS = [
@@ -25,9 +26,9 @@ function createServerData() {
   const baseServers = [
     {
       id: 'server-1',
-      name: 'Gaming Hub',
-      description: 'A community for gamers to discuss their favorite games, find teammates, and share gaming news and tips.',
-      category: 'Gaming',
+      name: 'Movie Buffs',
+      description: 'A community for movie enthusiasts to discuss their favorite films, share reviews, and discover new releases.',
+      category: 'Movies',
       rating: 9.2,
       memberCount: 1587,
       activeMembers: 342,
@@ -36,9 +37,9 @@ function createServerData() {
     },
     {
       id: 'server-2',
-      name: 'Code Masters',
-      description: 'A server for developers to collaborate, share resources, and help each other with coding challenges.',
-      category: 'Technology',
+      name: 'TV Series Club',
+      description: 'A server for TV show fans to discuss episodes, share theories, and keep up with the latest series.',
+      category: 'TV',
       rating: 9.5,
       memberCount: 2104,
       activeMembers: 487,
@@ -47,9 +48,9 @@ function createServerData() {
     },
     {
       id: 'server-3',
-      name: 'Digital Artists',
-      description: 'Connect with digital artists, get feedback on your work, and discover new techniques and tools.',
-      category: 'Art',
+      name: 'Comic Book Universe',
+      description: 'Connect with comic book fans, discuss storylines, and explore the world of graphic novels.',
+      category: 'Comics',
       rating: 8.9,
       memberCount: 1372,
       activeMembers: 210,
@@ -58,9 +59,9 @@ function createServerData() {
     },
     {
       id: 'server-4',
-      name: 'Study Group',
-      description: 'A collaborative learning environment for students to study together, share notes, and prepare for exams.',
-      category: 'Education',
+      name: 'Anime World',
+      description: 'A community for anime fans to discuss their favorite shows, share recommendations, and explore Japanese animation.',
+      category: 'Anime',
       rating: 9.3,
       memberCount: 918,
       activeMembers: 145,
@@ -69,9 +70,9 @@ function createServerData() {
     },
     {
       id: 'server-5',
-      name: 'Bookworms Club',
-      description: 'A community for book lovers to discuss literature, recommend books, and join virtual book clubs.',
-      category: 'Community',
+      name: 'News & Events',
+      description: 'Stay updated with the latest news, discuss current events, and engage in meaningful conversations.',
+      category: 'Current Events',
       rating: 9.1,
       memberCount: 892,
       activeMembers: 178,
@@ -84,9 +85,9 @@ function createServerData() {
   const additionalServers = [
     {
       id: 'server-6',
-      name: 'Music Lovers',
-      description: 'A server for music enthusiasts to share favorite songs, discuss albums, and discover new artists.',
-      category: 'Community',
+      name: 'Classic Films',
+      description: 'A server for classic movie enthusiasts to discuss timeless films and cinema history.',
+      category: 'Movies',
       rating: 8.7,
       memberCount: 1243,
       activeMembers: 156,
@@ -95,9 +96,9 @@ function createServerData() {
     },
     {
       id: 'server-7',
-      name: 'Startup Network',
-      description: 'Connect with entrepreneurs, share resources, and discuss challenges and opportunities in the startup world.',
-      category: 'Technology',
+      name: 'Streaming Shows',
+      description: 'Discuss your favorite streaming series, share recommendations, and stay updated with new releases.',
+      category: 'TV',
       rating: 9.1,
       memberCount: 1512,
       activeMembers: 289,
@@ -106,9 +107,9 @@ function createServerData() {
     },
     {
       id: 'server-8',
-      name: 'Language Exchange',
-      description: 'Practice languages with native speakers, get feedback on your writing, and improve your language skills.',
-      category: 'Education',
+      name: 'Manga & Comics',
+      description: 'A community for manga and comic book fans to discuss their favorite series and discover new ones.',
+      category: 'Comics',
       rating: 9.3,
       memberCount: 1678,
       activeMembers: 312,
@@ -126,19 +127,19 @@ interface ServerExplorerProps {
 }
 
 const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
-  // Create fresh server data for this component
-  const allServers = createServerData();
+  // Create fresh server data using useRef to prevent re-creation on renders
+  const allServersRef = useRef(createServerData());
   
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredServers, setFilteredServers] = useState(allServers);
+  const [filteredServers, setFilteredServers] = useState(allServersRef.current);
 
   // Apply filters and sort
   useEffect(() => {
-    let result = [...allServers];
+    let result = [...allServersRef.current];
     
     // Filter by search query
     if (searchQuery) {
@@ -172,7 +173,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
     });
     
     setFilteredServers(result);
-  }, [searchQuery, selectedCategory, sortBy, allServers]);
+  }, [searchQuery, selectedCategory, sortBy]);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -194,11 +195,12 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
 
   return (
     <div className="w-full py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Explore Servers</h1>
+      <h1 className="text-3xl text-center font-bold">Explore Servers</h1>
       
-      {/* Filters and Controls */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="relative flex-grow">
+      {/* Filters and Controls - flex row in parent and filter divs 
+      to ease separating search and filters and spacing */}
+      <div className="flex w-full flex-row gap-4 justify-center items-center">
+        <div className="relative w-1/2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Search servers by name or description..." 
@@ -208,7 +210,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
           />
         </div>
         
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+        <div className="flex flex-row gap-2 sm:flex-row sm:gap-4">
           <Select value={selectedCategory} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Category" />
@@ -285,7 +287,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
       )}
       
       {/* Results count */}
-      <div className="text-sm text-muted-foreground">
+      <div className="text-sm pl-5 text-muted-foreground">
         Showing {filteredServers.length} {filteredServers.length === 1 ? 'server' : 'servers'}
       </div>
       
@@ -298,7 +300,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
           </Button>
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="pl-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredServers.map((server) => (
             <ServerCard
               key={server.id}
@@ -317,14 +319,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
               <div className="flex items-center gap-4 md:w-64">
                 <div 
                   className="relative w-16 h-16 rounded-full overflow-hidden border-2"
-                  style={{ 
-                    borderColor: 
-                      server.category === 'Gaming' ? '#7963d2' : 
-                      server.category === 'Education' ? '#10a37f' : 
-                      server.category === 'Technology' ? '#0095ff' : 
-                      server.category === 'Art' ? '#ff4500' : 
-                      server.category === 'Community' ? '#f8b400' : '#888888' 
-                  }}
+                  style={{ borderColor: CATEGORY_COLORS[server.category as keyof typeof CATEGORY_COLORS] || '#888888' }}
                 >
                   <img
                     src={server.imageUrl}
@@ -353,9 +348,9 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
                   </div>
                   <div className="text-xs text-muted-foreground flex items-center gap-2">
                     <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" /> {server.memberCount}
+                      <Copy className="h-3 w-3" /> {server.memberCount} times copied
                     </span>
-                    <span>{server.activeMembers} active</span>
+                    <span>{server.activeMembers} echoes</span>
                     <span>Created: {server.createdAt}</span>
                   </div>
                 </div>
