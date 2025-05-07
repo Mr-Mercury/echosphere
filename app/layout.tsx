@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="bg-[#313338]">
+      <body className={`${inter.className} bg-[#313338] min-h-screen`}>
         <SocketProvider>
           <ModalProvider />
           <QueryProvider>

@@ -17,8 +17,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
     if (!user) return redirect('/')
     
     return(
-        <div className='h-full'>
-            <div className="flex h-screen bg-[#313338]">
+        <div className='min-h-screen'>
+            <div className="flex h-full">
                 <div className='hidden md:flex h-full w-[72px]
                 z-30 flex-col fixed inset-y-0'>
                     <ChatMainSidebar />
@@ -28,7 +28,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = async ({
                 </main>
             </div>
         </div>
-        
     )
 }
 
