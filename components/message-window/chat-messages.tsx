@@ -59,9 +59,8 @@ const ChatMessages = ({
     const [loadingMore, setLoadingMore] = useState(false);
     const chatContainerRef = useRef<ElementRef<'div'>>(null);
     const bottomRef = useRef<ElementRef<'div'>>(null);
-    const topBarRef = useRef<ElementRef<'div'>>(null);
-    const scrollPositionRef = useRef(0);
     const heightBeforeLoadRef = useRef(0);
+    const scrollPositionRef = useRef(0);
     const hasScrolledToBottomRef = useRef(true);
 
     const queryKey = `chat:${chatId}`;
@@ -85,13 +84,12 @@ const ChatMessages = ({
     // Save scroll position before loading more messages
     const saveScrollPosition = () => {
         if (!chatContainerRef.current) return;
-        
         heightBeforeLoadRef.current = chatContainerRef.current.scrollHeight;
         scrollPositionRef.current = chatContainerRef.current.scrollTop;
         setLoadingMore(true);
     };
 
-    // Restore scroll position after loading more messages
+    // Restore scroll position after loading more messages with absolute precision
     const restoreScrollPosition = () => {
         if (!chatContainerRef.current || !loadingMore) return;
         
@@ -99,6 +97,7 @@ const ChatMessages = ({
         const heightDifference = newScrollHeight - heightBeforeLoadRef.current;
         
         if (heightDifference > 0) {
+            // Set scroll position immediately with no animation to prevent any visible jump
             chatContainerRef.current.scrollTop = scrollPositionRef.current + heightDifference;
         }
         
@@ -106,7 +105,7 @@ const ChatMessages = ({
     };
 
     // Scroll to bottom for new messages
-    const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
+    const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
         bottomRef.current?.scrollIntoView({ behavior });
     };
 
@@ -139,7 +138,10 @@ const ChatMessages = ({
     // Restore scroll position after loading completes
     useEffect(() => {
         if (!isFetchingNextPage && loadingMore) {
-            setTimeout(restoreScrollPosition, 0);
+            // Use requestAnimationFrame to ensure the DOM has been updated before adjusting scroll
+            requestAnimationFrame(() => {
+                restoreScrollPosition();
+            });
         }
     }, [isFetchingNextPage, loadingMore]);
     
@@ -164,7 +166,11 @@ const ChatMessages = ({
     useEffect(() => {
         if (socket && chatId) {
             socket.emit('subscribe_to_channel', chatId);
-            return () => socket.emit('unsubscribe_from_channel', chatId);
+            
+            // Fix return type by explicitly returning void
+            return () => {
+                socket.emit('unsubscribe_from_channel', chatId);
+            };
         }
     }, [socket, chatId]);
     
@@ -204,9 +210,12 @@ const ChatMessages = ({
             className='flex-1 flex flex-col py-4 overflow-y-auto h-[calc(100vh-120px)]'
         >
             {hasNextPage && (
-                <div ref={topBarRef} className='flex justify-center py-2'>
+                <div className='flex justify-center py-2'>
                     {isFetchingNextPage ? (
-                        <Loader2 className='h-6 w-6 animate-spin text-zinc-500 my-2'/>
+                        <div className="flex flex-col items-center">
+                            <Loader2 className='h-6 w-6 animate-spin text-zinc-500 my-2'/>
+                            <span className="text-xs text-zinc-400">Loading previous messages...</span>
+                        </div>
                     ) : (
                         <button 
                             onClick={() => {
@@ -241,7 +250,8 @@ const ChatMessages = ({
                                 messageApiUrl={messageApiUrl}
                                 socketQuery={socketQuery}
                                 modelName={message.modelName}
-                                type={type} />
+                                type={type} 
+                            />
                         ))}
                     </Fragment>
                 ))}
