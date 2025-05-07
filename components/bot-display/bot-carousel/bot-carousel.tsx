@@ -5,7 +5,9 @@ import BotCard from '@/components/bot-display/bot-card/bot-card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Sample data for demonstration - this would come from a real API in production
+// Component can be used to display carousel based on a passed list of bots
+// or can be used to display a carousel of bots from the database
+
 export const SAMPLE_BOTS = [
   {
     id: 'bot-1',
@@ -98,11 +100,11 @@ const BotCarousel = ({
   };
 
   return (
-    <div className="w-full py-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="w-full px-6 py-6">
+      <div className="flex justify-center text-center items-center mb-4">
         <h2 className="text-2xl font-bold">{title}</h2>
         {onViewAll && (
-          <Button variant="link" onClick={onViewAll}>
+          <Button variant="link" onClick={onViewAll} className="absolute right-6">
             View all
           </Button>
         )}

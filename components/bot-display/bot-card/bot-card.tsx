@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Copy, Bot } from "lucide-react";
+import { Copy, Bot } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 
@@ -22,7 +22,6 @@ interface BotCardProps {
   name: string;
   description: string;
   prompt: string;
-  rating: number;
   copiesCreated: number;
   model: string;
   imageUrl: string;
@@ -35,22 +34,17 @@ const BotCard = ({
   name = 'Sample Bot',
   description = 'This is a sample bot description that explains what the bot does.',
   prompt = 'Default prompt for the bot to give it instructions on how to behave.',
-  rating = 8.5,
   copiesCreated = 120,
   model = 'Claude',
   imageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
   createdAt = '2023-04-01',
   onCreateCopy
 }: BotCardProps) => {
-  // Calculate whole stars and half stars for rating display
-  const wholeStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-  
   // Get model color for the border
   const modelColor = MODEL_COLORS[model as keyof typeof MODEL_COLORS] || MODEL_COLORS.default;
 
   return (
-    <Card className="w-72 h-full overflow-hidden flex flex-col">
+    <Card className="w-72 h-full overflow-hidden flex flex-col bg-black border-2 border-zinc-600 shadow-lg shadow-zinc-900/20">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -65,11 +59,11 @@ const BotCard = ({
               />
             </div>
             <div>
-              <h3 className="font-semibold text-lg line-clamp-1">{name}</h3>
+              <h3 className="font-semibold text-lg line-clamp-1 text-zinc-100">{name}</h3>
               <div className="flex items-center">
                 <Badge 
                   variant="outline" 
-                  className="text-xs" 
+                  className="text-xs bg-black border-zinc-800" 
                   style={{ color: modelColor, borderColor: modelColor }}
                 >
                   <Bot className="w-3 h-3 mr-1" style={{ color: modelColor }} />
@@ -78,43 +72,25 @@ const BotCard = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={16}
-                  className={cn(
-                    i < wholeStars ? "fill-yellow-400 text-yellow-400" : "text-zinc-300",
-                    i === wholeStars && hasHalfStar && "fill-yellow-400 text-yellow-400"
-                  )}
-                  fillOpacity={i < wholeStars ? 1 : i === wholeStars && hasHalfStar ? 0.5 : 0}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground">
-              {rating.toFixed(1)}/10
-            </span>
-          </div>
         </div>
       </CardHeader>
       
       <CardContent className="flex-grow">
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-medium text-muted-foreground">Copies Created</span>
-            <span className="text-xs">{copiesCreated}</span>
+            <span className="text-xs font-medium text-zinc-400">Copies Created</span>
+            <span className="text-xs text-zinc-100">{copiesCreated}</span>
           </div>
-          <div className="text-xs text-muted-foreground mb-1">Created: {createdAt}</div>
+          <div className="text-xs text-zinc-400 mb-1">Created: {createdAt}</div>
         </div>
         <div className="space-y-2">
           <div>
-            <span className="text-xs font-medium">Prompt:</span>
-            <p className="text-xs text-muted-foreground line-clamp-2">{prompt}</p>
+            <span className="text-xs font-medium text-zinc-100">Description:</span>
+            <p className="text-xs text-zinc-400 line-clamp-3">{description}</p>
           </div>
           <div>
-            <span className="text-xs font-medium">Description:</span>
-            <p className="text-xs text-muted-foreground line-clamp-3">{description}</p>
+            <span className="text-xs font-medium text-zinc-100">Prompt:</span>
+            <p className="text-xs text-zinc-400 line-clamp-2">{prompt}</p>
           </div>
         </div>
       </CardContent>
@@ -123,9 +99,9 @@ const BotCard = ({
         <NavTooltip label="Create a copy of this bot">
           <Button
             onClick={onCreateCopy}
-            variant="default"
+            variant="outline"
             size="sm"
-            className="w-full flex items-center gap-2"
+            className="w-full flex items-center gap-2 bg-black border-zinc-800 text-zinc-100 hover:bg-zinc-900 hover:text-zinc-50"
           >
             <Copy size={14} />
             Create a copy
