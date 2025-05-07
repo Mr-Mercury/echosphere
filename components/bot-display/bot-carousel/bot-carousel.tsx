@@ -110,14 +110,14 @@ const BotCarousel = ({
         )}
       </div>
       
-      <div className="relative">
+      <div className="relative px-8">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-background"
+          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 rounded-full hover:bg-zinc-800/80 hover:ring-2 hover:ring-white/50 transition-all bg-background/50 backdrop-blur-sm"
           onClick={scrollLeft}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-6 w-6 text-white" />
         </Button>
         
         <div 
@@ -139,12 +139,12 @@ const BotCarousel = ({
         </div>
         
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-background"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 rounded-full hover:bg-zinc-800/80 hover:ring-2 hover:ring-white/50 transition-all bg-background/50 backdrop-blur-sm"
           onClick={scrollRight}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-6 w-6 text-white" />
         </Button>
       </div>
     </div>
