@@ -121,10 +121,10 @@ function createBotData() {
 }
 
 interface BotExplorerProps {
-  onCreateCopy?: (botId: string) => void;
+  // Add any props if needed in the future
 }
 
-export const BotExplorer = ({ onCreateCopy }: BotExplorerProps) => {
+export const BotExplorer = () => {
   // Create fresh bot data using useRef to prevent re-creation on renders
   const allBotsRef = useRef(createBotData());
   
@@ -302,7 +302,6 @@ export const BotExplorer = ({ onCreateCopy }: BotExplorerProps) => {
             <BotCard
               key={bot.id}
               {...bot}
-              onCreateCopy={() => onCreateCopy?.(bot.id)}
             />
           ))}
         </div>
@@ -350,15 +349,6 @@ export const BotExplorer = ({ onCreateCopy }: BotExplorerProps) => {
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   {bot.description}
                 </p>
-                <div className="flex justify-end">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => onCreateCopy?.(bot.id)}
-                  >
-                    Create a copy
-                  </Button>
-                </div>
               </div>
             </div>
           ))}

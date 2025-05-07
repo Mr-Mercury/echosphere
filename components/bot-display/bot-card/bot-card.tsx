@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Copy, Bot } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
+import { useModal } from "@/hooks/use-modal-store";
 
 // LLM model colors - replace with your actual model colors
 const MODEL_COLORS = {
@@ -26,7 +27,6 @@ interface BotCardProps {
   model: string;
   imageUrl: string;
   createdAt: string;
-  onCreateCopy?: () => void;
 }
 
 const BotCard = ({
@@ -37,9 +37,9 @@ const BotCard = ({
   copiesCreated = 120,
   model = 'Claude',
   imageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-  createdAt = '2023-04-01',
-  onCreateCopy
+  createdAt = '2023-04-01'
 }: BotCardProps) => {
+  const { onOpen } = useModal();
   // Get model color for the border
   const modelColor = MODEL_COLORS[model as keyof typeof MODEL_COLORS] || MODEL_COLORS.default;
 
@@ -98,7 +98,7 @@ const BotCard = ({
       <CardFooter className="pt-0">
         <NavTooltip label="Create a copy of this bot">
           <Button
-            onClick={onCreateCopy}
+            onClick={() => onOpen('copyBot')}
             variant="outline"
             size="sm"
             className="w-full flex items-center gap-2 bg-black border-zinc-800 text-zinc-100 hover:bg-zinc-900 hover:text-zinc-50"

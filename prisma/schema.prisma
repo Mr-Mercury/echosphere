@@ -43,18 +43,20 @@ model User {
 model BotConfiguration {
   id           String  @id @default(cuid())
   isActive     Boolean @default(true)
-  botName      String
   homeServerId String
-
+  
+  // Copied by BotTemplate
+  botName      String
   botType       String? // e.g., "SERVER_BOT", "CHANNEL_BOT"
   systemPrompt  String? @db.Text
   modelName     String?
   description   String? @db.Text
   prompt        String? @db.Text
   chatFrequency String?
-  useSystemKey  Boolean @default(true)
   messagesPerMinute Int @default(3)
-
+  // End of BotTemplate copy region
+  
+  useSystemKey  Boolean @default(true)
   apiKeyId String?
   apiKey   ApiKey? @relation(fields: [apiKeyId], references: [id])
 
@@ -311,4 +313,26 @@ model Dm {
 
   @@index([memberId])
   @@index([conversationId])
+}
+
+model BotTemplate {
+  id             String  @id @default(uuid())
+
+  // Copied from BotConfiguration
+  botName        String
+  botType        String?
+  systemPrompt   String? @db.Text
+  modelName      String?
+  description    String? @db.Text
+  prompt         String? @db.Text
+  chatFrequency  String?
+  messagesPerMinute Int @default(3)
+  // End of BotConfiguration copy region
+
+  likes Int @default(0)
+  dislikes Int @default(0)
+  copiesCreated Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

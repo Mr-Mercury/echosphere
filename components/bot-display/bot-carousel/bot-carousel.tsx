@@ -70,14 +70,12 @@ interface BotCarouselProps {
   title: string;
   bots?: typeof SAMPLE_BOTS;
   onViewAll?: () => void;
-  onCreateCopy?: (botId: string) => void;
 }
 
 const BotCarousel = ({
   title = 'Popular Bots',
   bots = SAMPLE_BOTS,
-  onViewAll,
-  onCreateCopy
+  onViewAll
 }: BotCarouselProps) => {
   const carouselRef = React.useRef<HTMLDivElement>(null);
 
@@ -132,7 +130,6 @@ const BotCarousel = ({
             <div key={bot.id} className="flex-shrink-0">
               <BotCard
                 {...bot}
-                onCreateCopy={() => onCreateCopy?.(bot.id)}
               />
             </div>
           ))}
