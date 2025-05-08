@@ -124,7 +124,7 @@ interface BotExplorerProps {
   // Add any props if needed in the future
 }
 
-export const BotExplorer = () => {
+const BotExplorer = () => {
   // Create fresh bot data using useRef to prevent re-creation on renders
   const allBotsRef = useRef(createBotData());
   
@@ -357,3 +357,5 @@ export const BotExplorer = () => {
     </div>
   );
 }; 
+
+export default BotExplorer;

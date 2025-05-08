@@ -71,6 +71,26 @@ export const PersonalBotSchema = z.object({
     })
 })
 
+export const BotTemplateSchema = z.object({
+    name: z.string().min(1, {
+        message: 'You need to name your bot'
+    }),
+    profileDescription: z.string().min(1, {
+        message: 'You need a profile description for your bot'
+    }),
+    systemPrompt: z.string().min(1, {
+        message: 'You need to enter a prompt for your bot'
+    }),
+    imageUrl: z.string().min(1, {
+        message: 'You need an image for your bot'
+    }),
+    model: z.string().refine((value) => value in AVAILABLE_MODELS, {
+        message: 'Invalid model selected'
+    }),
+    fullPromptControl: z.boolean(),
+    chatFrequency: z.nativeEnum(ChatFrequency),
+    parentBotConfigId: z.string().optional()
+})
 export const ServerBotSchema = z.object({
     name: z.string().min(1, {
         message: 'You need to name your bot'

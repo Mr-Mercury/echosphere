@@ -5,7 +5,7 @@ import { create } from 'zustand';
 
 export type ModalType = 'createServer' | 'invite' | 'editServer' | 
 'members' | 'createChannel' | 'leaveServer' | 'deleteServer' | 'deleteChannel' 
-| 'editChannel' | 'messageFile' | 'createDM' | 'createServerBot' | 'editBot' | 'copyBot';
+| 'editChannel' | 'messageFile' | 'createDM' | 'createServerBot' | 'editBot' | 'copyBot' | 'createTemplate';
 
 interface ModalData {
     server?: ServerWithMembersAndProfiles;

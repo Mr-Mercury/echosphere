@@ -5,6 +5,7 @@ import CreateChannelModal from "../modal-dialog/channels/create-channel-modal";
 import { useState, useEffect } from "react";
 import InviteServerModal from "../modal-dialog/servers/invite-server-modal";
 import ServerSettingsModal from "../modal-dialog/servers/server-settings-modal";
+import CreateTemplateModal from "../modal-dialog/template/create-template-modal";
 import MembersModal from "../modal-dialog/members-modal";
 import LeaveServerModal from "../modal-dialog/servers/leave-server-modal";
 import DeleteServerModal from "../modal-dialog/servers/delete-server-modal";
@@ -50,6 +51,7 @@ export const ModalProvider = () => {
             <CreateServerBotModal data={data}/>
             <EditBotModal />
             <CopyBotModal />
+            <CreateTemplateModal />
         </>
     )   
 }
