@@ -1,7 +1,7 @@
 'use client'
 
 import qs from 'query-string';
-import { ServerBotSchema } from "@/zod-schemas";
+import { BotTemplateSchema } from "@/zod-schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
@@ -55,7 +55,7 @@ const CreateTemplateModal = ({ data }: CreateTemplateModalProps) => {
     
 
     const form = useForm({
-        resolver: zodResolver(ServerBotSchema),
+        resolver: zodResolver(BotTemplateSchema),
         defaultValues: {
             name: '',
             profileDescription: '',
@@ -64,7 +64,6 @@ const CreateTemplateModal = ({ data }: CreateTemplateModalProps) => {
             model: Object.keys(AVAILABLE_MODELS)[0],
             fullPromptControl: false,
             chatFrequency: ChatFrequency.Average,
-            parentBotConfigId: null,
         }
     });
 
@@ -79,7 +78,7 @@ const CreateTemplateModal = ({ data }: CreateTemplateModalProps) => {
 
     const isLoading = form.formState.isSubmitting;
 
-    const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
+    const onSubmit = async (val: z.infer<typeof BotTemplateSchema>) => {
         try {
             const result = await registerServerBotAction(val, params?.serverId as string);
 
