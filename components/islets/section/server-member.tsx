@@ -129,7 +129,7 @@ export const ServerMember = ({
                             <DropdownMenuItem 
                                 onClick={() => onOpen('editBot', { botUser: member.user })}
                                 className='px-3 py-2 text-sm cursor-pointer'>
-                                Edit Bot
+                                Inspect & Edit Bot
                                 <Edit className='h-4 w-4 ml-auto'/>
                             </DropdownMenuItem>
                         )}

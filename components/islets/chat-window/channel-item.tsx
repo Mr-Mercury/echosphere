@@ -53,11 +53,11 @@ export const ChannelItem = ({
                 <div className='ml-auto flex items-center gap-x-2'>
                     <NavTooltip label='Edit'>
                         <Edit onClick={(e) => onAction(e, 'editChannel')}
-                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
+                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transition'/>
                     </NavTooltip>
                     <NavTooltip label='Delete'>
                         <Trash onClick={(e) => onAction(e, 'deleteChannel')}
-                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transnition'/>
+                        className='hidden group-hover:block h-4 w-4 text-zinc-400 hover:text-zinc-300 transition'/>
                     </NavTooltip>
                 </div>
             )}

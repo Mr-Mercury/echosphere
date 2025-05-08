@@ -166,10 +166,10 @@ const EditBotModal = () => {
             <DialogContent className='bg-black text-white p-0 max-w-2xl overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold '>
-                        Edit Bot
+                        Inspect and Edit Bot
                     </DialogTitle>
                     <DialogDescription className='text-center text-zinc-300'>
-                        <div>Update your bot's settings and personality</div> 
+                        <div>Update your bot's settings and personality or create a template for everyone to use!</div> 
                     </DialogDescription>
                 </DialogHeader>
                 {isFetching ? (
@@ -375,6 +375,16 @@ const EditBotModal = () => {
                                 </div>
                             </div>
                             <DialogFooter className='px-6 py-4'>
+                                <Button disabled={isLoading} variant='secondary'>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        "Upload Template"
+                                    )}
+                                </Button>
                                 <Button disabled={isLoading} variant='secondary'>
                                     {isLoading ? (
                                         <>

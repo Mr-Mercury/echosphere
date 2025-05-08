@@ -1,5 +1,3 @@
-import { PageContainer } from "@/components/page-container";
-import { auth, signOut } from "@/auth";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import BotCarousel from "@/components/bot-display/bot-carousel/bot-carousel";
 import ServerCarousel from "@/components/server-display/server-carousel/server-carousel";
@@ -9,7 +7,7 @@ export default async function Personal() {
 
     return (
         <div className='w-full'>
-            <div className="w-full bg-gradient-to-r from-gray-700 to-gray-800 py-3 shadow-lg sticky top-0 z-50">
+            <div className="w-full bg-gradient-to-r from-zinc-800 to-zinc-900 to-zinc-800 py-3 shadow-lg sticky top-0 z-50">
                 <div className="h-full flex items-center justify-center">
                     <h1 className="text-4xl font-extrabold text-white tracking-wider animate-pulse">
                         ECHOSPHERE

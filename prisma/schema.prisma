@@ -35,7 +35,7 @@ model User {
   personalBotConversations PersonalBotConversation[]
   botConfig                BotConfiguration?
   apiKeys                  ApiKey[]
-
+  botTemplates             BotTemplate[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -329,10 +329,15 @@ model BotTemplate {
   messagesPerMinute Int @default(3)
   // End of BotConfiguration copy region
 
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
   likes Int @default(0)
   dislikes Int @default(0)
   copiesCreated Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
 }
