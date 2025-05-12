@@ -1,0 +1,4 @@
+export const CACHE_CONSTANTS = {
+    POPULAR_BOTS: 86400,
+    POPULAR_SERVERS: 86400,
+}

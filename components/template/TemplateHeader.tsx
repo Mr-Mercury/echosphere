@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import { useModal } from "@/hooks/use-modal-store";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface TemplateHeaderProps {
     activeTab: string;
@@ -11,7 +12,13 @@ interface TemplateHeaderProps {
 
 export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
     const { onOpen } = useModal();
-    
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const handleTabChange = (value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', value);
+        router.push(`?${params.toString()}`);
+    };
     return (
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
             <div className="relative flex items-center px-4 h-14">
@@ -20,18 +27,21 @@ export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
                         <TabsTrigger 
                             value="featured" 
                             className="rounded-md px-3 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
+                            onClick={() => handleTabChange("featured")}
                         >
                             Featured
                         </TabsTrigger>
                         <TabsTrigger 
                             value="bots" 
                             className="rounded-md px-3 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
+                            onClick={() => handleTabChange("bots")}
                         >
                             Bot Templates
                         </TabsTrigger>
                         <TabsTrigger 
                             value="servers" 
                             className="rounded-md px-3 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
+                            onClick={() => handleTabChange("servers")}
                         >
                             Server Templates
                         </TabsTrigger>

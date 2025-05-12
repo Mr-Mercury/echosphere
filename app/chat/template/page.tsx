@@ -7,12 +7,21 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import ServerExplorer from "@/components/server-display/server-explorer/server-explorer";
 
-export default async function TemplatePage() {
+interface TemplatePageProps {
+    searchParams: { tab?: string };
+}
+
+export default async function TemplatePage({ searchParams }: TemplatePageProps) {
     const user = await currentUser();
 
     if (!user) {
         return redirect('/');
     }
+
+    // Get tab from URL query parameter or default to "featured"
+    const tab = searchParams.tab && ['featured', 'bots', 'servers'].includes(searchParams.tab) 
+        ? searchParams.tab 
+        : 'featured';
 
     const featuredContent = (
         <div className="px-4 space-y-6">
@@ -36,7 +45,7 @@ export default async function TemplatePage() {
     return (
         <div className="min-h-screen pb-20">
             <TemplateTabs 
-                defaultTab="featured"
+                defaultTab={tab}
                 featuredContent={featuredContent}
                 botTemplatesContent={botTemplatesContent}
                 serverTemplatesContent={serverTemplatesContent}

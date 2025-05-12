@@ -1,9 +1,10 @@
 'use client';
 
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TemplateHeader } from "./TemplateHeader";
+import { useSearchParams } from "next/navigation";
 
 interface TemplateTabsProps {
     defaultTab: string;
@@ -18,9 +19,20 @@ export function TemplateTabs({
     botTemplatesContent,
     serverTemplatesContent
 }: TemplateTabsProps) {
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState(defaultTab);
+    
+    // Update tab when URL changes
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab && ['featured', 'bots', 'servers'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+    
     return (
-        <Tabs defaultValue={defaultTab} className="w-full">
-            <TemplateHeader activeTab={defaultTab} />
+        <Tabs value={activeTab} defaultValue={defaultTab} className="w-full">
+            <TemplateHeader activeTab={activeTab} />
             
             <div className="mt-4">
                 <TabsContent value="featured">
