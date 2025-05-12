@@ -3,6 +3,7 @@ import BotCarousel from "@/components/bot-display/bot-carousel/bot-carousel";
 import ServerCarousel from "@/components/server-display/server-carousel/server-carousel";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import PopularBotsContainer from "@/components/bot-display/bot-carousel/bot-carousel-wrapper";
 
 export default async function Personal() {
     const user = await currentUser();
@@ -25,9 +26,10 @@ export default async function Personal() {
                         </Link>
                     </Button>
                 </div>
-                <BotCarousel title={"Currently Popular Bots"}/>
-                
-                <div className="flex items-center justify-between px-4 mb-2 mt-6">
+                <PopularBotsContainer 
+                title="" 
+                showTitle={false}
+            />                <div className="flex items-center justify-between px-4 mb-2 mt-6">
                     <h2 className="text-xl font-semibold">Currently Popular Servers</h2>
                     <Button variant="outline" size="sm" asChild>
                         <Link href="/chat/template?tab=servers">

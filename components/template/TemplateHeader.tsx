@@ -14,11 +14,13 @@ export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
     const { onOpen } = useModal();
     const router = useRouter();
     const searchParams = useSearchParams();
+    
     const handleTabChange = (value: string) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', value);
         router.push(`?${params.toString()}`);
     };
+    
     return (
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
             <div className="relative flex items-center px-4 h-14">
