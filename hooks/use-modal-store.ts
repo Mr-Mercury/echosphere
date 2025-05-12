@@ -15,6 +15,7 @@ interface ModalData {
     query?: Record<string, any>;
     // bot?: PersonalBot;
     botUser?: User;
+    templateId?: string;
 }
 
 interface ModalStore {

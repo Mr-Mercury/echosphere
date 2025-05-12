@@ -45,6 +45,13 @@ const BotCard = ({
   // Get model color for the border
   const modelColor = MODEL_COLORS[model as keyof typeof MODEL_COLORS] || MODEL_COLORS.default;
 
+  const handleCopyButtonClick = () => {
+    console.log("Copy button clicked for template:", { id, name, image: imageUrl });
+    
+    // Pass the template ID to the modal
+    onOpen('copyBot', { templateId: id });
+  };
+
   return (
     <Card className="w-72 h-full overflow-hidden flex flex-col bg-black border-2 border-zinc-600 shadow-lg shadow-zinc-900/20">
       <CardHeader className="pb-2">
@@ -100,7 +107,7 @@ const BotCard = ({
       <CardFooter className="pt-0">
         <NavTooltip label="Create a copy of this bot">
           <Button
-            onClick={() => onOpen('copyBot')}
+            onClick={handleCopyButtonClick}
             variant="outline"
             size="sm"
             className="w-full flex items-center gap-2 bg-black border-zinc-800 text-zinc-100 hover:bg-zinc-900 hover:text-zinc-50"
