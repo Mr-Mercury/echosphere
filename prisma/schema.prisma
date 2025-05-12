@@ -318,8 +318,9 @@ model Dm {
 model BotTemplate {
   id             String  @id @default(uuid())
 
-  // Copied from BotConfiguration
+  // Copied from BotConfiguration if pre-existing bot is used
   botName        String
+  imageUrl           String? @db.Text
   botType        String?
   systemPrompt   String? @db.Text
   modelName      String?

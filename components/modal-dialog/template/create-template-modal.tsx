@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react';
 import { ServerWithMembersAndProfiles } from '@/lib/entities/servers';
 import FileUpload from '@/components/islets/uploads/file-upload';
 import { Switch } from "../../ui/switch";
+import { registerBotTemplateAction } from '@/app/actions/create-bot-template';
 
 interface CreateTemplateModalProps {
     data?: {
@@ -80,7 +81,7 @@ const CreateTemplateModal = ({ data }: CreateTemplateModalProps) => {
 
     const onSubmit = async (val: z.infer<typeof BotTemplateSchema>) => {
         try {
-            const result = await registerServerBotAction(val, params?.serverId as string);
+            const result = await registerBotTemplateAction(val);
 
             if (result.error) {
                 // TODO: Add proper error handling/display here

@@ -68,6 +68,7 @@ export const registerBotTemplateAction = async (
         const newTemplate = await db.botTemplate.create({
             data: {
                 botName: sanitizedName,
+                imageUrl,
                 description: sanitizedDescription,
                 systemPrompt: systemPrompt,
                 modelName: model,
