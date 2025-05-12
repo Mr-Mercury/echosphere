@@ -36,9 +36,33 @@ import { useEffect, useState } from 'react';
 import { ServerWithMembersAndProfiles } from '@/lib/entities/servers';
 import FileUpload from '@/components/islets/uploads/file-upload';
 import { Switch } from "../../ui/switch";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utilities/clsx/utils";
+
+const customDisabledStyles = "!text-secondary !cursor-not-allowed";
+
+// Add styling to override disabled appearance
+const CustomStyles = () => (
+  <style jsx global>{`
+    .${customDisabledStyles.replace(/\s+/g, '.')} {
+      color: inherit !important;
+      -webkit-text-fill-color: inherit !important;
+      cursor: not-allowed !important;
+    }
+    textarea:disabled, select:disabled, input:disabled {
+      color: inherit !important;
+      -webkit-text-fill-color: inherit !important;
+      cursor: not-allowed !important;
+      opacity: 0.7 !important;
+      background-color: rgb(39, 39, 42, 0.5) !important;
+    }
+    .warning-background {
+      background-color: rgba(220, 38, 38, 0.1) !important;
+      border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    }
+  `}</style>
+);
 
 interface CopyBotModalProps {
     data?: {
@@ -54,6 +78,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
     const [isFetching, setIsFetching] = useState(false);
     const [isLoadingServers, setIsLoadingServers] = useState(false);
     const [isLoadingBotData, setIsLoadingBotData] = useState(false);
+    const [originalModel, setOriginalModel] = useState<string>('');
     const { isOpen, onClose, type, data: modalData } = useModal();
     const router = useRouter();
     const params = useParams();
@@ -153,6 +178,9 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                     form.setValue('model', templateData.modelName || Object.keys(AVAILABLE_MODELS)[0]);
                     form.setValue('profileDescription', templateData.description || '');
                     
+                    // Save the original model
+                    setOriginalModel(templateData.modelName || Object.keys(AVAILABLE_MODELS)[0]);
+                    
                     // Important: Use the original prompt if available, not the system prompt
                     form.setValue('systemPrompt', templateData.prompt || templateData.systemPrompt || '');
                     
@@ -232,6 +260,9 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
     }
 
     const selectedModel = form.watch('model');
+    
+    // Check if current model differs from original template model
+    const isModelChanged = selectedModel !== originalModel && originalModel !== '';
 
     const isLoading = isLoadingServers || isLoadingBotData || form.formState.isSubmitting;
 
@@ -289,6 +320,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleClose}>
+            <CustomStyles />
             <DialogContent className='bg-black text-white p-0 max-w-2xl overflow-hidden'>
                 <DialogHeader className='pt-8 px-6'>
                     <DialogTitle className='text-2xl text-center font-bold'>
@@ -353,7 +385,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                 <FormField control={form.control} name='name' render={({field}) => (
                                     <FormItem>
                                         <FormLabel className='uppercase text-xs font-bold text-secondary'>
-                                                Template name
+                                                Bot name
                                         </FormLabel>
                                         <FormControl>
                                             <Input disabled={isLoading} className='border-0 
@@ -371,13 +403,16 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                 <FormField control={form.control} name='profileDescription' render={({field}) => (
                                     <FormItem>
                                         <FormLabel className='uppercase text-xs font-bold text-secondary'>
-                                            Template Description
+                                            Bot Description
                                         </FormLabel>
+                                        <div className="text-xs text-muted-foreground mb-2">
+                                            This description comes from the template and cannot be modified.
+                                        </div>
                                         <FormControl>
                                             <Textarea 
-                                                disabled={isLoading} 
-                                                className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
-                                                placeholder='Describe this template'
+                                                disabled={true} 
+                                                className={cn('border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none bg-zinc-800/50', customDisabledStyles)}
+                                                placeholder='Describe this bot'
                                                 {...field}
                                                 maxLength={500}
                                                 />
@@ -398,29 +433,19 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                     <FormItem>
                                         <div className='flex items-center justify-between'>
                                             <FormLabel className='uppercase text-xs font-bold text-secondary'>
-                                                Template Prompt
+                                                Bot Prompt
                                             </FormLabel>
-                                            <div className='flex items-center space-x-2'>
-                                                <Checkbox 
-                                                    id='fullPromptControl'
-                                                    checked={form.watch('fullPromptControl')}
-                                                    onCheckedChange={(checked) => form.setValue('fullPromptControl', checked as boolean)}
-                                                    className='border-[1px] border-white/50 data-[state=checked]:border-white'
-                                                />
-                                                <label htmlFor='fullPromptControl' className='text-xs text-muted-foreground cursor-pointer'>
-                                                    Full prompt control
-                                                </label>
-                                            </div>
                                         </div>
                                         <div className="text-xs text-muted-foreground mb-2">
                                             {form.watch('fullPromptControl') ? 
                                                 "Full prompt control: Your prompt will be used exactly as written - echoes will not function properly without adding chat instructions." :
                                                 ""}
+                                            <div className="mt-1">This prompt comes from the template and cannot be modified.</div>
                                         </div>
                                             <FormControl>
                                                 <Textarea 
-                                                    disabled={isLoading} 
-                                                    className='border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none'
+                                                    disabled={true} 
+                                                    className={cn('border-0 focus-visible:ring-0 text-secondary focus-visible:ring-offset-0 resize-none bg-zinc-800/50', customDisabledStyles)}
                                                     placeholder='Enter your prompt here'
                                                     rows={15}
                                                     {...field}
@@ -436,6 +461,40 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                             <FormMessage />
                                     </FormItem>
                                 )} 
+                                />
+                                <FormField control={form.control} name='model' render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel className='uppercase text-xs font-bold text-secondary'>Model </FormLabel>
+                                        {isModelChanged && (
+                                            <div className="text-xs text-rose-500 mb-2">
+                                                Warning: This template was created for {originalModel}. Using a different model may affect the bot's behavior.
+                                            </div>
+                                        )}
+                                        <Select disabled={isLoading} 
+                                        onValueChange={field.onChange} 
+                                        defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger
+                                                    className={cn('border-0 focus:ring-0 ring-offset-0 focus:ring-offset-0 capitalize outline-none', 
+                                                    isModelChanged && 'warning-background')}
+                                                >
+                                                    <SelectValue className='text-secondary'
+                                                    placeholder='Select a model'
+                                                    />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className='bg-primary text-secondary'>
+                                                {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
+                                                    <SelectItem key={key} value={key} className='capitalize'>
+                                                        {model.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                                 />
                                 <FormField control={form.control} name='chatFrequency' render={({field}) => (
                                     <FormItem>
@@ -459,36 +518,6 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                                 {Object.values(ChatFrequency).map((frequency) => (
                                                     <SelectItem key={frequency} value={frequency} className='capitalize'>
                                                         {frequency.toLowerCase().replace('_', ' ')}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField control={form.control} name='model' render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel className='uppercase text-xs font-bold text-secondary'>Model </FormLabel>
-                                        <Select disabled={isLoading} 
-                                        onValueChange={field.onChange} 
-                                        defaultValue={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger
-                                                    className='border-0
-                                                    focus:ring-0 ring-offset-0
-                                                    focus:ring-offset-0 capitalize outline-none'
-                                                >
-                                                    <SelectValue className='text-secondary'
-                                                    placeholder='Select a model'
-                                                    />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className='bg-primary text-secondary'>
-                                                {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
-                                                    <SelectItem key={key} value={key} className='capitalize'>
-                                                        {model.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
