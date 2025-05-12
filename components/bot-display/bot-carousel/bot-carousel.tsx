@@ -4,7 +4,7 @@ import React from 'react';
 import BotCard from '@/components/bot-display/bot-card/bot-card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Bot, SAMPLE_BOTS } from '@/components/bot-display/types';
+import { Bot, SAMPLE_BOTS } from '@/lib/entities/bot-display-types';
 
 interface BotCarouselProps {
   title: string;

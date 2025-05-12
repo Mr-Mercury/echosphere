@@ -27,9 +27,9 @@ export default async function Personal() {
                     </Button>
                 </div>
                 <PopularBotsContainer 
-                title="" 
-                showTitle={false}
-            />                <div className="flex items-center justify-between px-4 mb-2 mt-6">
+                title="Currently Popular Bots" 
+                showTitle={false}/>                
+                <div className="flex items-center justify-between px-4 mb-2 mt-6">
                     <h2 className="text-xl font-semibold">Currently Popular Servers</h2>
                     <Button variant="outline" size="sm" asChild>
                         <Link href="/chat/template?tab=servers">
