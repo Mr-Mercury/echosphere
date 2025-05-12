@@ -8,14 +8,16 @@ import { Copy, Bot } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
+import { PROVIDER_COLORS } from "@/lib/config/models";
 
-// LLM model colors - replace with your actual model colors
+// Map display model names to provider colors
 const MODEL_COLORS = {
-  'Claude': '#7963d2', // Purple for Claude
-  'GPT-4': '#10a37f', // Green for GPT-4
-  'Mistral': '#0095ff', // Blue for Mistral
-  'Llama': '#ff4500', // Orange for Llama
-  'default': '#888888' // Default gray
+  'Claude': PROVIDER_COLORS.anthropic.primary,
+  'GPT-4': PROVIDER_COLORS.openai.primary,
+  'Mistral': '#0095ff', // Blue for Mistral - not in provider colors yet
+  'Llama': '#ff4500', // Orange for Llama - not in provider colors yet
+  'Gemini': PROVIDER_COLORS.google.primary,
+  'default': PROVIDER_COLORS.default
 };
 
 interface BotCardProps {
