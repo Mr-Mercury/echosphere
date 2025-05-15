@@ -3,7 +3,7 @@ import BotCarousel from "@/components/bot-display/bot-carousel/bot-carousel";
 import ServerCarousel from "@/components/server-display/server-carousel/server-carousel";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import PopularBotsContainer from "@/components/bot-display/bot-carousel/bot-carousel-wrapper";
+import PopularBotsContainer from "@/components/bot-display/bot-carousel/popular-bots-container";
 
 export default async function Personal() {
     const user = await currentUser();

@@ -6,7 +6,8 @@ import { TemplateTabs } from "@/components/template/TemplateTabs";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import ServerExplorer from "@/components/server-display/server-explorer/server-explorer";
-
+import PopularBotsContainer from "@/components/bot-display/bot-carousel/popular-bots-container";
+import BotExplorerContainer from "@/components/bot-display/bot-explorer/bot-explorer-container";
 interface TemplatePageProps {
     searchParams: { tab?: string };
 }
@@ -25,14 +26,14 @@ export default async function TemplatePage({ searchParams }: TemplatePageProps) 
 
     const featuredContent = (
         <div className="px-4 space-y-6">
-            <BotCarousel title="Featured Bots" />
+            <PopularBotsContainer title="Featured Bots" />
             <ServerCarousel title="Featured Servers" />
         </div>
     );
 
     const botTemplatesContent = (
         <div className="px-4">
-            <BotExplorer />
+            <BotExplorerContainer />
         </div>
     );
 

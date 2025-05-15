@@ -66,3 +66,72 @@ export const AVAILABLE_MODELS: Record<string, AIModel> = {
 };
 
 export const AVAILABLE_MODELS_IDS = Object.keys(AVAILABLE_MODELS);
+
+// Map display model names to provider colors
+export const MODEL_DISPLAY = {
+    'Claude': {
+        color: PROVIDER_COLORS.anthropic.primary,
+        displayName: 'Claude',
+        provider: 'anthropic'
+    },
+    'GPT': {
+        color: PROVIDER_COLORS.openai.primary,
+        displayName: 'GPT',
+        provider: 'openai'
+    },
+    'GPT-4': {
+        color: PROVIDER_COLORS.openai.primary,
+        displayName: 'GPT-4',
+        provider: 'openai'
+    },
+    'GPT-4o': {
+        color: PROVIDER_COLORS.openai.primary,
+        displayName: 'GPT-4o',
+        provider: 'openai'
+    },
+    'GPT-4o Mini': {
+        color: PROVIDER_COLORS.openai.primary,
+        displayName: 'GPT-4o Mini',
+        provider: 'openai'
+    },
+    'Claude 3.5 Sonnet': {
+        color: PROVIDER_COLORS.anthropic.primary,
+        displayName: 'Claude 3.5 Sonnet',
+        provider: 'anthropic'
+    },
+    'Mistral': {
+        color: '#0095ff', // Blue for Mistral
+        displayName: 'Mistral',
+        provider: 'mistral'
+    },
+    'Llama': {
+        color: '#ff4500', // Orange for Llama
+        displayName: 'Llama',
+        provider: 'meta'
+    },
+    'Gemini 2.0 Flash Lite': {
+        color: PROVIDER_COLORS.google.primary,
+        displayName: 'Gemini',
+        provider: 'google'
+    },
+    'default': {
+        color: PROVIDER_COLORS.default,
+        displayName: 'AI Assistant',
+        provider: 'other'
+    }
+};
+
+// Model filter options for UI components - organize by family then specific models
+export const BOT_MODEL_OPTIONS = [
+  'All Models',
+  // Model families first
+  'GPT',
+  'Claude',
+  'Mistral',
+  'Llama',
+  // Then specific models
+  ...Object.values(AVAILABLE_MODELS)
+    .map(model => model.name)
+    // Filter out models that would be redundant with families
+    .filter(name => name !== 'GPT' && name !== 'Claude' && name !== 'Mistral' && name !== 'Llama')
+];

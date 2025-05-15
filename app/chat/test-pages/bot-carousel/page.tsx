@@ -1,4 +1,4 @@
-import PopularBotsContainer from "@/components/bot-display/bot-carousel/bot-carousel-wrapper";
+import PopularBotsContainer from "@/components/bot-display/bot-carousel/popular-bots-container";
 import { Button } from "@/components/ui/button";
 
 export default function TestPage() {

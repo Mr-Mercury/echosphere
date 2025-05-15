@@ -73,6 +73,8 @@ interface CopyBotModalProps {
 const CopyBotModal = ({ data }: CopyBotModalProps) => {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [useDefaultImage, setUseDefaultImage] = useState(false);
+    const [useTemplateImage, setUseTemplateImage] = useState(true);
+    const [templateImageUrl, setTemplateImageUrl] = useState<string>('');
     const [adminServers, setAdminServers] = useState<Server[]>([]);
     const [selectedServer, setSelectedServer] = useState<Server | null>(null);
     const [isFetching, setIsFetching] = useState(false);
@@ -190,10 +192,10 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
 
                     // Handle image
                     if (templateData.imageUrl) {
-                        const isDefaultImage = templateData.imageUrl === 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg';
-                        setUseDefaultImage(isDefaultImage);
+                        setTemplateImageUrl(templateData.imageUrl);
                         setImageUrl(templateData.imageUrl);
                         form.setValue('imageUrl', templateData.imageUrl);
+                        setUseTemplateImage(true);
                     } else {
                         setDefaultImage();
                     }
@@ -256,6 +258,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
     const setDefaultImage = () => {
         const defaultImageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg';
         setImageUrl(defaultImageUrl);
+        setTemplateImageUrl(defaultImageUrl);
         form.setValue('imageUrl', defaultImageUrl);
     }
 
@@ -305,10 +308,13 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
     };
 
     const handleImageToggle = (checked: boolean) => {
-        setUseDefaultImage(checked);
+        setUseTemplateImage(checked);
         if (checked) {
-            setDefaultImage();
+            // Use the template's image
+            setImageUrl(templateImageUrl);
+            form.setValue('imageUrl', templateImageUrl);
         } else {
+            // Allow user to upload their own
             setImageUrl('');
             form.setValue('imageUrl', '');
         }
@@ -530,11 +536,11 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                     <div className='flex items-center justify-between px-2'>
                                         <div className='flex items-center space-x-2'>
                                             <Switch 
-                                                checked={useDefaultImage}
+                                                checked={useTemplateImage}
                                                 onCheckedChange={handleImageToggle}
                                             />
                                             <span className='text-xs text-muted-foreground'>
-                                                Use default avatar
+                                                Use template avatar
                                             </span>
                                         </div>
                                     </div>
@@ -546,11 +552,11 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        {useDefaultImage ? (
+                                                        {useTemplateImage ? (
                                                             <div className='relative w-24 h-24'>
                                                                 <img 
                                                                     src={field.value}
-                                                                    alt="Default avatar"
+                                                                    alt="Template avatar"
                                                                     className='rounded-full w-full h-full object-cover'
                                                                 />
                                                             </div>

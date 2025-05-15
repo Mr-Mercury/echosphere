@@ -24,20 +24,17 @@ function getModelDisplayName(modelId: string): string {
   // Check if this is a model we know about
   if (modelId in AVAILABLE_MODELS) {
     const model = AVAILABLE_MODELS[modelId];
-    const provider = model.provider;
     
-    // Map provider to display name
-    if (provider === 'anthropic') return 'Claude';
-    if (provider === 'openai') return 'GPT-4';
-    
-    // For other providers, use the name from the model config
+    // Use the actual model name from the configuration
     return model.name;
   }
   
   // Handle legacy models or models not in the config
   const modelLower = modelId.toLowerCase();
   if (modelLower.includes('claude')) return 'Claude';
-  if (modelLower.includes('gpt')) return 'GPT-4';
+  if (modelLower.includes('gpt-4o')) return 'GPT-4o';
+  if (modelLower.includes('gpt-4')) return 'GPT-4';
+  if (modelLower.includes('gpt')) return 'GPT';
   if (modelLower.includes('mistral')) return 'Mistral';
   if (modelLower.includes('llama')) return 'Llama';
   
@@ -182,4 +179,144 @@ export const fetchPopularBotTemplatesWithRevalidation = unstable_cache(
   },
   ['popular-bot-templates'],
   { revalidate: CACHE_CONSTANTS.POPULAR_BOTS }
+);
+
+/**
+ * Interface for bot template fetch parameters
+ */
+interface FetchBotTemplatesParams {
+  page: number;
+  pageSize: number;
+  sort?: 'popular' | 'rating' | 'recent';
+  model?: string;
+  searchQuery?: string;
+}
+
+/**
+ * Fetch bot templates with filtering, sorting, and pagination
+ */
+export async function fetchBotTemplatesWithFilters({
+  page,
+  pageSize,
+  sort = 'popular',
+  model,
+  searchQuery
+}: FetchBotTemplatesParams): Promise<{ bots: Bot[], total: number }> {
+  try {
+    // Building the where clause for filtering
+    const where: any = {};
+    
+    // model filter with support for model families
+    if (model && model !== 'All Models') {
+      // Handle specific model families
+      if (model === 'GPT') {
+        where.modelName = {
+          contains: 'gpt',
+          mode: 'insensitive'
+        };
+      } else if (model === 'Claude') {
+        where.modelName = {
+          contains: 'claude',
+          mode: 'insensitive'
+        };
+      } else if (model === 'Mistral') {
+        where.modelName = {
+          contains: 'mistral',
+          mode: 'insensitive'
+        };
+      } else if (model === 'Llama') {
+        where.modelName = {
+          contains: 'llama',
+          mode: 'insensitive'
+        };
+      } else {
+        // For specific model versions, match exactly
+        where.modelName = model;
+      }
+    }
+    
+    // search query
+    if (searchQuery) {
+      where.OR = [
+        { botName: { contains: searchQuery, mode: 'insensitive' } },
+        { description: { contains: searchQuery, mode: 'insensitive' } },
+        { prompt: { contains: searchQuery, mode: 'insensitive' } }
+      ];
+    }
+
+    // pagination
+    const skip = (page - 1) * pageSize;
+
+    // Build the orderBy clause based on sort parameter
+    let orderBy: any = {};
+    switch (sort) {
+      case 'popular':
+        orderBy = { copiesCreated: 'desc' };
+        break;
+      case 'rating':
+        // Calculate rating based on likes/dislikes ratio
+        orderBy = [
+          { likes: 'desc' },
+          { dislikes: 'asc' }
+        ];
+        break;
+      case 'recent':
+        orderBy = { createdAt: 'desc' };
+        break;
+    }
+
+    // Fetch the data
+    const [bots, total] = await Promise.all([
+      db.botTemplate.findMany({
+        where,
+        orderBy,
+        skip,
+        take: pageSize,
+        include: {
+          creator: {
+            select: {
+              name: true,
+              image: true
+            }
+          }
+        }
+      }),
+      db.botTemplate.count({ where })
+    ]);
+
+    // Transform the data to match Bot display type
+    const transformedBots: Bot[] = bots.map(bot => ({
+      id: bot.id,
+      name: bot.botName,
+      description: bot.description || '',
+      prompt: bot.prompt || '',
+      rating: bot.likes > 0 ? (bot.likes / (bot.likes + bot.dislikes || 1)) * 10 : 0,
+      copiesCreated: bot.copiesCreated,
+      model: getModelDisplayName(bot.modelName || 'Unknown'),
+      imageUrl: bot.imageUrl || '',
+      createdAt: bot.createdAt.toISOString(),
+      creator: bot.creator
+    }));
+
+    return {
+      bots: transformedBots,
+      total
+    };
+  } catch (error) {
+    console.error('Error fetching bot templates:', error);
+    throw new Error(`Failed to fetch bot templates: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Cached version of fetchBotTemplatesWithFilters using Next.js unstable_cache
+ * Cache duration is shorter than popular bots 
+ */
+export const fetchBotTemplatesWithFiltersCached = unstable_cache(
+  async (params: FetchBotTemplatesParams) => {
+    console.log('Bot templates cache revalidated');
+    return await fetchBotTemplatesWithFilters(params);
+  },
+  ['bot-templates-filtered'],
+  { revalidate: CACHE_CONSTANTS.BOT_TEMPLATES }
 ); 

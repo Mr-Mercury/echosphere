@@ -8,17 +8,7 @@ import { Copy, Bot } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
-import { PROVIDER_COLORS } from "@/lib/config/models";
-
-// Map display model names to provider colors
-const MODEL_COLORS = {
-  'Claude': PROVIDER_COLORS.anthropic.primary,
-  'GPT-4': PROVIDER_COLORS.openai.primary,
-  'Mistral': '#0095ff', // Blue for Mistral - not in provider colors yet
-  'Llama': '#ff4500', // Orange for Llama - not in provider colors yet
-  'Gemini': PROVIDER_COLORS.google.primary,
-  'default': PROVIDER_COLORS.default
-};
+import { MODEL_DISPLAY } from "@/lib/config/models";
 
 interface BotCardProps {
   id?: string;
@@ -42,8 +32,10 @@ const BotCard = ({
   createdAt = '2023-04-01'
 }: BotCardProps) => {
   const { onOpen } = useModal();
-  // Get model color for the border
-  const modelColor = MODEL_COLORS[model as keyof typeof MODEL_COLORS] || MODEL_COLORS.default;
+  // Get model color from the centralized configuration
+  const modelConfig = MODEL_DISPLAY[model as keyof typeof MODEL_DISPLAY] || MODEL_DISPLAY.default;
+  const modelColor = modelConfig.color;
+  const displayName = modelConfig.displayName;
 
   const handleCopyButtonClick = () => {
     console.log("Copy button clicked for template:", { id, name, image: imageUrl });
@@ -76,7 +68,7 @@ const BotCard = ({
                   style={{ color: modelColor, borderColor: modelColor }}
                 >
                   <Bot className="w-3 h-3 mr-1" style={{ color: modelColor }} />
-                  {model}
+                  {displayName}
                 </Badge>
               </div>
             </div>

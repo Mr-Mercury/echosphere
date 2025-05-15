@@ -7,177 +7,107 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, List, Grid3X3, Star } from 'lucide-react';
-
-// Model filter options
-const MODEL_OPTIONS = ['All Models', 'Claude', 'GPT-4', 'Mistral', 'Llama'];
-
-// Sort options
-const SORT_OPTIONS = [
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'rating', label: 'Highest Rated' },
-  { value: 'recent', label: 'Most Recent' },
-];
-
-// Define a function to create the bot data instead of direct imports
-function createBotData() {
-  // Sample base bots
-  const baseBots = [
-    {
-      id: 'bot-1',
-      name: 'Customer Support Bot',
-      description: 'A helpful bot designed to handle customer inquiries and provide support for common issues.',
-      prompt: 'You are a helpful and friendly customer support agent for a tech company.',
-      rating: 9.2,
-      copiesCreated: 587,
-      model: 'Claude',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-09-15',
-    },
-    {
-      id: 'bot-2',
-      name: 'Code Assistant',
-      description: 'An AI assistant that helps with coding tasks, debugging, and explaining code concepts.',
-      prompt: 'You are a coding assistant that helps developers write better code and solve programming problems.',
-      rating: 9.7,
-      copiesCreated: 1204,
-      model: 'GPT-4',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-08-22',
-    },
-    {
-      id: 'bot-3',
-      name: 'Marketing Copywriter',
-      description: 'Creates engaging marketing copy for different platforms and audience segments.',
-      prompt: 'You are a creative marketing copywriter who creates engaging and conversion-focused content.',
-      rating: 8.5,
-      copiesCreated: 372,
-      model: 'Claude',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-10-05',
-    },
-    {
-      id: 'bot-4',
-      name: 'Data Analyst',
-      description: 'Helps analyze and interpret data, generate insights, and create visualizations.',
-      prompt: 'You are a data analyst who helps users interpret data and derive meaningful insights.',
-      rating: 8.9,
-      copiesCreated: 318,
-      model: 'Mistral',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-11-12',
-    },
-    {
-      id: 'bot-5',
-      name: 'Learning Tutor',
-      description: 'A patient tutor that explains concepts in simple terms and provides educational guidance.',
-      prompt: 'You are a patient and knowledgeable tutor who specializes in breaking down complex concepts.',
-      rating: 9.4,
-      copiesCreated: 892,
-      model: 'GPT-4',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-07-30',
-    },
-  ];
-  
-  // Additional bots 
-  const additionalBots = [
-    {
-      id: 'bot-6',
-      name: 'Fitness Coach',
-      description: 'A virtual fitness coach that provides workout routines, nutrition advice, and motivation.',
-      prompt: 'You are a motivational fitness coach who helps users achieve their health and fitness goals.',
-      rating: 8.7,
-      copiesCreated: 243,
-      model: 'Llama',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-12-01',
-    },
-    {
-      id: 'bot-7',
-      name: 'Creative Writer',
-      description: 'Assists with creative writing, generating ideas, and providing feedback on written content.',
-      prompt: 'You are a creative writing assistant who helps users with their writing projects.',
-      rating: 9.1,
-      copiesCreated: 512,
-      model: 'Claude',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-09-28',
-    },
-    {
-      id: 'bot-8',
-      name: 'Research Assistant',
-      description: 'Helps with academic research, finding sources, summarizing papers, and organizing information.',
-      prompt: 'You are a research assistant who helps users find, synthesize, and organize academic information.',
-      rating: 9.3,
-      copiesCreated: 678,
-      model: 'GPT-4',
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-10-15',
-    },
-  ];
-  
-  // Return the combined data
-  return [...baseBots, ...additionalBots];
-}
+import { Bot } from '@/lib/entities/bot-display-types';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { 
+  BOT_MODEL_OPTIONS, 
+  BOT_SORT_OPTIONS, 
+  BOT_PAGINATION,
+  BOT_EXPLORER_DEFAULTS
+} from '@/lib/config/bot-explorer';
+import { VIEW_MODES } from '@/lib/config/ui-constants';
 
 interface BotExplorerProps {
-  // Add any props if needed in the future
+  initialData: Bot[];
+  totalBots: number;
+  defaultSort: 'popular' | 'rating' | 'recent';
+  defaultModel: string;
+  defaultSearchQuery: string;
 }
 
-const BotExplorer = () => {
-  // Create fresh bot data using useRef to prevent re-creation on renders
-  const allBotsRef = useRef(createBotData());
-  
+const BotExplorer = ({
+  initialData,
+  totalBots,
+  defaultSort,
+  defaultModel,
+  defaultSearchQuery
+}: BotExplorerProps) => {
   // State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedModel, setSelectedModel] = useState('All Models');
-  const [sortBy, setSortBy] = useState('popular');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredBots, setFilteredBots] = useState(allBotsRef.current);
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
+  const [selectedModel, setSelectedModel] = useState(defaultModel);
+  const [sortBy, setSortBy] = useState(defaultSort);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(BOT_EXPLORER_DEFAULTS.VIEW_MODE);
+  
+  // Ref for infinite scroll
+  const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Apply filters and sort
-  useEffect(() => {
-    let result = [...allBotsRef.current];
-    
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        bot => 
-          bot.name.toLowerCase().includes(query) || 
-          bot.description.toLowerCase().includes(query) ||
-          bot.prompt.toLowerCase().includes(query)
-      );
-    }
-    
-    // Filter by model
-    if (selectedModel !== 'All Models') {
-      result = result.filter(bot => bot.model === selectedModel);
-    }
-    
-    // Sort bots
-    result = result.sort((a, b) => {
-      switch (sortBy) {
-        case 'popular':
-          return b.copiesCreated - a.copiesCreated;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'recent':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        default:
-          return 0;
-      }
+  // Fetch function for react-query
+  const fetchBots = async ({ pageParam = 1 }) => {
+    const params = new URLSearchParams({
+      page: pageParam.toString(),
+      pageSize: BOT_PAGINATION.PAGE_SIZE.toString(),
+      sort: sortBy,
+      model: selectedModel,
+      searchQuery
     });
-    
-    setFilteredBots(result);
-  }, [searchQuery, selectedModel, sortBy]); // Removed allBots dependency
 
+    const response = await axios.get(`/api/templates/bots?${params}`);
+    return response.data;
+  };
+
+  // Setup infinite query
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status
+  } = useInfiniteQuery({
+    queryKey: ['bots', searchQuery, selectedModel, sortBy],
+    queryFn: fetchBots,
+    initialPageParam: 1,
+    initialData: {
+      pages: [{ bots: initialData, total: totalBots }],
+      pageParams: [1]
+    },
+    getNextPageParam: (lastPage, pages) => {
+      const nextPage = pages.length + 1;
+      return nextPage * BOT_PAGINATION.PAGE_SIZE <= lastPage.total ? nextPage : undefined;
+    }
+  });
+
+  // Custom infinite scroll implementation
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loaderRef.current && hasNextPage && !isFetchingNextPage) {
+        const loaderRect = loaderRef.current.getBoundingClientRect();
+        // If the loader element is in the viewport
+        if (loaderRect.top <= window.innerHeight && loaderRect.bottom >= 0) {
+          fetchNextPage();
+        }
+      }
+    };
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Initial check in case the content doesn't fill the page
+    handleScroll();
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Handle filter changes
   const handleModelChange = (value: string) => {
     setSelectedModel(value);
   };
 
   const handleSortChange = (value: string) => {
-    setSortBy(value);
+    setSortBy(value as 'popular' | 'rating' | 'recent');
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,16 +116,18 @@ const BotExplorer = () => {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setSelectedModel('All Models');
-    setSortBy('popular');
+    setSelectedModel(BOT_EXPLORER_DEFAULTS.MODEL);
+    setSortBy(BOT_EXPLORER_DEFAULTS.SORT);
   };
+
+  // Get all bots from all pages
+  const allBots = data?.pages.flatMap(page => page.bots) ?? [];
 
   return (
     <div className="w-full py-6 space-y-6">
       <h1 className="text-3xl text-center font-bold">Explore Bots</h1>
       
-      {/* Filters and Controls - flex row in parent and filter divs 
-      to ease separating search and filters and spacing */}
+      {/* Filters and Controls */}
       <div className="flex w-full flex-row gap-4 justify-center items-center">
         <div className="relative w-1/2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -213,7 +145,7 @@ const BotExplorer = () => {
               <SelectValue placeholder="Select Model" />
             </SelectTrigger>
             <SelectContent>
-              {MODEL_OPTIONS.map((model) => (
+              {BOT_MODEL_OPTIONS.map((model) => (
                 <SelectItem key={model} value={model}>
                   {model}
                 </SelectItem>
@@ -226,7 +158,7 @@ const BotExplorer = () => {
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              {SORT_OPTIONS.map((option) => (
+              {BOT_SORT_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -236,18 +168,18 @@ const BotExplorer = () => {
           
           <div className="flex items-center border rounded-md">
             <Button 
-              variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+              variant={viewMode === VIEW_MODES.GRID ? 'default' : 'ghost'} 
               size="sm" 
               className="rounded-r-none"
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode(VIEW_MODES.GRID)}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
             <Button 
-              variant={viewMode === 'list' ? 'default' : 'ghost'} 
+              variant={viewMode === VIEW_MODES.LIST ? 'default' : 'ghost'} 
               size="sm" 
               className="rounded-l-none"
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode(VIEW_MODES.LIST)}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -256,7 +188,7 @@ const BotExplorer = () => {
       </div>
       
       {/* Active filters display */}
-      {(searchQuery || selectedModel !== 'All Models') && (
+      {(searchQuery || selectedModel !== BOT_EXPLORER_DEFAULTS.MODEL) && (
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Active filters:</span>
@@ -266,7 +198,7 @@ const BotExplorer = () => {
                 Search: {searchQuery}
               </Badge>
             )}
-            {selectedModel !== 'All Models' && (
+            {selectedModel !== BOT_EXPLORER_DEFAULTS.MODEL && (
               <Badge variant="outline" className="flex items-center gap-1">
                 Model: {selectedModel}
               </Badge>
@@ -285,29 +217,31 @@ const BotExplorer = () => {
       
       {/* Results count */}
       <div className="text-sm pl-5 text-muted-foreground">
-        Showing {filteredBots.length} {filteredBots.length === 1 ? 'bot' : 'bots'}
+        Showing {allBots.length} of {data?.pages[0]?.total ?? 0} bots
       </div>
       
       {/* Bot displays */}
-      {filteredBots.length === 0 ? (
+      {allBots.length === 0 ? (
         <div className="py-12 text-center">
           <p className="text-lg text-muted-foreground">No bots found matching your criteria.</p>
           <Button variant="link" onClick={clearFilters}>
             Clear filters
           </Button>
         </div>
-      ) : viewMode === 'grid' ? (
+      ) : viewMode === VIEW_MODES.GRID ? (
         <div className="pl-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredBots.map((bot) => (
+          {allBots.map((bot) => (
             <BotCard
               key={bot.id}
               {...bot}
             />
           ))}
+          {/* Infinite scroll trigger */}
+          <div ref={loaderRef} className="h-10" />
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredBots.map((bot) => (
+          {allBots.map((bot) => (
             <div 
               key={bot.id} 
               className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
@@ -352,10 +286,19 @@ const BotExplorer = () => {
               </div>
             </div>
           ))}
+          {/* Infinite scroll trigger */}
+          <div ref={loaderRef} className="h-10" />
+        </div>
+      )}
+      
+      {/* Loading indicator */}
+      {isFetchingNextPage && (
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">Loading more bots...</p>
         </div>
       )}
     </div>
   );
-}; 
+};
 
 export default BotExplorer;
