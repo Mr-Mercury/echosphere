@@ -59,7 +59,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="sticky bottom-0 bg-[#313338] z-10">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full bg-[#313338]">
                 <FormField 
                     control={form.control} 
                     name='content' 

@@ -45,7 +45,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
     const role = server.members.find((member) => member.userId === user.id)?.role;
 
     return (
-        <div className='flex flex-col h-full text-white w-full bg-[#2B2D31]'>
+        <div className='flex flex-col h-full text-white w-full bg-[#2B2D31] overflow-hidden'>
             <ServerHeader server={server} role={role}/>
             {/* <ul>
                 {Array.from(channels.map(channel => (

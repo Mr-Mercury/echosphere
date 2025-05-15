@@ -36,28 +36,28 @@ const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
     if (!channel || !member) return redirect('/chat/server/personal')
     return (
         <div className='bg-[#313338] flex flex-col h-full'>
-            <ChatHeader name={channel.name} serverId={channel.serverId} type='channel'/>
-            <div className='flex-1 flex flex-col overflow-hidden'>
-                <div className='flex-1 overflow-y-auto'>
-                    <ChatMessages 
-                        member={member} 
-                        name={channel.name} 
-                        type='channel'
-                        chatId={channel.id}
-                        messageApiUrl={messageApiUrl} 
-                        socketQuery={{ channelId: channel.id, serverId: channel.serverId }}
-                        paramKey='channelId'
-                        paramValue={channel.id}
-                    />
-                </div>
-                <div className='flex-shrink-0'>
-                    <ChatInput 
-                        name={channel.name} 
-                        type='channel' 
-                        apiUrl={apiUrl} 
-                        query={{channelId: channel.id, serverId: channel.serverId}}
-                    />
-                </div>
+            <div className="fixed top-0 right-0 left-0 md:left-[312px] z-10">
+                <ChatHeader name={channel.name} serverId={channel.serverId} type='channel'/>
+            </div>
+            <div className='pt-12 pb-20 flex-1'>
+                <ChatMessages 
+                    member={member} 
+                    name={channel.name} 
+                    type='channel'
+                    chatId={channel.id}
+                    messageApiUrl={messageApiUrl} 
+                    socketQuery={{ channelId: channel.id, serverId: channel.serverId }}
+                    paramKey='channelId'
+                    paramValue={channel.id}
+                />
+            </div>
+            <div className="fixed bottom-0 right-0 left-0 md:left-[312px]">
+                <ChatInput 
+                    name={channel.name} 
+                    type='channel' 
+                    apiUrl={apiUrl} 
+                    query={{channelId: channel.id, serverId: channel.serverId}}
+                />
             </div>
         </div>
     )

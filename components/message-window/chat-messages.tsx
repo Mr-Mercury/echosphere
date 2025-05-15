@@ -105,7 +105,7 @@ const ChatMessages = ({
     };
 
     // Scroll to bottom for new messages
-    const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
         bottomRef.current?.scrollIntoView({ behavior });
     };
 
@@ -207,7 +207,7 @@ const ChatMessages = ({
     return (
         <div 
             ref={chatContainerRef} 
-            className='flex-1 flex flex-col py-4 overflow-y-auto h-[calc(100vh-120px)]'
+            className='flex-1 flex flex-col py-4 overflow-y-auto h-[calc(100vh-130px)]'
         >
             {hasNextPage && (
                 <div className='flex justify-center py-2'>
