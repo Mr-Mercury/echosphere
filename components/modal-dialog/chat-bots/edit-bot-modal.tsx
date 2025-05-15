@@ -1,7 +1,7 @@
 'use client'
 
 import qs from 'query-string';
-import { ServerBotSchema } from "@/zod-schemas";
+import { ServerBotSchema, BotTemplateSchema } from "@/zod-schemas";
 import { AVAILABLE_MODELS } from '@/lib/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import axios from 'axios';
@@ -27,20 +27,30 @@ import { Switch } from "../../ui/switch";
 import { Button } from "../../ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import FileUpload from '@/components/islets/uploads/file-upload';
-import { Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2, X } from "lucide-react";
+import { registerBotTemplateAction } from '@/app/actions/create-bot-template';
 
 const EditBotModal = () => {
     const [imageUrl, setImageUrl] = useState<string>('');
     const [useDefaultImage, setUseDefaultImage] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploadingTemplate, setIsUploadingTemplate] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState<{
+        visible: boolean;
+        success?: boolean;
+        message?: string;
+    } | null>(null);
     const { isOpen, onClose, type, data } = useModal();
     const router = useRouter();
     const params = useParams();
     
     const isModalOpen = isOpen && type === 'editBot';
     const botId = data.botUser?.id;
+
+    const feedbackRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         console.log("Modal data:", data);
@@ -105,10 +115,11 @@ const EditBotModal = () => {
         }
     }, [isModalOpen, botId, form]);
 
-    const isLoading = form.formState.isSubmitting;
+    const isLoading = form.formState.isSubmitting || isSubmitting;
 
     const onSubmit = async (val: z.infer<typeof ServerBotSchema>) => {
         try {
+            setIsSubmitting(true);
             const url = qs.stringifyUrl({
                 url: '/api/bots/server-bots/single-bot',
                 query: { id: botId }
@@ -128,19 +139,97 @@ const EditBotModal = () => {
 
             await axios.patch(url, updateData);
             
-            // Success handling
+            // Success handling - use console instead of toast
+            console.log("Bot updated successfully");
+            
             form.reset();
             router.refresh();
             onClose();
         } catch (error) {
             console.error("Failed to update bot:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
+    const handleUploadTemplate = async () => {
+        try {
+            setIsUploadingTemplate(true);
+            // Clear previous feedback message
+            setFeedbackMessage(null);
+            
+            // Get current form values to create the template
+            const formValues = form.getValues();
+            
+            // Convert from ServerBotSchema to BotTemplateSchema format
+            const templateData = {
+                name: formValues.name,
+                profileDescription: formValues.profileDescription,
+                systemPrompt: formValues.systemPrompt,
+                imageUrl: formValues.imageUrl,
+                model: formValues.model,
+                chatFrequency: formValues.chatFrequency,
+                fullPromptControl: formValues.fullPromptControl,
+            };
+            
+            // Validate the data against BotTemplateSchema
+            const validationResult = BotTemplateSchema.safeParse(templateData);
+            
+            if (!validationResult.success) {
+                // Handle validation errors
+                const errorMessages = validationResult.error.errors.map(err => err.message).join(', ');
+                console.error("Template validation failed:", errorMessages);
+                setFeedbackMessage({
+                    visible: true,
+                    success: false,
+                    message: `Validation error: ${errorMessages}`
+                });
+                return;
+            }
+            
+            // Data is valid, proceed with template creation
+            const result = await registerBotTemplateAction(validationResult.data);
+            
+            if (result.error) {
+                console.error("Template upload failed:", result.error);
+                setFeedbackMessage({
+                    visible: true,
+                    success: false,
+                    message: `Upload Failed: ${result.error}`
+                });
+            } else {
+                console.log("Template uploaded successfully");
+                setFeedbackMessage({
+                    visible: true,
+                    success: true,
+                    message: `Template uploaded!`
+                });
+            }
+        } catch (error) {
+            console.error("Failed to upload template:", error);
+            setFeedbackMessage({
+                visible: true,
+                success: false,
+                message: `Error: ${error instanceof Error ? error.message : "An unknown error occurred"}`
+            });
+        } finally {
+            setIsUploadingTemplate(false);
+        }
+    };
+
     const handleClose = () => {
         form.reset();
+        setFeedbackMessage(null);
         onClose();
     }
+
+    useEffect(() => {
+        if (feedbackMessage && feedbackMessage.visible && feedbackRef.current) {
+            setTimeout(() => {
+                feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+    }, [feedbackMessage]);
 
     const getMaxSystemPromptLength = (model: string) => {
         return AVAILABLE_MODELS[model]?.maxSystemPromptLength ?? 1000;
@@ -160,6 +249,10 @@ const EditBotModal = () => {
             form.setValue('imageUrl', '');
         }
     }
+
+    const closeFeedback = () => {
+        setFeedbackMessage(null);
+    };
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleClose}>
@@ -374,19 +467,56 @@ const EditBotModal = () => {
                                     </div>
                                 </div>
                             </div>
-                            <DialogFooter className='px-6 py-4'>
-                                <Button disabled={isLoading} variant='secondary'>
-                                    {isLoading ? (
+                            <DialogFooter className='px-6 py-4 flex flex-row items-center justify-end gap-4'>
+                                {/* Feedback message that appears inline */}
+                                {feedbackMessage && feedbackMessage.visible && (
+                                    <div 
+                                        ref={feedbackRef}
+                                        className={`flex-1 py-2 px-3 rounded-md flex items-center text-sm ${
+                                            feedbackMessage.success 
+                                                ? 'bg-green-950 border border-green-800 text-green-400' 
+                                                : 'bg-red-950 border border-red-800 text-red-400'
+                                        }`}
+                                    >
+                                        {feedbackMessage.success ? (
+                                            <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                                        ) : (
+                                            <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                                        )}
+                                        <p className="line-clamp-1">{feedbackMessage.message}</p>
+                                        <button 
+                                            type="button"
+                                            onClick={closeFeedback}
+                                            className="ml-2 text-gray-400 hover:text-white"
+                                            aria-label="Close"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                )}
+                                <Button
+                                    type="button"
+                                    onClick={handleUploadTemplate}
+                                    disabled={isLoading || isUploadingTemplate}
+                                    variant='secondary'
+                                    className="whitespace-nowrap"
+                                >
+                                    {isUploadingTemplate ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Saving...
+                                            Uploading...
                                         </>
                                     ) : (
                                         "Upload Template"
                                     )}
                                 </Button>
-                                <Button disabled={isLoading} variant='secondary'>
-                                    {isLoading ? (
+                                <Button 
+                                    type="submit"
+                                    disabled={isLoading} 
+                                    variant='secondary'
+                                    className="whitespace-nowrap"
+                                >
+                                    {isSubmitting ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             Updating...
