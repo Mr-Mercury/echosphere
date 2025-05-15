@@ -336,5 +336,62 @@ export class BotServiceManager {
         }
         console.log(`All bots stopped: ${botIds.length} bots`);
     }
+    async stopAllServerBots(serverId) {
+        console.log(`Stopping all bots for server ${serverId}...`);
+        const botIds = Array.from(this.bots.keys());
+        let stopCount = 0;
+        const results = {
+            successful: [],
+            failed: []
+        };
+        // Filter bots belonging to this server first
+        const serverBotIds = botIds.filter(botId => {
+            const botInstance = this.bots.get(botId);
+            return botInstance && botInstance.config.homeServerId === serverId;
+        });
+        if (serverBotIds.length === 0) {
+            console.log(`No active bots found for server ${serverId}`);
+            return { count: 0, results };
+        }
+        // Process each bot in sequence to ensure we handle each one properly
+        for (const botId of serverBotIds) {
+            const botInstance = this.bots.get(botId);
+            if (!botInstance)
+                continue;
+            try {
+                // Use a transaction for each bot to keep DB and runtime state in sync
+                await db.$transaction(async (tx) => {
+                    // Deactivate bot in memory
+                    const deactivated = await this.deactivateBot(botId);
+                    if (!deactivated) {
+                        throw new Error(`Failed to deactivate bot ${botId} in memory`);
+                    }
+                    // Update database within transaction
+                    await tx.botConfiguration.update({
+                        where: { id: botId },
+                        data: { isActive: false }
+                    });
+                });
+                console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
+                stopCount++;
+                results.successful.push({
+                    id: botId,
+                    name: botInstance.config.botName
+                });
+            }
+            catch (error) {
+                console.error(`Failed to stop bot ${botId} (${botInstance.config.botName}):`, error);
+                results.failed.push({
+                    id: botId,
+                    name: botInstance.config.botName,
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+                // Attempt recovery for this specific bot
+                await this.forceCleanupBot(botId);
+            }
+        }
+        console.log(`Server ${serverId} bots stopped: ${stopCount}/${serverBotIds.length} bots`);
+        return { count: stopCount, results };
+    }
 }
 //# sourceMappingURL=botService.js.map

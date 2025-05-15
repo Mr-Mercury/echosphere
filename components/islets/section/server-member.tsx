@@ -32,12 +32,35 @@ export const ServerMember = ({
 }: ServerMemberProps) => {
     const params = useParams();
     const router = useRouter();
-    const { isTogglingAny, setIsTogglingAny } = useBotToggleStore();
+    const { 
+        isTogglingAny, 
+        setIsTogglingAny, 
+        serverBotUpdateTimestamp,
+        setBotStatus
+    } = useBotToggleStore();
     const { onOpen } = useModal();
     // Hydration error mismatch fix - do not remove the mounted & state pattern 
     const [mounted, setMounted] = useState(false);
     const [botActive, setBotActive] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    
+    // Check for server-wide bot status changes
+    useEffect(() => {
+        if (member.user.botConfig && mounted) {
+            const lastServerUpdate = serverBotUpdateTimestamp[server.id];
+            
+            // If there was a server update and this is a bot
+            if (lastServerUpdate && member.role === 'ECHO') {
+                // Update the local state to show bot as stopped
+                setBotActive(false);
+                
+                // Also update the global store
+                if (member.user.botConfig.id) {
+                    setBotStatus(member.user.botConfig.id, false);
+                }
+            }
+        }
+    }, [serverBotUpdateTimestamp, server.id, member.role, member.user.botConfig, mounted, setBotStatus]);
 
     useEffect(() => {
         setBotActive(member.user.botConfig?.isActive ?? false);
@@ -78,6 +101,11 @@ export const ServerMember = ({
             }
 
             setBotActive(newState);
+            
+            // Update the global store with this bot's status
+            if (member.user.botConfig?.id) {
+                setBotStatus(member.user.botConfig.id, newState);
+            }
         } catch (error) {
             console.error('Failed to toggle bot:', error);
             setBotActive(!newState);

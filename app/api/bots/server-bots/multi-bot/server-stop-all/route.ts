@@ -53,7 +53,13 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             message: `Successfully stopped ${result.count} bots on the server`,
-            count: result.count
+            count: result.count,
+            details: {
+                successful: result.results.successful.length > 0 ? 
+                    result.results.successful.map((bot: any) => bot.name) : [],
+                failed: result.results.failed.length > 0 ? 
+                    result.results.failed.map((bot: any) => ({ name: bot.name, reason: bot.error })) : []
+            }
         });
     } catch (error) {
         console.error("[SERVER_STOP_ALL_BOTS_ERROR]", error);

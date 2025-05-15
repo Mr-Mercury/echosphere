@@ -1,0 +1,1 @@
+{"version":3,"file":"api-req-utils.js","sourceRoot":"","sources":["../../src/util/api-req-utils.ts"],"names":[],"mappings":"AAAA,MAAM,UAAU,wBAAwB,CAAC,OAAe;IACpD,MAAM,eAAe,GAAG,IAAI,eAAe,EAAE,CAAC;IAC9C,MAAM,SAAS,GAAG,UAAU,CAAC,GAAG,EAAE,CAAC,eAAe,CAAC,KAAK,EAAE,EAAE,OAAO,CAAC,CAAC;IACrE,OAAO,EAAE,eAAe,EAAE,SAAS,EAAE,CAAC;AAC1C,CAAC"}

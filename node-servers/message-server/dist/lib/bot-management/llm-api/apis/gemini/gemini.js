@@ -1,21 +1,29 @@
 import { getApiKey } from "../../../../../util/getApiKey.js";
 import { abortControllerAssembler } from "../../../../../util/api-req-utils.js";
-export async function chatgpt(config, userPrompt) {
-    const messages = [
-        { role: 'system', content: config.systemPrompt },
-        { role: 'user', content: userPrompt }
-    ];
+export async function gemini(config, userPrompt) {
+    const geminiBaseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${config.modelName}:generateContent?key=`;
+    const messages = {
+        "contents": {
+            "parts": [
+                {
+                    'text': config.systemPrompt
+                },
+                {
+                    'text': userPrompt
+                }
+            ]
+        }
+    };
     try {
         const apiKey = getApiKey(config.apiKeyId, config.modelName);
         if (!apiKey) {
-            throw new Error('API key retrieval failed or no API key found in chatgpt.ts');
+            throw new Error('API key retrieval failed or no API key found in gemini.ts');
         }
         const { abortController, timeoutId } = abortControllerAssembler(30000);
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(`${geminiBaseUrl}${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
                 model: config.modelName,
@@ -57,4 +65,4 @@ export async function chatgpt(config, userPrompt) {
         };
     }
 }
-//# sourceMappingURL=chatgpt.js.map
+//# sourceMappingURL=gemini.js.map

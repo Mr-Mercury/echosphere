@@ -395,30 +395,75 @@ export class BotServiceManager {
         const botIds = Array.from(this.bots.keys());
         let stopCount = 0;
         
-        const stopPromises = botIds.map(async (botId) => {
+        interface BotResult {
+            id: string;
+            name: string;
+        }
+        
+        interface BotErrorResult extends BotResult {
+            error: string;
+        }
+        
+        const results: {
+            successful: BotResult[];
+            failed: BotErrorResult[];
+        } = {
+            successful: [],
+            failed: []
+        };
+        
+        // Filter bots belonging to this server first
+        const serverBotIds = botIds.filter(botId => {
             const botInstance = this.bots.get(botId);
+            return botInstance && botInstance.config.homeServerId === serverId;
+        });
+        
+        if (serverBotIds.length === 0) {
+            console.log(`No active bots found for server ${serverId}`);
+            return { count: 0, results };
+        }
+        
+        // Process each bot in sequence to ensure we handle each one properly
+        for (const botId of serverBotIds) {
+            const botInstance = this.bots.get(botId);
+            if (!botInstance) continue;
             
-            // Check if bot belongs to the specified server
-            if (botInstance && botInstance.config.homeServerId === serverId) {
-                try {
-                    await this.deactivateBot(botId);
-                    console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
-                    stopCount++;
+            try {
+                // Use a transaction for each bot to keep DB and runtime state in sync
+                await db.$transaction(async (tx) => {
+                    // Deactivate bot in memory
+                    const deactivated = await this.deactivateBot(botId);
+                    if (!deactivated) {
+                        throw new Error(`Failed to deactivate bot ${botId} in memory`);
+                    }
                     
-                    // Also update the database to mark bot as inactive
-                    await db.botConfiguration.update({
+                    // Update database within transaction
+                    await tx.botConfiguration.update({
                         where: { id: botId },
                         data: { isActive: false }
                     });
-                } catch (error) {
-                    console.error(`Failed to stop bot ${botId}:`, error);
-                }
+                });
+                
+                console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
+                stopCount++;
+                results.successful.push({
+                    id: botId, 
+                    name: botInstance.config.botName
+                });
+            } catch (error) {
+                console.error(`Failed to stop bot ${botId} (${botInstance.config.botName}):`, error);
+                results.failed.push({
+                    id: botId,
+                    name: botInstance.config.botName,
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+                
+                // Attempt recovery for this specific bot
+                await this.forceCleanupBot(botId);
             }
-        });
+        }
         
-        await Promise.all(stopPromises);
-        console.log(`All bots for server ${serverId} stopped: ${stopCount} bots`);
-        
-        return stopCount;
+        console.log(`Server ${serverId} bots stopped: ${stopCount}/${serverBotIds.length} bots`);
+        return { count: stopCount, results };
     }
 }

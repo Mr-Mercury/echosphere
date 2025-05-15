@@ -244,12 +244,13 @@
             }
 
             console.log('Attempting to stop all bots for server with botService');
-            const stoppedCount = await botService.stopAllServerBots(serverId);
+            const result = await botService.stopAllServerBots(serverId);
             console.log('Server bots stop successful');
             
             res.status(200).json({ 
                 message: 'All server bots stopped successfully', 
-                count: stoppedCount 
+                count: result.count,
+                results: result.results
             });
         } catch (error) {
             console.error('MESSAGE SERVER STOP ALL SERVER BOTS ERROR: ', error);
