@@ -13,5 +13,5 @@ const nextConfig = {
         },
         ],
   },};
-
+// TODO: AMAZON S3 FOR PROD??
 export default nextConfig;

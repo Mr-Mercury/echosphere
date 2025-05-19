@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss"
 
+// TODO: Properly handle theming, so add real primary and secondary colors.
 const config = {
   darkMode: ["class"],
   content: [

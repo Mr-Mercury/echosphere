@@ -27,7 +27,7 @@ export const apiAuthPrefix = '/api/auth';
 /* Default redirect path after logging in.
 @type {string}
 */ 
-// TODO: Change this to chat (or dashboard) later
+// TODO: New solution for /setup kludge for user initialization (place on server to avoid redirect)
 export const DEFAULT_LOGIN_REDIRECT = '/setup';
 
 export const PERSONAL_ROOM_ROUTE = '/chat/server/personal';
