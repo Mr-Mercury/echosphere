@@ -81,11 +81,12 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
                                 label: 'Members',
                                 type: 'member',
                                 data: server.members?.map((member) => {
-                                    console.log('Member role:', member.role);
                                     return {
                                         id: member.id,
                                         name: member.user.username!,
                                         icon: getRoleIcon(member.role),
+                                        isBot: member.role === 'ECHO',
+                                        user: member.user
                                     };
                                 })
                             }

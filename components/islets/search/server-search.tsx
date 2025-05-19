@@ -1,9 +1,16 @@
 'use client'
 
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Hash, Mic2, Search, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Hash, Mic2, Search, ShieldAlert, ShieldCheck, MessageSquare, Edit } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useModal } from "@/hooks/use-modal-store";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 interface ServerSearchProps {
     data: {
@@ -13,6 +20,8 @@ interface ServerSearchProps {
             icon: React.ReactNode;
             name: string;
             id: string;
+            isBot?: boolean;
+            user?: any;
         }[] | undefined
     }[];
 }
@@ -21,7 +30,7 @@ const ServerSearch = ({
     data
 }: ServerSearchProps) => {
     const [open, setOpen] = useState(false);
-
+    const { onOpen } = useModal();
     const router = useRouter();
     const params = useParams();
 
@@ -37,16 +46,9 @@ const ServerSearch = ({
         return () => document.removeEventListener('keydown', down);
     }, []);
 
-    const onClick = ({ id, type }: { id: string, type: 'channel' | 'member' }) => {
+    const onMemberClick = (id: string) => {
         setOpen(false);
-
-        if (type === 'member') {
-            return router.push(`/chat/server/personal/dm/${id}`)
-        }
-
-        if (type === 'channel') {
-            return router.push(`/chat/server/${params?.serverId}/${id}`)
-        }
+        router.push(`/chat/server/personal/dm/${id}`);
     }
 
     return (
@@ -79,19 +81,57 @@ const ServerSearch = ({
 
                             return (
                                 <CommandGroup key={label} heading={label}>
-                                    {data?.map(({ id, icon, name }) => {
+                                    {data?.map(({ id, icon, name, isBot, user }) => {
                                         return (
-                                            // Using onSelect here so that you can search w keyboard commands
-                                            <CommandItem key={id} onSelect={() => onClick({ id, type })}>
-                                                {icon}
-                                                <span>{name}</span>
+                                            <CommandItem key={id}>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger className='focus:outline-none w-full' asChild>
+                                                        <button className='flex items-center min-w-0 w-full text-left'>
+                                                            {icon}
+                                                            <span>{name}</span>
+                                                        </button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent className='w-48 bg-black text-xs font-medium 
+                                                        text-neutral-400 space-y-[2px]'>
+                                                        {type === 'member' && (
+                                                            <>
+                                                                <DropdownMenuItem 
+                                                                    onClick={() => onMemberClick(id)}
+                                                                    className='px-3 py-2 text-sm cursor-pointer'>
+                                                                    Message
+                                                                    <MessageSquare className='h-4 w-4 ml-auto'/>
+                                                                </DropdownMenuItem>
+                                                                {isBot && (
+                                                                    <DropdownMenuItem 
+                                                                        onClick={() => {
+                                                                            setOpen(false);
+                                                                            onOpen('editBot', { botUser: user });
+                                                                        }}
+                                                                        className='px-3 py-2 text-sm cursor-pointer'>
+                                                                        Inspect & Edit Bot
+                                                                        <Edit className='h-4 w-4 ml-auto'/>
+                                                                    </DropdownMenuItem>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                        {type === 'channel' && (
+                                                            <DropdownMenuItem 
+                                                                onClick={() => {
+                                                                    setOpen(false);
+                                                                    router.push(`/chat/server/${params?.serverId}/${id}`);
+                                                                }}
+                                                                className='px-3 py-2 text-sm cursor-pointer'>
+                                                                Go to Channel
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </CommandItem>
                                         )
                                     })}
                                 </CommandGroup>
                             )
-
-                        } )}
+                        })}
                     </CommandList>
                 </Command>
             </CommandDialog>

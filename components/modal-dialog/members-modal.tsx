@@ -95,7 +95,7 @@ const MembersModal = () => {
                     </DialogDescription>
                 </DialogHeader>
                 {/* TODO: Fix the icons to leave a blank spot OR have an icon for all roles so names don't bounce on role change */}
-                <ScrollArea className='mt-8 max-h-[420] pr-6'>
+                <ScrollArea className='mt-8 max-h-[420px] pr-6'>
                     {server?.members?.map((member) => (
                         <div key={member.id} className='flex items-center gap-x-2 mb-6'>
                             <UserAvatar 
