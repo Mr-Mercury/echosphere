@@ -50,17 +50,33 @@ export const ServerMember = ({
             const lastServerUpdate = serverBotUpdateTimestamp[server.id];
             
             // If there was a server update and this is a bot
-            if (lastServerUpdate && member.role === 'ECHO') {
-                // Update the local state to show bot as stopped
-                setBotActive(false);
+            if (lastServerUpdate !== undefined && member.role === 'ECHO') {
+                // Check if this is a server-stop (timestamp = 0) or server-start (timestamp > 0)
+                const isServerStarting = lastServerUpdate > 0;
                 
-                // Also update the global store
-                if (member.user.botConfig.id) {
-                    setBotStatus(member.user.botConfig.id, false);
+                // Update the local state to match the server action
+                // For server-stop (timestamp = 0), all bots should be inactive
+                // For server-start (timestamp > 0), update will come from the store directly
+                if (!isServerStarting) {
+                    setBotActive(false);
                 }
+                
+                // Global store is updated by the server-listing component directly
             }
         }
-    }, [serverBotUpdateTimestamp, server.id, member.role, member.user.botConfig, mounted, setBotStatus]);
+    }, [serverBotUpdateTimestamp, server.id, member.role, member.user.botConfig, mounted]);
+
+    // Sync with bot status store
+    const botStatuses = useBotToggleStore((state) => state.botStatuses);
+    
+    useEffect(() => {
+        if (member.user.botConfig?.id && mounted) {
+            const storeStatus = botStatuses[member.user.botConfig.id];
+            if (storeStatus !== undefined) {
+                setBotActive(storeStatus);
+            }
+        }
+    }, [botStatuses, member.user.botConfig?.id, mounted]);
 
     useEffect(() => {
         setBotActive(member.user.botConfig?.isActive ?? false);

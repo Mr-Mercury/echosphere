@@ -189,6 +189,29 @@ app.post('/bots/stop-server', async (req, res) => {
         res.status(500).json({ error: 'Failed to stop all server bots', details: message });
     }
 });
+app.post('/bots/start-server', async (req, res) => {
+    try {
+        const { serverId } = req.body;
+        console.log('Received server start all bots request:', { serverId });
+        if (!serverId) {
+            console.log('Invalid server ID received');
+            return res.status(400).json({ error: 'Invalid server ID' });
+        }
+        console.log('Attempting to start all bots for server with botService');
+        const result = await botService.startAllServerBots(serverId);
+        console.log('Server bots start successful');
+        res.status(200).json({
+            message: 'All server bots started successfully',
+            count: result.count,
+            results: result.results
+        });
+    }
+    catch (error) {
+        console.error('MESSAGE SERVER START ALL SERVER BOTS ERROR: ', error);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        res.status(500).json({ error: 'Failed to start all server bots', details: message });
+    }
+});
 // Socket logic starts here
 io.use(socketAuthMiddleware);
 // Join socket polling on connection based on user's server membership

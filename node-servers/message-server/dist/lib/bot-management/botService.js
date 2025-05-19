@@ -339,7 +339,6 @@ export class BotServiceManager {
     async stopAllServerBots(serverId) {
         console.log(`Stopping all bots for server ${serverId}...`);
         const botIds = Array.from(this.bots.keys());
-        let stopCount = 0;
         const results = {
             successful: [],
             failed: []
@@ -353,11 +352,11 @@ export class BotServiceManager {
             console.log(`No active bots found for server ${serverId}`);
             return { count: 0, results };
         }
-        // Process each bot in sequence to ensure we handle each one properly
-        for (const botId of serverBotIds) {
+        // Process all bots in parallel
+        const stopPromises = serverBotIds.map(async (botId) => {
             const botInstance = this.bots.get(botId);
             if (!botInstance)
-                continue;
+                return;
             try {
                 // Use a transaction for each bot to keep DB and runtime state in sync
                 await db.$transaction(async (tx) => {
@@ -373,25 +372,120 @@ export class BotServiceManager {
                     });
                 });
                 console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
-                stopCount++;
-                results.successful.push({
-                    id: botId,
-                    name: botInstance.config.botName
-                });
+                return {
+                    success: true,
+                    data: {
+                        id: botId,
+                        name: botInstance.config.botName
+                    }
+                };
             }
             catch (error) {
                 console.error(`Failed to stop bot ${botId} (${botInstance.config.botName}):`, error);
-                results.failed.push({
-                    id: botId,
-                    name: botInstance.config.botName,
-                    error: error instanceof Error ? error.message : 'Unknown error'
-                });
                 // Attempt recovery for this specific bot
                 await this.forceCleanupBot(botId);
+                return {
+                    success: false,
+                    data: {
+                        id: botId,
+                        name: botInstance.config.botName,
+                        error: error instanceof Error ? error.message : 'Unknown error'
+                    }
+                };
             }
-        }
+        });
+        // Wait for all operations to complete
+        const stopResults = await Promise.all(stopPromises);
+        // Process results
+        stopResults.forEach(result => {
+            if (!result)
+                return; // Skip null results from non-existent bots
+            if (result.success) {
+                results.successful.push(result.data);
+            }
+            else {
+                results.failed.push(result.data);
+            }
+        });
+        const stopCount = results.successful.length;
         console.log(`Server ${serverId} bots stopped: ${stopCount}/${serverBotIds.length} bots`);
         return { count: stopCount, results };
+    }
+    async startAllServerBots(serverId) {
+        console.log(`Starting all bots for server ${serverId}...`);
+        const results = {
+            successful: [],
+            failed: []
+        };
+        try {
+            // Get all inactive bot configurations for this server
+            const botConfigs = await db.botConfiguration.findMany({
+                where: {
+                    homeServerId: serverId,
+                    isActive: false
+                }
+            });
+            if (botConfigs.length === 0) {
+                console.log(`No inactive bots found for server ${serverId}`);
+                return { count: 0, results };
+            }
+            // Process all bots in parallel
+            const startPromises = botConfigs.map(async (config) => {
+                try {
+                    // Use a transaction for each bot to keep DB and runtime state in sync
+                    await db.$transaction(async (tx) => {
+                        // Update database within transaction
+                        await tx.botConfiguration.update({
+                            where: { id: config.id },
+                            data: { isActive: true }
+                        });
+                    });
+                    // Start the bot
+                    await this.startBot(config);
+                    console.log(`Bot ${config.id} (${config.botName}) started successfully`);
+                    return {
+                        success: true,
+                        data: {
+                            id: config.id,
+                            name: config.botName
+                        }
+                    };
+                }
+                catch (error) {
+                    console.error(`Failed to start bot ${config.id} (${config.botName}):`, error);
+                    // Attempt recovery for this specific bot
+                    await this.forceCleanupBot(config.id);
+                    return {
+                        success: false,
+                        data: {
+                            id: config.id,
+                            name: config.botName,
+                            error: error instanceof Error ? error.message : 'Unknown error'
+                        }
+                    };
+                }
+            });
+            // Wait for all operations to complete
+            const startResults = await Promise.all(startPromises);
+            // Process results
+            startResults.forEach(result => {
+                if (!result)
+                    return; // Skip null results from non-existent bots
+                if (result.success) {
+                    results.successful.push(result.data);
+                }
+                else {
+                    results.failed.push(result.data);
+                }
+            });
+            const startCount = results.successful.length;
+            console.log(`Server ${serverId} bots started: ${startCount}/${botConfigs.length} bots`);
+            return { count: startCount, results };
+        }
+        catch (error) {
+            console.error(`Failed to start all bots for server ${serverId}:`, error);
+            throw error;
+        }
     }
 }
 //# sourceMappingURL=botService.js.map

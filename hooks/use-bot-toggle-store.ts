@@ -31,12 +31,10 @@ export const useBotToggleStore = create<BotToggleStore>((set) => ({
   // Update all bots for a server to a specific status
   updateServerBots: (serverId: string, isActive: boolean) =>
     set((state) => ({
-      // We don't update individual bot statuses directly since we don't know
-      // which bots belong to this server in the store
-      // Instead we just record the timestamp of the server-wide update
+      // Use 0 to indicate stopped, current timestamp to indicate started
       serverBotUpdateTimestamp: {
         ...state.serverBotUpdateTimestamp,
-        [serverId]: Date.now()
+        [serverId]: isActive ? Date.now() : 0
       }
     }))
 })) 

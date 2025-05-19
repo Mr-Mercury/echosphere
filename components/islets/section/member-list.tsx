@@ -11,29 +11,28 @@ interface MemberListProps {
 }
 
 export const MemberList = async ({server, role}: MemberListProps) => {
-
     const user = await currentUser();
     if (!user) return redirect('/');
-
 
     if (!server) return redirect('/');
 
     const members = server.members;
 
     return (
-       <div>{!!members?.length && (
-            <div className='mb-2'>
-                <ServerListing 
-                    sectionType='members' 
-                    label='Members'
-                    server={server}
-                    role={role}
-                />
-                {members.map((member) => (
-                    <ServerMember key={member.id} member={member} server={server}/>
-                ))}
-            </div>
-        )}
+       <div>
+            {!!members?.length && (
+                <div className='mb-2'>
+                    <ServerListing 
+                        sectionType='members' 
+                        label='Members'
+                        server={server}
+                        role={role}
+                    />
+                    {members.map((member) => (
+                        <ServerMember key={member.id} member={member} server={server}/>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }
