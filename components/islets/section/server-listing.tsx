@@ -253,17 +253,19 @@ export const ServerListing = ({
             {role !== MemberRole.GUEST && sectionType === 'members' && (
                 <div className="flex items-center">
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button 
-                                disabled={isButtonDisabled}
-                                className={cn(
-                                    "text-zinc-400 transition relative z-10 overflow-visible rounded-md p-1 mr-1",
-                                    isButtonDisabled ? 'opacity-50 cursor-not-allowed' : '',
-                                    !isButtonDisabled && hasActiveBots ? 'hover:text-red-500' : 'hover:text-green-500'
-                                )}>
-                                <Power className={`h-4 w-4 ${isLoading ? 'animate-pulse' : ''}`}/>
-                            </button>
-                        </DropdownMenuTrigger>
+                        <NavTooltip label="Stop/Start Multiple Bots" side="top">
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    disabled={isButtonDisabled}
+                                    className={cn(
+                                        "text-zinc-400 transition relative z-10 overflow-visible rounded-md p-1 mr-1",
+                                        isButtonDisabled ? 'opacity-50 cursor-not-allowed' : '',
+                                        !isButtonDisabled && hasActiveBots ? 'hover:text-red-500' : 'hover:text-green-500'
+                                    )}>
+                                    <Power className={`h-4 w-4 ${isLoading ? 'animate-pulse' : ''}`} />
+                                </button>
+                            </DropdownMenuTrigger>
+                        </NavTooltip>
                         <DropdownMenuContent className="w-56 bg-black text-xs font-medium text-neutral-400 space-y-[2px]">
                             <DropdownMenuItem
                                 onClick={handleStartAllBots}
