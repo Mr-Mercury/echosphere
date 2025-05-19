@@ -1,7 +1,7 @@
 'use client'
 
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Hash, Mic2, Search, ShieldAlert, ShieldCheck, MessageSquare, Edit } from "lucide-react";
+import { Hash, Mic2, Search, ShieldAlert, ShieldCheck, MessageSquare, Edit, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useModal } from "@/hooks/use-modal-store";
@@ -102,15 +102,29 @@ const ServerSearch = ({
                                                                     <MessageSquare className='h-4 w-4 ml-auto'/>
                                                                 </DropdownMenuItem>
                                                                 {isBot && (
-                                                                    <DropdownMenuItem 
-                                                                        onClick={() => {
-                                                                            setOpen(false);
-                                                                            onOpen('editBot', { botUser: user });
-                                                                        }}
-                                                                        className='px-3 py-2 text-sm cursor-pointer'>
-                                                                        Inspect & Edit Bot
-                                                                        <Edit className='h-4 w-4 ml-auto'/>
-                                                                    </DropdownMenuItem>
+                                                                    <>
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => {
+                                                                                setOpen(false);
+                                                                                onOpen('editBot', { botUser: user });
+                                                                            }}
+                                                                            className='px-3 py-2 text-sm cursor-pointer'>
+                                                                            Inspect & Edit Bot
+                                                                            <Edit className='h-4 w-4 ml-auto'/>
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => {
+                                                                                setOpen(false);
+                                                                                onOpen('deleteBot', { 
+                                                                                    server: params?.serverId, 
+                                                                                    member: { userId: user.id, user } 
+                                                                                });
+                                                                            }}
+                                                                            className='px-3 py-2 text-sm cursor-pointer text-rose-500'>
+                                                                            Delete Bot
+                                                                            <Trash2 className='h-4 w-4 ml-auto'/>
+                                                                        </DropdownMenuItem>
+                                                                    </>
                                                                 )}
                                                             </>
                                                         )}

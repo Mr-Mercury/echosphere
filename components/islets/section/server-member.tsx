@@ -7,7 +7,7 @@ import { UserAvatar } from "../users/user-avatar";
 import { getRoleIcon } from "@/lib/utilities/role-icons";
 import { useState, useEffect } from "react";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
-import { Edit, MessageSquare, Pause, Play } from "lucide-react";
+import { Edit, MessageSquare, Pause, Play, Trash2 } from "lucide-react";
 import { useBotToggleStore } from '@/hooks/use-bot-toggle-store';
 import { useModal } from "@/hooks/use-modal-store";
 import {
@@ -170,12 +170,20 @@ export const ServerMember = ({
                             <MessageSquare className='h-4 w-4 ml-auto'/>
                         </DropdownMenuItem>
                         {isBot && (
-                            <DropdownMenuItem 
-                                onClick={() => onOpen('editBot', { botUser: member.user })}
-                                className='px-3 py-2 text-sm cursor-pointer'>
-                                Inspect & Edit Bot
-                                <Edit className='h-4 w-4 ml-auto'/>
-                            </DropdownMenuItem>
+                            <>
+                                <DropdownMenuItem 
+                                    onClick={() => onOpen('editBot', { botUser: member.user })}
+                                    className='px-3 py-2 text-sm cursor-pointer'>
+                                    Inspect & Edit Bot
+                                    <Edit className='h-4 w-4 ml-auto'/>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onClick={() => onOpen('deleteBot', { server, member })}
+                                    className='px-3 py-2 text-sm cursor-pointer text-rose-500'>
+                                    Delete Bot
+                                    <Trash2 className='h-4 w-4 ml-auto'/>
+                                </DropdownMenuItem>
+                            </>
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
