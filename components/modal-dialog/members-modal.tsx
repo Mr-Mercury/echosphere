@@ -43,8 +43,10 @@ const MembersModal = () => {
                 if (result.error) {
                     throw new Error(result.error);
                 }
+                if (result.server) {
+                    onOpen('members', { server: result.server });
+                }
                 router.refresh();
-                onOpen('members', { server });
                 return;
             }
 

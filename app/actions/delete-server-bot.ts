@@ -7,7 +7,7 @@ import { MemberRole } from '@prisma/client';
 export const deleteServerBotAction = async (
     botId: string,
     serverId: string
-): Promise<{ error?: string; success?: boolean }> => {
+): Promise<{ error?: string; success?: boolean; server?: any }> => {
     try {
         const user = await currentUser();
         if (!user) {
@@ -84,7 +84,19 @@ export const deleteServerBotAction = async (
             // TODO - add deleted bot record here, trigger (isDeleted) on bot messages
         ]);
 
-        return { success: true };
+        // Fetch the updated server data
+        const updatedServer = await db.server.findUnique({
+            where: { id: serverId },
+            include: {
+                members: {
+                    include: {
+                        user: true
+                    }
+                }
+            }
+        });
+
+        return { success: true, server: updatedServer };
 
     } catch (error) {
         console.error('Server bot deletion failed:', error);
