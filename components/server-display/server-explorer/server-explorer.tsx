@@ -195,9 +195,9 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
 
   return (
     <div className="w-full py-6 space-y-6">
-      <div className="flex items-center justify-between px-4">
-        <h1 className="text-3xl font-bold">Explore Servers</h1>
-        <div className="flex gap-2">
+      <div className="flex items-center px-4 relative">
+        <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Explore Servers</h1>
+        <div className="flex gap-2 ml-auto">
           <Button variant="outline" size="sm">All Templates</Button>
           <Button variant="ghost" size="sm">My Templates</Button>
         </div>
