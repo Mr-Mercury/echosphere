@@ -244,18 +244,18 @@ export class BotServiceManager {
             // Direct check for message property
             if (response && response.message) {
                 console.log(`Using standard response format for ${config.botName}`);
-                const processedMessage = processMessage(response.message, config.botName, response.modelName);
+                const processedMessage = processMessage(response.message, config.botName, config.botUserId, response.modelName);
                 return processedMessage;
             }
             // Fallback to default message
             else {
                 console.log(`Using fallback message for ${config.botName}`);
-                return processMessage("I'm having trouble generating a response right now.", config.botName, config.modelName);
+                return processMessage("I'm having trouble generating a response right now.", config.botName, config.botUserId, config.modelName);
             }
         }
         catch (error) {
             console.error(`Failed to generate message for bot ${config.botName}:`, error);
-            return processMessage("I'm having trouble generating a response right now.", config.botName, config.modelName);
+            return processMessage("I'm having trouble generating a response right now.", config.botName, config.botUserId, config.modelName);
         }
     }
     async deactivateBot(botId) {

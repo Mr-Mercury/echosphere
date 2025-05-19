@@ -116,7 +116,8 @@ app.post('/message', async (req, res) => {
         res.status(result.status).send(result.message);
     }
     catch (error) {
-        console.log('MESSAGE SERVER POST ERROR');
+        console.log('MESSAGE SERVER POST ERROR', error);
+        res.status(500).json({ error: 'Failed to post message' });
     }
 });
 app.post('/bots/start', async (req, res) => {

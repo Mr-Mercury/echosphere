@@ -1,6 +1,7 @@
-export function processMessage(message, botName, modelName) {
+import crypto from 'crypto';
+export function processMessage(message, botName, botUserId, modelName) {
     return {
-        id: Date.now().toString(), // Generate a unique ID
+        id: crypto.randomUUID(), // Generate a unique ID
         content: message,
         fileUrl: null,
         deleted: false,
@@ -8,10 +9,10 @@ export function processMessage(message, botName, modelName) {
         updatedAt: new Date(),
         modelName,
         member: {
-            id: botName, // Using botName as member ID for now
+            id: botUserId, // Using botUserId as a placeholder for member ID
             user: {
-                id: botName,
-                username: botName,
+                id: botUserId, // Correctly use botUserId
+                username: botName, // Use botName for the username
                 human: false
             }
         }
