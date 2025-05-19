@@ -125,7 +125,13 @@ const BotExplorer = ({
 
   return (
     <div className="w-full py-6 space-y-6">
-      <h1 className="text-3xl text-center font-bold">Explore Bots</h1>
+      <div className="flex items-center justify-between px-4">
+        <h1 className="text-3xl font-bold">Explore Bots</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">All Templates</Button>
+          <Button variant="ghost" size="sm">My Templates</Button>
+        </div>
+      </div>
       
       {/* Filters and Controls */}
       <div className="flex w-full flex-row gap-4 justify-center items-center">

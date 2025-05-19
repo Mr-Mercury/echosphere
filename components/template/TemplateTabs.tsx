@@ -40,22 +40,10 @@ export function TemplateTabs({
                 </TabsContent>
                 
                 <TabsContent value="bots">
-                    <div className="flex justify-end px-4 mb-6">
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm">All Templates</Button>
-                            <Button variant="ghost" size="sm">My Templates</Button>
-                        </div>
-                    </div>
                     {botTemplatesContent}
                 </TabsContent>
                 
                 <TabsContent value="servers">
-                    <div className="flex justify-end px-4 mb-6">
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm">All Templates</Button>
-                            <Button variant="ghost" size="sm">My Templates</Button>
-                        </div>
-                    </div>
                     {serverTemplatesContent}
                 </TabsContent>
             </div>

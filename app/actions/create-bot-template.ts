@@ -42,14 +42,14 @@ export const registerBotTemplateAction = async (
         const sanitizedDescription = sanitizeInput(profileDescription);
         const sanitizedSystemPrompt = sanitizeInput(rawSystemPrompt);
 
+        // Always save the original prompt
+        const originalPrompt = sanitizedSystemPrompt;
+        
+        // Determine the system prompt based on fullPromptControl
         let systemPrompt = sanitizedSystemPrompt;
-        let originalPrompt = null;
-
         if (!fullPromptControl) {
             try {
-                // Save the original prompt before system modifies it
-                originalPrompt = sanitizedSystemPrompt;
-                systemPrompt = serverBotPromptBuilder(systemPrompt, sanitizedName);
+                systemPrompt = serverBotPromptBuilder(sanitizedSystemPrompt, sanitizedName);
             } catch (error) {
                 return { error: `Failed to build system prompt: ${error instanceof Error ? error.message : 'Unknown error'}` };
             }
@@ -74,7 +74,7 @@ export const registerBotTemplateAction = async (
                 modelName: model,
                 chatFrequency,
                 messagesPerMinute: ChatFrequencyMsgPerMinute[chatFrequency as keyof typeof ChatFrequencyMsgPerMinute],
-                prompt: originalPrompt,
+                prompt: originalPrompt, // Always store the original prompt
                 creatorId: user.id,
             }
         });

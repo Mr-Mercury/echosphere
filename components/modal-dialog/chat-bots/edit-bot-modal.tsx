@@ -96,7 +96,17 @@ const EditBotModal = () => {
                     form.setValue('model', data.modelName);
                     form.setValue('imageUrl', data.botUser.image);
                     form.setValue('profileDescription', data.description);
-                    form.setValue('systemPrompt', data.systemPrompt);
+                    
+                    // Prioritize the original prompt when available, fall back to system prompt
+                    // This allows us to show the user's original input rather than the system-modified prompt
+                    if (data.prompt) {
+                        console.log("Using original prompt from database");
+                        form.setValue('systemPrompt', data.prompt);
+                    } else {
+                        console.log("Original prompt not found, using system prompt");
+                        form.setValue('systemPrompt', data.systemPrompt);
+                    }
+                    
                     form.setValue('chatFrequency', data.chatFrequency);
                     form.setValue('ourApiKey', data.useSystemKey || true);
                     form.setValue('fullPromptControl', data.fullPromptControl || false);
@@ -125,11 +135,16 @@ const EditBotModal = () => {
                 query: { id: botId }
             });
 
+            // Get the original prompt from the form
+            const originalPrompt = val.systemPrompt;
+            
             // Prepare data for the patch request
+            // The API endpoint will handle generating the system prompt based on fullPromptControl
             const updateData = {
                 modelName: val.model,
                 description: val.profileDescription,
-                systemPrompt: val.systemPrompt,
+                systemPrompt: originalPrompt, // Send the original prompt in the systemPrompt field
+                prompt: originalPrompt,       // Always store the original user input in the prompt field
                 chatFrequency: val.chatFrequency,
                 useSystemKey: val.ourApiKey,
                 fullPromptControl: val.fullPromptControl,
@@ -165,7 +180,7 @@ const EditBotModal = () => {
             const templateData = {
                 name: formValues.name,
                 profileDescription: formValues.profileDescription,
-                systemPrompt: formValues.systemPrompt,
+                systemPrompt: formValues.systemPrompt, // This is the original unmodified prompt
                 imageUrl: formValues.imageUrl,
                 model: formValues.model,
                 chatFrequency: formValues.chatFrequency,

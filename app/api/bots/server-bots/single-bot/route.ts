@@ -36,6 +36,7 @@ export async function PATCH(req: Request) {
             modelName, 
             description, 
             systemPrompt, 
+            prompt: clientPrompt, // Renamed to distinguish from the calculated prompt
             chatFrequency, 
             useSystemKey, 
             messagesPerMinute, 
@@ -48,13 +49,15 @@ export async function PATCH(req: Request) {
         // Sanitize the system prompt
         const sanitizedSystemPrompt = sanitizeInput(systemPrompt);
         
+        // Always preserve the original prompt in the prompt field
+        // This gives us access to the user's original input when editing
+        const originalPrompt = sanitizeInput(clientPrompt || systemPrompt);
+        
         // Handle prompt field update logic based on fullPromptControl
         let updatedSystemPrompt = sanitizedSystemPrompt;
-        let updatedPrompt = undefined; // By default, don't change the prompt field
 
         if (!fullPromptControl) {
-            // Save original prompt and generate the modified system prompt
-            updatedPrompt = sanitizedSystemPrompt;
+            // Generate the modified system prompt using the original input
             try {
                 updatedSystemPrompt = serverBotPromptBuilder(sanitizedSystemPrompt, botName);
             } catch (error) {
@@ -72,7 +75,7 @@ export async function PATCH(req: Request) {
                     modelName,
                     description,
                     systemPrompt: updatedSystemPrompt,
-                    prompt: updatedPrompt, // Will only be set when !fullPromptControl
+                    prompt: originalPrompt, // Always store the original prompt
                     chatFrequency,
                     useSystemKey,
                     messagesPerMinute,
