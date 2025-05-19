@@ -21,7 +21,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
     },
     callbacks: {
-        // TODO: Fix verification email
+        // TODO: Fix verification email - IMPORTANT
         // async signIn({ user, account }) {
         //     //Adjust if you add more providers? 
         //     if (account?.provider !== 'credentials') return true;

@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import Github from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-
+// TODO: Add more providers here
 export default { providers: [
     Github({
         clientId: process.env.GITHUB_CLIENT_ID,

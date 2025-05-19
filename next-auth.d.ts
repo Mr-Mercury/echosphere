@@ -1,7 +1,9 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import { JWT } from '@auth/core/jwt';
 
-//Bizarre TS workaround - auth.js TS solution does not work. Extending the 
+// TODO: Check if auth.js has updated so i can stop using this.
+
+// Bizarre TS workaround - auth.js TS solution does not work. Extending the 
 // JWT interface and session interface in next-auth along w exporting 
 // a new type does seem to work.  
 export type ExtendedUser = DefaultSession['user'] & {
