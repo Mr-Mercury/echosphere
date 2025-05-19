@@ -11,6 +11,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
+import { getServerChannelsById } from "@/lib/utilities/data/fetching/serverData";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 
 interface ServerSearchProps {
     data: {
@@ -33,6 +36,27 @@ const ServerSearch = ({
     const { onOpen } = useModal();
     const router = useRouter();
     const params = useParams();
+    const [server, setServer] = useState<ServerWithMembersAndProfiles | null>(null);
+
+    useEffect(() => {
+        const fetchServer = async () => {
+            try {
+                const user = await currentUser();
+                if (!user) return;
+                
+                const serverData = await getServerChannelsById(params?.serverId as string, user.id);
+                if (serverData) {
+                    setServer(serverData);
+                }
+            } catch (error) {
+                console.error('Failed to fetch server:', error);
+            }
+        };
+
+        if (params?.serverId) {
+            fetchServer();
+        }
+    }, [params?.serverId]);
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -115,10 +139,12 @@ const ServerSearch = ({
                                                                         <DropdownMenuItem 
                                                                             onClick={() => {
                                                                                 setOpen(false);
-                                                                                onOpen('deleteBot', { 
-                                                                                    server: params?.serverId, 
-                                                                                    member: { userId: user.id, user } 
-                                                                                });
+                                                                                if (server) {
+                                                                                    onOpen('deleteBot', { 
+                                                                                        server, 
+                                                                                        member: { userId: user.id, user } 
+                                                                                    });
+                                                                                }
                                                                             }}
                                                                             className='px-3 py-2 text-sm cursor-pointer text-rose-500'>
                                                                             Delete Bot

@@ -10,6 +10,9 @@ import NavTooltip from "@/components/server-listing-sidebar-components/nav-toolt
 import { Edit, MessageSquare, Pause, Play, Trash2 } from "lucide-react";
 import { useBotToggleStore } from '@/hooks/use-bot-toggle-store';
 import { useModal } from "@/hooks/use-modal-store";
+import { ServerWithMembersAndProfiles } from "@/lib/entities/servers";
+import { getServerChannelsById } from "@/lib/utilities/data/fetching/serverData";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,6 +46,7 @@ export const ServerMember = ({
     const [mounted, setMounted] = useState(false);
     const [botActive, setBotActive] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [serverWithMembers, setServerWithMembers] = useState<ServerWithMembersAndProfiles | null>(null);
     
     // Check for server-wide bot status changes
     useEffect(() => {
@@ -65,6 +69,24 @@ export const ServerMember = ({
             }
         }
     }, [serverBotUpdateTimestamp, server.id, member.role, member.user.botConfig, mounted]);
+
+    // Fetch complete server data when needed
+    useEffect(() => {
+        const fetchServerData = async () => {
+            try {
+                const user = await currentUser();
+                if (!user) return;
+                
+                const serverData = await getServerChannelsById(server.id, user.id);
+                if (serverData) {
+                    setServerWithMembers(serverData);
+                }
+            } catch (error) {
+                console.error("Failed to fetch server data:", error);
+            }
+        };
+        fetchServerData();
+    }, [server.id]);
 
     // Sync with bot status store
     const botStatuses = useBotToggleStore((state) => state.botStatuses);
@@ -178,7 +200,11 @@ export const ServerMember = ({
                                     <Edit className='h-4 w-4 ml-auto'/>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
-                                    onClick={() => onOpen('deleteBot', { server, member })}
+                                    onClick={() => {
+                                        if (serverWithMembers) {
+                                            onOpen('deleteBot', { server: serverWithMembers, member });
+                                        }
+                                    }}
                                     className='px-3 py-2 text-sm cursor-pointer text-rose-500'>
                                     Delete Bot
                                     <Trash2 className='h-4 w-4 ml-auto'/>
