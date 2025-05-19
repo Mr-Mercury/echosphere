@@ -276,7 +276,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                 return;
             }
 
-            const result = await registerServerBotAction(val, selectedServer.id);
+            const result = await registerServerBotAction(val, selectedServer.id, modalData?.templateId);
 
             if (result.error) {
                 // TODO: Add proper error handling/display here

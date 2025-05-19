@@ -11,8 +11,8 @@ export const PROVIDER_COLORS = {
         secondary: '#a78bfa', // violet-400
     },
     'google': {
-        primary: '#f97316', // orange-500
-        secondary: '#fb923c', // orange-400
+        primary: '#4285F4', // google blue
+        secondary: '#64B5F6', // slightly darker blue
     },
     'other': {
         primary: '#22c55e',
@@ -111,7 +111,7 @@ export const MODEL_DISPLAY = {
     },
     'Gemini 2.0 Flash Lite': {
         color: PROVIDER_COLORS.google.primary,
-        displayName: 'Gemini',
+        displayName: 'Gemini 2.0 Flash Lite',
         provider: 'google'
     },
     'default': {

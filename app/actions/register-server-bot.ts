@@ -17,7 +17,8 @@ type ActionResult = {
 
 export const registerServerBotAction = async (
     values: z.infer<typeof ServerBotSchema>, 
-    homeServerId: string
+    homeServerId: string,
+    templateId?: string
 ): Promise<ActionResult> => {
     try {
         // Get the current user server-side
@@ -166,6 +167,23 @@ export const registerServerBotAction = async (
                     botConfig: config
                 })
             })
+        }
+
+        // If a templateId is provided, increment the copiesCreated count
+        if (templateId) {
+            try {
+                await db.botTemplate.update({
+                    where: { id: templateId },
+                    data: {
+                        copiesCreated: {
+                            increment: 1
+                        }
+                    }
+                });
+            } catch (error) {
+                // Log the error but don't let it fail the whole bot creation process
+                console.error(`Failed to increment copiesCreated for template ${templateId}:`, error);
+            }
         }
 
         return { success: config };

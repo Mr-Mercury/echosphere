@@ -1,4 +1,5 @@
 import { chatgpt } from "./apis/chatgpt/chatgpt.js";
+import { gemini } from "./apis/gemini/gemini.js";
 import { BotConfiguration } from "../../entities/bot-types.js";
 
 export async function llmApi(config: BotConfiguration, userPrompt: string) {
@@ -13,6 +14,8 @@ export async function llmApi(config: BotConfiguration, userPrompt: string) {
                 return await chatgpt(config, userPrompt);
             case 'gpt-4o-mini':
                 return await chatgpt(config, userPrompt);
+            case 'gemini-2.0-flash-lite':
+                return await gemini(config, userPrompt);
             default:
                 throw new Error(`Model ${config.modelName} not found`);
         }

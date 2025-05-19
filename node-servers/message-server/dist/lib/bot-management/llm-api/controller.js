@@ -1,4 +1,5 @@
 import { chatgpt } from "./apis/chatgpt/chatgpt.js";
+import { gemini } from "./apis/gemini/gemini.js";
 export async function llmApi(config, userPrompt) {
     try {
         if (!config.apiKeyId) {
@@ -10,6 +11,8 @@ export async function llmApi(config, userPrompt) {
                 return await chatgpt(config, userPrompt);
             case 'gpt-4o-mini':
                 return await chatgpt(config, userPrompt);
+            case 'gemini-2.0-flash-lite':
+                return await gemini(config, userPrompt);
             default:
                 throw new Error(`Model ${config.modelName} not found`);
         }
