@@ -7,7 +7,7 @@ import { getUserByEmail } from '@/lib/utilities/data/fetching/userData';
 import { generateVerificationToken } from '@/lib/utilities/data/tokens/token-generation';
 import { sendVerificationEmail } from '@/lib/utilities/mail/mail';
 
-//Again, type safety for login using zod
+
 export const registerAction = async (values: z.infer<typeof RegistrationSchema>) => {
     const validatedFields = RegistrationSchema.safeParse(values)
 

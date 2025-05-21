@@ -117,3 +117,24 @@ export const MessageFileUploadSchema = z.object({
         message: 'You need a valid filepath'
     })
 })
+
+export const ServerTemplateChannelSchema = z.object({
+  name: z.string().min(1, {
+    message: 'Channel name is required'
+  }).refine(name => name !== 'general', {
+    message: 'Channel name cannot be "general"' // Field for reserved name(s)
+  }),
+  type: z.nativeEnum(ChannelType),
+  topic: z.string().optional() // Topic *Currently* optional TODO: Make required when sensible
+});
+
+export const ServerTemplateCreateSchema = z.object({
+  serverName: z.string().min(1, {
+    message: 'Server template name is required'
+  }),
+  description: z.string().optional(),
+  serverImageUrl: z.string().url({ message: 'Invalid URL for server image' }).optional(),
+  channels: z.array(ServerTemplateChannelSchema).default([]), // Allows empty array, defaults to empty
+  botTemplateIds: z.array(z.string().uuid({ message: 'Invalid Bot Template ID' })).optional(), // Array of UUIDs, optional
+  isPublic: z.boolean().default(true).optional()
+});
