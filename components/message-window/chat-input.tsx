@@ -12,7 +12,7 @@ import { useSocket } from '../providers/socket-provider';
 import { useModal } from '@/hooks/use-modal-store';
 import EmojiMenu from '../islets/chat-window/emoji-menu';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -31,7 +31,6 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null);
 
-
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             content: '',
@@ -40,10 +39,21 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     });
 
     const isLoading = form.formState.isSubmitting;
+
+    // inputRef.current is read-only, this function is used to focus the input
+    const focusInput = () => {
+        // Timeout is used to ensure the component has fully updated so we can actually select it.
+        // TODO: Figure out if it's worth creating a branch of react-hook-form to enable mutable inputRef.current
+        setTimeout(() => {
+            const inputElement = document.querySelector('input[name="content"]') as HTMLInputElement;
+            if (inputElement) {
+                inputElement.focus();
+            }
+        }, 10);
+    };
     
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            //TODO - use Querystring again
             const url = qs.stringifyUrl({
                 url: apiUrl,
                 query,
@@ -52,15 +62,17 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
             if (socket) { 
                 socket.emit('message', { query, values, type });
                 form.reset();
-                router.refresh();
-                if (inputRef.current) {
-                    inputRef.current.focus();
-                }
+                focusInput();
             };
         } catch(error) {
                 (error);
         }
     }
+
+    // Focus the input when the component mounts
+    useEffect(() => {
+        focusInput();
+    }, []);
 
     return (
         <Form {...form}>
@@ -81,14 +93,13 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                             p-1 flex items-center justify-center'>
                                             <Plus className='text-[#313338]'/>
                                         </button>
-                                        <Input 
-                                            ref={inputRef}
+                                        <Input
+                                            {...field}
                                             disabled={isLoading} 
                                             className='px-14 py-6 bg-zinc-700/70 border-none 
                                             border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
                                             placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
                                             autoComplete="off"
-                                            {...field}
                                         />
                                         <div className='absolute top-7 right-8'>
                                             <EmojiMenu onChange={(emoji:string) => {
