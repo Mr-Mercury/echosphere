@@ -12,6 +12,7 @@ import { useSocket } from '../providers/socket-provider';
 import { useModal } from '@/hooks/use-modal-store';
 import EmojiMenu from '../islets/chat-window/emoji-menu';
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -28,6 +29,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
     const { onOpen } = useModal(); 
     const { socket } = useSocket();
     const router = useRouter();
+    const inputRef = useRef<HTMLInputElement>(null);
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -51,6 +53,9 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                 socket.emit('message', { query, values, type });
                 form.reset();
                 router.refresh();
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                }
             };
         } catch(error) {
                 (error);
@@ -77,6 +82,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                             <Plus className='text-[#313338]'/>
                                         </button>
                                         <Input 
+                                            ref={inputRef}
                                             disabled={isLoading} 
                                             className='px-14 py-6 bg-zinc-700/70 border-none 
                                             border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'

@@ -28,9 +28,11 @@ interface BotConfiguration {
     botName: string;
     homeServerId: string;
     botType: string;
+    //The fully constructed prompt including system prompt and user prompt.
     systemPrompt: string;
     modelName: string;
     description: string;
+    //The raw prompt or base instruction template entered by the user during bot c
     prompt: string;
     messagesPerMinute: number;
     useSystemKey: boolean;

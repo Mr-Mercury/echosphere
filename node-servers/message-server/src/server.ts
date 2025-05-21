@@ -13,6 +13,7 @@
     import type { Session } from "@auth/express";
     import type { JWT } from "next-auth/jwt";
     import type { ChatSocket, User, Token, SessionCallback } from "./lib/entities/server-types.js";
+    import type { MessagePostHandlerParams } from "./lib/entities/message-handler-types.js";
 
 
 
@@ -61,6 +62,9 @@
     // postgres adapter later on OR use the Redis adapter (preferred)
     dotenv.config();
 
+    const MESSAGE_SERVER_PORT = process.env.MESSAGE_SERVER_PORT || '4000';
+    const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+
     const AuthConfig: Parameters<typeof getSession>[1] = {
         secret: process.env.AUTH_SECRET,
         providers: [],
@@ -101,13 +105,13 @@
         },
     };
         
-    const port = 4000;
+    const port = parseInt(MESSAGE_SERVER_PORT, 10);
     const app = express();
     const server = createServer(app);
 
     const io = new IoServer(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: CORS_ORIGIN,
             methods: ["GET", "POST"],
             credentials: true 
         }
@@ -118,7 +122,7 @@
     app.use(express.json());
 
     app.use(cors({
-        origin: 'http://localhost:3000',
+        origin: CORS_ORIGIN,
         credentials: true,
     }))
 
@@ -155,25 +159,41 @@
                 return res.status(400).json({ error: 'Invalid server or channel ID format' });
             }
 
-            const params = { 
+            const isDm = !!conversationId;
+            const messageType = isDm ? 'dm' : 'channel';
+
+            const params: MessagePostHandlerParams = { 
                 userId: session.user.id,
-                serverId, 
-                channelId, 
-                conversationId: conversationId?.toString() || null, 
-                fileUrl, 
+                serverId: isDm ? null : serverId,
+                channelId: isDm ? null : channelId,
+                conversationId: isDm ? conversationId.toString() : null,
+                fileUrl,
                 content,
-                type: conversationId ? 'dm' : 'channel' as const
-            }
-            //@ts-ignore
+                type: messageType
+            };
+            
             const result = await messagePostHandler(params);
-            //@ts-ignore
 
-            if (result.status === 200) {
-                const channelKey = `chat:${channelId}:messages`
+            if (result.status === 200 && result.message) {
+                let roomToEmitTo: string | undefined;
+                let eventKey: string | undefined;
+
+                if (messageType === 'channel' && params.channelId) {
+                    roomToEmitTo = params.channelId;
+                    eventKey = `chat:${params.channelId}:messages`;
+                } else if (messageType === 'dm' && params.conversationId) {
+                    roomToEmitTo = params.conversationId; // Assuming DM rooms are identified by conversationId
+                    eventKey = `chat:${params.conversationId}:messages`;
+                }
+
+                if (roomToEmitTo && eventKey) {
+                    io.to(roomToEmitTo).emit(eventKey, result.message);
+                    console.log(`Emitted bot message via HTTP to room ${roomToEmitTo} with key ${eventKey}`);
+                }
+                res.status(result.status).json(result.message); 
+            } else {
+                res.status(result.status || 500).json({ error: result.error || 'Failed to post message' });
             }
-            //@ts-ignore
-
-            res.status(result.status).send(result.message);
         } catch (error) {
             console.log('MESSAGE SERVER POST ERROR', error);
             res.status(500).json({ error: 'Failed to post message' });
@@ -416,57 +436,40 @@
         }
     })
 
-    process.on('SIGTERM', () => {
-        console.log('SIGTERM received, shutting down gracefully');
-        
-        // Set a timeout to force exit if graceful shutdown takes too long
-        const forceExitTimeout = setTimeout(() => {
-            console.log('Forcing exit after timeout');
-            process.exit(1);
-        }, 5000);
-        
-        // Clear the timeout if we exit normally
-        forceExitTimeout.unref();
-        
-        try {
-            // Stop all bots first
-            botService.stopAll();
-            
-            // Close the server with a timeout
-            server.close(() => {
-                console.log('Server closed successfully');
-                process.exit(0);
-            });
-        } catch (error) {
-            console.error('Error during shutdown:', error);
-            process.exit(1);
-        }
-    });
+const SHUTDOWN_TIMEOUT_MS = 5000;
 
-    // Handle SIGINT (Ctrl+C) the same way
-    process.on('SIGINT', () => {
-        console.log('SIGINT received, shutting down gracefully');
-        
-        // Set a timeout to force exit if graceful shutdown takes too long
-        const forceExitTimeout = setTimeout(() => {
-            console.log('Forcing exit after timeout');
-            process.exit(1);
-        }, 5000);
-        
-        // Clear the timeout if we exit normally
-        forceExitTimeout.unref();
-        
-        try {
-            // Stop all bots first
-            botService.stopAll();
-            
-            // Close the server with a timeout
-            server.close(() => {
-                console.log('Server closed successfully');
-                process.exit(0);
+function gracefulShutdown(signal: string) {
+    console.log(`${signal} received, shutting down gracefully...`);
+
+    // Set a timeout to force exit if graceful shutdown takes too long
+    const forceExitTimeout = setTimeout(() => {
+        console.warn('Graceful shutdown timed out. Forcing exit.');
+        process.exit(1);
+    }, SHUTDOWN_TIMEOUT_MS);
+
+    // Allow Node.js to exit if this is the only active timer
+    forceExitTimeout.unref();
+
+    console.log('Stopping all bot services...');
+    botService.stopAll()
+        .then(() => {
+            console.log('All bot services stopped.');
+            console.log('Closing HTTP server...');
+            server.close((err) => {
+                if (err) {
+                    console.error('Error during server close:', err);
+                    process.exit(1); 
+                } else {
+                    console.log('HTTP server closed successfully.');
+                    process.exit(0);
+                }
             });
-        } catch (error) {
-            console.error('Error during shutdown:', error);
+        })
+        .catch(error => {
+            console.error('Error stopping bot services during shutdown:', error);
             process.exit(1);
-        }
-    });
+        });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

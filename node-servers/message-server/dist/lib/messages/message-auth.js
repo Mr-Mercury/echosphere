@@ -1,6 +1,8 @@
 import activeSessions from "../../util/sessionStore.js";
 import dotenv from 'dotenv';
 dotenv.config();
+const INTERNAL_AUTH_URL = process.env.INTERNAL_AUTH_URL || 'http://localhost:4000/authenticate';
+const SESSION_RECHECK_INTERVAL_MS = parseInt(process.env.SESSION_RECHECK_INTERVAL_MS || '300000', 10); // Default 5 minutes
 export async function authenticateSocketSession(socket) {
     try {
         const cookies = socket.handshake.headers.cookie;
@@ -9,7 +11,7 @@ export async function authenticateSocketSession(socket) {
             'Content-Type': 'application/json',
             'Cookie': cookies || ''
         };
-        const response = await fetch('http://localhost:4000/authenticate', {
+        const response = await fetch(INTERNAL_AUTH_URL, {
             method: 'POST',
             headers
         });
@@ -73,7 +75,7 @@ export function scheduleSessionRecheck(socket) {
             console.error('Session revalidation error: ', error);
             socket.disconnect();
         }
-    }, 5 * 60 * 1000); // TODO: Check best practicies (5 mins atm)
+    }, SESSION_RECHECK_INTERVAL_MS); // Use configured interval
     socket.data.sessionInterval = interval;
 }
 //# sourceMappingURL=message-auth.js.map

@@ -13,6 +13,8 @@ import { scheduleSessionRecheck, socketAuthMiddleware } from "./lib/messages/mes
 //TODO: Notes on socket.io expansions - will require a different adapter - search for MySQL adapter or change the 
 // postgres adapter later on OR use the Redis adapter (preferred)
 dotenv.config();
+const MESSAGE_SERVER_PORT = process.env.MESSAGE_SERVER_PORT || '4000';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const AuthConfig = {
     secret: process.env.AUTH_SECRET,
     providers: [],
@@ -47,12 +49,12 @@ const AuthConfig = {
         },
     },
 };
-const port = 4000;
+const port = parseInt(MESSAGE_SERVER_PORT, 10);
 const app = express();
 const server = createServer(app);
 const io = new IoServer(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: CORS_ORIGIN,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -60,7 +62,7 @@ const io = new IoServer(server, {
 const botService = new BotServiceManager(io);
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: CORS_ORIGIN,
     credentials: true,
 }));
 // Auth logic starts here 
@@ -97,23 +99,38 @@ app.post('/message', async (req, res) => {
         if (typeof serverId !== 'string' || typeof channelId !== 'string') {
             return res.status(400).json({ error: 'Invalid server or channel ID format' });
         }
+        const isDm = !!conversationId;
+        const messageType = isDm ? 'dm' : 'channel';
         const params = {
             userId: session.user.id,
-            serverId,
-            channelId,
-            conversationId: conversationId?.toString() || null,
+            serverId: isDm ? null : serverId,
+            channelId: isDm ? null : channelId,
+            conversationId: isDm ? conversationId.toString() : null,
             fileUrl,
             content,
-            type: conversationId ? 'dm' : 'channel'
+            type: messageType
         };
-        //@ts-ignore
         const result = await messagePostHandler(params);
-        //@ts-ignore
-        if (result.status === 200) {
-            const channelKey = `chat:${channelId}:messages`;
+        if (result.status === 200 && result.message) {
+            let roomToEmitTo;
+            let eventKey;
+            if (messageType === 'channel' && params.channelId) {
+                roomToEmitTo = params.channelId;
+                eventKey = `chat:${params.channelId}:messages`;
+            }
+            else if (messageType === 'dm' && params.conversationId) {
+                roomToEmitTo = params.conversationId; // Assuming DM rooms are identified by conversationId
+                eventKey = `chat:${params.conversationId}:messages`;
+            }
+            if (roomToEmitTo && eventKey) {
+                io.to(roomToEmitTo).emit(eventKey, result.message);
+                console.log(`Emitted bot message via HTTP to room ${roomToEmitTo} with key ${eventKey}`);
+            }
+            res.status(result.status).json(result.message);
         }
-        //@ts-ignore
-        res.status(result.status).send(result.message);
+        else {
+            res.status(result.status || 500).json({ error: result.error || 'Failed to post message' });
+        }
     }
     catch (error) {
         console.log('MESSAGE SERVER POST ERROR', error);
@@ -336,51 +353,37 @@ server.listen(port, () => {
         console.error('Failed to initialize bot service manager (message server): ', error);
     }
 });
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
+const SHUTDOWN_TIMEOUT_MS = 5000;
+function gracefulShutdown(signal) {
+    console.log(`${signal} received, shutting down gracefully...`);
     // Set a timeout to force exit if graceful shutdown takes too long
     const forceExitTimeout = setTimeout(() => {
-        console.log('Forcing exit after timeout');
+        console.warn('Graceful shutdown timed out. Forcing exit.');
         process.exit(1);
-    }, 5000);
-    // Clear the timeout if we exit normally
+    }, SHUTDOWN_TIMEOUT_MS);
+    // Allow Node.js to exit if this is the only active timer
     forceExitTimeout.unref();
-    try {
-        // Stop all bots first
-        botService.stopAll();
-        // Close the server with a timeout
-        server.close(() => {
-            console.log('Server closed successfully');
-            process.exit(0);
+    console.log('Stopping all bot services...');
+    botService.stopAll()
+        .then(() => {
+        console.log('All bot services stopped.');
+        console.log('Closing HTTP server...');
+        server.close((err) => {
+            if (err) {
+                console.error('Error during server close:', err);
+                process.exit(1);
+            }
+            else {
+                console.log('HTTP server closed successfully.');
+                process.exit(0);
+            }
         });
-    }
-    catch (error) {
-        console.error('Error during shutdown:', error);
+    })
+        .catch(error => {
+        console.error('Error stopping bot services during shutdown:', error);
         process.exit(1);
-    }
-});
-// Handle SIGINT (Ctrl+C) the same way
-process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
-    // Set a timeout to force exit if graceful shutdown takes too long
-    const forceExitTimeout = setTimeout(() => {
-        console.log('Forcing exit after timeout');
-        process.exit(1);
-    }, 5000);
-    // Clear the timeout if we exit normally
-    forceExitTimeout.unref();
-    try {
-        // Stop all bots first
-        botService.stopAll();
-        // Close the server with a timeout
-        server.close(() => {
-            console.log('Server closed successfully');
-            process.exit(0);
-        });
-    }
-    catch (error) {
-        console.error('Error during shutdown:', error);
-        process.exit(1);
-    }
-});
+    });
+}
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 //# sourceMappingURL=server.js.map

@@ -41,7 +41,7 @@ export type MessageEditHandlerParams = {
     channelId: string | null;
     conversationId: string | null;
     content: string;
-    type: string;
+    type: string; // TODO: Change to 'channel' | 'dm' for better type safety (when I can make sure things don't break)
     method: 'DELETE' | 'EDIT';
 }
 
