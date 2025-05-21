@@ -17,15 +17,15 @@ import CreateServerBotModal from "../modal-dialog/chat-bots/create-srv-bot-modal
 import EditBotModal from "../modal-dialog/chat-bots/edit-bot-modal";
 import CopyBotModal from "../modal-dialog/chat-bots/copy-bot-modal";
 import DeleteBotConfirmationModal from "../modal-dialog/chat-bots/delete-bot-confirmation-modal";
+import CreateServerTemplateModal from "../modal-dialog/template/create-server-template-modal";
 import { useModal } from "@/hooks/use-modal-store";
 
 export const ModalProvider = () => {
-    const [isMounted, setIsMounted] = useState('false');
+    const [isMounted, setIsMounted] = useState(false);
     const { data } = useModal();
 
     useEffect( () => {
-        setIsMounted('true');
-
+        setIsMounted(true);
     }, []);
 
     //Hydration fix...TODO: Figure out if there's a better method
@@ -54,6 +54,7 @@ export const ModalProvider = () => {
             <CopyBotModal />
             <CreateTemplateModal />
             <DeleteBotConfirmationModal />
+            <CreateServerTemplateModal />
         </>
     )   
 }

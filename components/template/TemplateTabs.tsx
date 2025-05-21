@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 
 interface TemplateTabsProps {
     defaultTab: string;
+    userId?: string;
     featuredContent: ReactNode;
     botTemplatesContent: ReactNode;
     serverTemplatesContent: ReactNode;
@@ -15,6 +16,7 @@ interface TemplateTabsProps {
 
 export function TemplateTabs({ 
     defaultTab,
+    userId,
     featuredContent,
     botTemplatesContent,
     serverTemplatesContent
@@ -32,7 +34,7 @@ export function TemplateTabs({
     
     return (
         <Tabs value={activeTab} defaultValue={defaultTab} className="w-full">
-            <TemplateHeader activeTab={activeTab} />
+            <TemplateHeader activeTab={activeTab} userId={userId} />
             
             <div className="mt-4">
                 <TabsContent value="featured">

@@ -47,6 +47,7 @@ export default async function TemplatePage({ searchParams }: TemplatePageProps) 
         <div className="min-h-screen pb-20">
             <TemplateTabs 
                 defaultTab={tab}
+                userId={user.id}
                 featuredContent={featuredContent}
                 botTemplatesContent={botTemplatesContent}
                 serverTemplatesContent={serverTemplatesContent}

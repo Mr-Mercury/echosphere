@@ -190,6 +190,7 @@ interface FetchBotTemplatesParams {
   sort?: 'popular' | 'rating' | 'recent';
   model?: string;
   searchQuery?: string;
+  creatorId?: string;
 }
 
 /**
@@ -200,12 +201,17 @@ export async function fetchBotTemplatesWithFilters({
   pageSize,
   sort = 'popular',
   model,
-  searchQuery
+  searchQuery,
+  creatorId
 }: FetchBotTemplatesParams): Promise<{ bots: Bot[], total: number }> {
   try {
     // Building the where clause for filtering
     const where: any = {};
     
+    if (creatorId) {
+      where.creatorId = creatorId;
+    }
+
     // model filter with support for model families
     if (model && model !== 'All Models') {
       // Handle specific model families
@@ -314,7 +320,7 @@ export async function fetchBotTemplatesWithFilters({
  */
 export const fetchBotTemplatesWithFiltersCached = unstable_cache(
   async (params: FetchBotTemplatesParams) => {
-    console.log('Bot templates cache revalidated');
+    console.log('Bot templates cache revalidated for params:', params);
     return await fetchBotTemplatesWithFilters(params);
   },
   ['bot-templates-filtered'],

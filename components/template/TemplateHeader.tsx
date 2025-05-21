@@ -1,16 +1,17 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Bot } from "lucide-react";
+import { Bot, LayoutTemplate } from "lucide-react";
 import { useModal } from "@/hooks/use-modal-store";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface TemplateHeaderProps {
     activeTab: string;
+    userId?: string;
 }
 
-export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
+export function TemplateHeader({ activeTab, userId }: TemplateHeaderProps) {
     const { onOpen } = useModal();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -19,6 +20,14 @@ export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', value);
         router.push(`?${params.toString()}`);
+    };
+    
+    const openCreateServerTemplateModal = () => {
+        if (userId) {
+            onOpen('createServerTemplate', { userId: userId });
+        } else {
+            console.error("User ID not available in TemplateHeader to open CreateServerTemplateModal");
+        }
     };
     
     return (
@@ -54,14 +63,23 @@ export function TemplateHeader({ activeTab }: TemplateHeaderProps) {
                     Template Library
                 </h1>
                 
-                <div className="flex-1 flex justify-end">
+                <div className="flex-1 flex justify-end items-center">
                     <Button 
                         size="sm" 
-                        className="gap-1 hover:bg-zinc-800/80 hover:ring-2 hover:ring-white/50 transition-all bg-background/50 backdrop-blur-sm" 
+                        className="gap-1 hover:bg-zinc-800/80 hover:ring-2 hover:ring-white/50 transition-all bg-background/50 backdrop-blur-sm"
                         onClick={() => onOpen('createTemplate')}
                     >
                         <Bot className="h-4 w-4" />
-                        Create Template
+                        Create Bot Template
+                    </Button>
+                    <Button 
+                        size="sm" 
+                        className="ml-2 gap-1 hover:bg-zinc-800/80 hover:ring-2 hover:ring-white/50 transition-all bg-background/50 backdrop-blur-sm"
+                        onClick={openCreateServerTemplateModal}
+                        disabled={!userId}
+                    >
+                        <LayoutTemplate className="h-4 w-4" />
+                        Create Server Template
                     </Button>
                 </div>
             </div>
