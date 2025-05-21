@@ -89,6 +89,7 @@ export async function PATCH(req: Request) {
                 },
                 data: {
                     name: botName,
+                    username: botName,
                     image: image
                 }
             })
