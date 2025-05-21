@@ -5,9 +5,7 @@ import { unstable_cache } from 'next/cache';
 import { CACHE_CONSTANTS } from '@/lib/config/cache-constants';
 import { AVAILABLE_MODELS, PROVIDER_COLORS } from '@/lib/config/models';
 
-/**
- * Calculate a popularity score based on copies created and like/dislike ratio
- */
+// Calculate a popularity score based on copies created and like/dislike ratio
 export function calculatePopularityScore(copiesCreated: number, likes: number, dislikes: number) {
   const totalVotes = likes + dislikes || 1;
   const likeRatio = likes / totalVotes;
@@ -16,16 +14,15 @@ export function calculatePopularityScore(copiesCreated: number, likes: number, d
   return (copiesCreated * 0.7) + (likeRatio * copiesCreated * 0.3);
 }
 
-/**
- * Map model IDs to display names based on the AVAILABLE_MODELS config
- * Returns a standardized display name that matches what's expected in the UI
- */
-function getModelDisplayName(modelId: string): string {
+// Map model IDs to display names based on the AVAILABLE_MODELS config
+// Returns a standardized display name that matches what's expected in the UI
+
+export function getModelDisplayName(modelId: string): string {
   // Check if this is a model we know about
   if (modelId in AVAILABLE_MODELS) {
     const model = AVAILABLE_MODELS[modelId];
     
-    // Use the actual model name from the configuration
+    // Uses the actual model name from the configuration
     return model.name;
   }
   
@@ -42,10 +39,8 @@ function getModelDisplayName(modelId: string): string {
   return modelId;
 }
 
-/**
- * Core implementation of popular bot templates fetching logic
- * Extracted as a separate function to be wrapped with different caching strategies
- */
+// Core implementation of popular bot templates fetching logic
+// Extracted as a separate function to be wrapped with different caching strategies
 async function fetchPopularBotTemplatesImpl(): Promise<Bot[]> {
   // First, check if we have any active bots with copies
   const activeBotCount = await db.botTemplate.count({
@@ -193,9 +188,7 @@ interface FetchBotTemplatesParams {
   creatorId?: string;
 }
 
-/**
- * Fetch bot templates with filtering, sorting, and pagination
- */
+// Fetch bot templates with filtering, sorting, and pagination
 export async function fetchBotTemplatesWithFilters({
   page,
   pageSize,
@@ -314,10 +307,8 @@ export async function fetchBotTemplatesWithFilters({
   }
 }
 
-/**
- * Cached version of fetchBotTemplatesWithFilters using Next.js unstable_cache
- * Cache duration is shorter than popular bots 
- */
+// Cached version of fetchBotTemplatesWithFilters using Next.js unstable_cache
+// Cache duration is shorter than popular bots 
 export const fetchBotTemplatesWithFiltersCached = unstable_cache(
   async (params: FetchBotTemplatesParams) => {
     console.log('Bot templates cache revalidated for params:', params);

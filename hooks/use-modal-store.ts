@@ -1,11 +1,11 @@
 import { ServerWithMembersAndProfiles } from '@/lib/entities/servers';
+import { Bot } from '@/lib/entities/bot-display-types';
 import { Channel, ChannelType, Server, User } from '@prisma/client';
-// TODO: Prisma build lol
 import { create } from 'zustand';
 
 export type ModalType = 'createServer' | 'invite' | 'editServer' | 
 'members' | 'createChannel' | 'leaveServer' | 'deleteServer' | 'deleteChannel' 
-| 'editChannel' | 'messageFile' | 'createDM' | 'createServerBot' | 'editBot' | 'copyBot' | 'createTemplate' | 'deleteBot' | 'createServerTemplate';
+| 'editChannel' | 'messageFile' | 'createDM' | 'createServerBot' | 'editBot' | 'copyBot' | 'createTemplate' | 'deleteBot' | 'createServerTemplate' | 'botTemplateDetail';
 
 interface ModalData {
     server?: ServerWithMembersAndProfiles;
@@ -18,6 +18,7 @@ interface ModalData {
     templateId?: string;
     member?: any;
     userId?: string;
+    bot?: Bot;
 }
 
 interface ModalStore {

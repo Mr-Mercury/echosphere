@@ -10,6 +10,12 @@ import NavTooltip from "@/components/server-listing-sidebar-components/nav-toolt
 import { useModal } from "@/hooks/use-modal-store";
 import { MODEL_DISPLAY } from "@/lib/config/models";
 
+export interface ActionButtonConfig {
+  text: string;
+  onClick: () => void;
+  icon?: React.ElementType; // Optional icon component
+}
+
 interface BotCardProps {
   id?: string;
   name: string;
@@ -19,6 +25,7 @@ interface BotCardProps {
   model: string;
   imageUrl: string;
   createdAt: string;
+  actionButtonConfig?: ActionButtonConfig | null; // CUSTOM BUTTON PROP - used for select/deselect bot in create server template modal
 }
 
 const BotCard = ({
@@ -29,7 +36,8 @@ const BotCard = ({
   copiesCreated = 120,
   model = 'Claude',
   imageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-  createdAt = '2023-04-01'
+  createdAt = '2023-04-01',
+  actionButtonConfig
 }: BotCardProps) => {
   const { onOpen } = useModal();
   // Get model color from the centralized configuration
@@ -97,17 +105,33 @@ const BotCard = ({
       </CardContent>
 
       <CardFooter className="pt-0">
-        <NavTooltip label="Create a copy of this bot">
-          <Button
-            onClick={handleCopyButtonClick}
-            variant="outline"
-            size="sm"
-            className="w-full flex items-center gap-2 bg-black border-zinc-800 text-zinc-100 hover:bg-zinc-900 hover:text-zinc-50"
-          >
-            <Copy size={14} />
-            Create a copy
-          </Button>
-        </NavTooltip>
+        {actionButtonConfig === null ? null : actionButtonConfig ? (
+          // Custom button render if prop is provided
+          <NavTooltip label={actionButtonConfig.text}>
+            <Button
+              onClick={actionButtonConfig.onClick}
+              variant="outline"
+              size="sm"
+              className="w-full flex items-center gap-2 bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700"
+            >
+              {actionButtonConfig.icon && <actionButtonConfig.icon size={14} />}
+              {actionButtonConfig.text}
+            </Button>
+          </NavTooltip>
+        ) : (
+          // Default button
+          <NavTooltip label="Create a copy of this bot">
+            <Button
+              onClick={handleCopyButtonClick}
+              variant="outline"
+              size="sm"
+              className="w-full flex items-center gap-2 bg-black border-zinc-800 text-zinc-100 hover:bg-zinc-900 hover:text-zinc-50"
+            >
+              <Copy size={14} />
+              Create a copy
+            </Button>
+          </NavTooltip>
+        )}
       </CardFooter>
     </Card>
   );

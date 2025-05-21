@@ -17,12 +17,14 @@ import { ChannelType } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, XCircle } from "lucide-react";
+import { PlusCircle, XCircle, X as XIcon } from "lucide-react";
 import BotTemplateSelector from "@/components/islets/bot-template-selector/bot-template-selector";
+import { Bot } from "@/lib/entities/bot-display-types";
+import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 
 // TODO: Refine this type later if needed
 interface ChannelInput {
-    id: string; // For React key prop
+    id: string; // REACT KEY PROP
     name: string;
     type: ChannelType;
     topic?: string;
@@ -35,10 +37,12 @@ const CreateServerTemplateModal = () => {
 
     const isModalOpen = isOpen && type === 'createServerTemplate';
 
-    // State for dynamic parts of the form
+    // Dynamic state
     const [channels, setChannels] = useState<ChannelInput[]>([]);
     const [selectedBotTemplateIds, setSelectedBotTemplateIds] = useState<string[]>([]);
+    const [selectedBotObjects, setSelectedBotObjects] = useState<Bot[]>([]);
     const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+    const [loadingBotDetails, setLoadingBotDetails] = useState(false);
 
     const form = useForm<z.infer<typeof ServerTemplateCreateSchema>>({
         resolver: zodResolver(ServerTemplateCreateSchema),
@@ -52,14 +56,59 @@ const CreateServerTemplateModal = () => {
         }
     });
 
-    // Sync local state with react-hook-form state for submission
+    // Syncs local state w/ react-hook-form state for submission - has temporary client side id for channels
     useEffect(() => {
-        form.setValue('channels', channels.map(({ id, ...rest }) => rest)); // Remove temporary client-side id
+        form.setValue('channels', channels.map(({ id, ...rest }) => rest)); 
     }, [channels, form]);
 
     useEffect(() => {
         form.setValue('botTemplateIds', selectedBotTemplateIds);
-    }, [selectedBotTemplateIds, form]);
+
+        // Fetch details for IDs that are in selectedBotTemplateIds but not yet in selectedBotObjects
+        const idsToFetch = selectedBotTemplateIds.filter(id => 
+            !selectedBotObjects.some(obj => obj.id === id)
+        );
+
+        if (idsToFetch.length > 0) {
+            setLoadingBotDetails(true);
+            axios.post<Bot[]>('/api/bot-templates/by-ids', { ids: idsToFetch })
+                .then(response => {
+                    setSelectedBotObjects(prevObjs => {
+                        const newBotsMap = new Map(response.data.map(bot => [bot.id, bot]));
+                        const updatedObjects = [...prevObjs];
+                        idsToFetch.forEach(id => {
+                            const botDetail = newBotsMap.get(id);
+                            if (botDetail && !updatedObjects.some(obj => obj.id === id)) { // Ensure no duplicates if somehow already present
+                                updatedObjects.push(botDetail);
+                            }
+                        });
+                        // Maintain selection order (not super important, remove if creates performance issues)
+                        return selectedBotTemplateIds.map(id => updatedObjects.find(obj => obj.id === id)).filter(Boolean) as Bot[];
+                    });
+                })
+                .catch(error => {
+                    console.error("CreateServerTemplateModal Failed to fetch bot template details:", error);
+                    // TODO: handle removal of IDs that failed to fetch from selectedBotTemplateIds here
+                })
+                .finally(() => {
+                    setLoadingBotDetails(false);
+                });
+        } else if (selectedBotTemplateIds.length === 0 && selectedBotObjects.length > 0) {
+            // If all IDs are removed, clear objects (though handleSelectBot should also do this for individual removals)
+            setSelectedBotObjects([]);
+        } else if (selectedBotTemplateIds.length > 0 && selectedBotObjects.length > 0) {
+            // If IDs exist, ensure selectedBotObjects are in the same order and contain only those IDs
+            // Handle cases where an external change desyncs, maintain consistency.
+            const orderedAndFilteredBots = selectedBotTemplateIds
+                .map(id => selectedBotObjects.find(obj => obj.id === id))
+                .filter(Boolean) as Bot[];
+            if (orderedAndFilteredBots.length !== selectedBotObjects.length || 
+                !orderedAndFilteredBots.every((bot, index) => bot.id === selectedBotObjects[index]?.id)) {
+                setSelectedBotObjects(orderedAndFilteredBots);
+            }
+        }
+
+    }, [selectedBotTemplateIds, form.setValue]);
 
     const isLoading = form.formState.isSubmitting;
 
@@ -69,6 +118,7 @@ const CreateServerTemplateModal = () => {
             form.reset();
             setSelectedBotTemplateIds([]);
             setChannels([]);
+            setSelectedBotObjects([]);
             setIsSelectorOpen(false);
             router.refresh();
             onClose();
@@ -82,6 +132,7 @@ const CreateServerTemplateModal = () => {
         form.reset();
         setSelectedBotTemplateIds([]);
         setChannels([]);
+        setSelectedBotObjects([]);
         setIsSelectorOpen(false);
         onClose();
     };
@@ -103,22 +154,27 @@ const CreateServerTemplateModal = () => {
 
     // --- Bot Template Selection Management ---
     const handleSelectBot = (botId: string) => {
-        setSelectedBotTemplateIds(prev => {
-            if (prev.includes(botId)) {
-                return prev.filter(id => id !== botId);
+        const isCurrentlySelected = selectedBotTemplateIds.includes(botId);
+        
+        setSelectedBotTemplateIds(prevIds => {
+            if (isCurrentlySelected) {
+                return prevIds.filter(id => id !== botId);
             } else {
-                // Optional: Add logic here if there's a max number of selections
-                return [...prev, botId];
+                return [...prevIds, botId];
             }
         });
+
+        if (isCurrentlySelected) {
+            setSelectedBotObjects(prevObjs => prevObjs.filter(obj => obj.id !== botId));
+        }
     };
 
-    // Effect to reset internal state if modal is closed externally or data changes
     useEffect(() => {
         if (!isOpen) {
             form.reset();
             setSelectedBotTemplateIds([]);
             setChannels([]);
+            setSelectedBotObjects([]);
             setIsSelectorOpen(false);
         }
     }, [isOpen, form]);
@@ -249,34 +305,46 @@ const CreateServerTemplateModal = () => {
                                         variant="outline" 
                                         size="sm" 
                                         onClick={() => setIsSelectorOpen(true)} 
-                                        disabled={isLoading || !currentUserId}
+                                        disabled={isLoading}
                                         className='text-xs'
                                     >
                                         <PlusCircle className="h-4 w-4 mr-2" />
-                                        Add Bot
+                                        {selectedBotTemplateIds.length > 0 ? 'Edit Bots' : 'Add Bots'}
                                     </Button>
                                 </div>
-
-                                {selectedBotTemplateIds.length === 0 && (
-                                    <p className='text-sm text-zinc-400'>No bot templates selected. You need to select at least two.</p>
-                                )}
                                 
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedBotTemplateIds.map(botId => (
-                                        <div key={botId} className="flex items-center bg-zinc-700/50 p-2 rounded-md text-sm">
-                                            <span>Bot ID: {botId.substring(0, 8)}...</span> 
-                                            <Button 
-                                                type="button" 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-5 w-5 ml-2 text-rose-500 hover:text-rose-600"
-                                                onClick={() => handleSelectBot(botId)}
-                                            >
-                                                <XCircle className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
+                                {loadingBotDetails && selectedBotTemplateIds.length > 0 && (
+                                    <p className="text-sm text-zinc-400">Loading bot details...</p>
+                                )}
+
+                                {!loadingBotDetails && selectedBotTemplateIds.length === 0 && (
+                                    <p className="text-sm text-zinc-400">No bot templates selected. You must select at least two.</p>
+                                )}
+
+                                {!loadingBotDetails && selectedBotObjects.length > 0 && (
+                                    <div className="flex flex-wrap gap-3 p-2 bg-zinc-700/20 rounded-md min-h-[50px]">
+                                        {selectedBotObjects.map(bot => (
+                                            <NavTooltip key={bot.id} label={bot.name} side="top" align="center">
+                                                <div className="relative group">
+                                                    <img 
+                                                        src={bot.imageUrl || 'https://utfs.io/f/1c8f7f2e-3f5e-47f7-9b7e-9d9f1f6a3b5c-1q2w3e.png'} 
+                                                        alt={bot.name} 
+                                                        className="w-12 h-12 rounded-full object-cover border-2 border-zinc-600 group-hover:border-indigo-500 transition-colors"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSelectBot(bot.id)}
+                                                        className="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        aria-label={`Remove ${bot.name}`}
+                                                        disabled={isLoading}
+                                                    >
+                                                        <XIcon size={14} />
+                                                    </button>
+                                                </div>
+                                            </NavTooltip>
+                                        ))}
+                                    </div>
+                                )}
                                 <FormMessage>{form.formState.errors.botTemplateIds?.message}</FormMessage>
                             </div>
 

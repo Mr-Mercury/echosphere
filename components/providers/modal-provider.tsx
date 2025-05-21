@@ -18,6 +18,7 @@ import EditBotModal from "../modal-dialog/chat-bots/edit-bot-modal";
 import CopyBotModal from "../modal-dialog/chat-bots/copy-bot-modal";
 import DeleteBotConfirmationModal from "../modal-dialog/chat-bots/delete-bot-confirmation-modal";
 import CreateServerTemplateModal from "../modal-dialog/template/create-server-template-modal";
+import BotTemplateDetailModal from "../modal-dialog/template/bot-template-detail-modal";
 import { useModal } from "@/hooks/use-modal-store";
 
 export const ModalProvider = () => {
@@ -55,6 +56,7 @@ export const ModalProvider = () => {
             <CreateTemplateModal />
             <DeleteBotConfirmationModal />
             <CreateServerTemplateModal />
+            <BotTemplateDetailModal />
         </>
     )   
 }
