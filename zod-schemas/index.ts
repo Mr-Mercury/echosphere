@@ -135,6 +135,6 @@ export const ServerTemplateCreateSchema = z.object({
   description: z.string().optional(),
   serverImageUrl: z.string().url({ message: 'Invalid URL for server image' }).optional(),
   channels: z.array(ServerTemplateChannelSchema).default([]), // Allows empty array, defaults to empty
-  botTemplateIds: z.array(z.string().uuid({ message: 'Invalid Bot Template ID' })).optional(), // Array of UUIDs, optional
+  botTemplateIds: z.array(z.string().uuid({ message: 'Invalid Bot Template ID' })).min(2, { message: 'Server template must include at least two bot templates' }),
   isPublic: z.boolean().default(true).optional()
 });

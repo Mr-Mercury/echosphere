@@ -30,13 +30,12 @@ export async function POST(req: Request) {
             isPublic
         } = parsedBody.data;
 
-        // Prepare data for Prisma create
         const createData: any = {
             creatorId: user.id,
             serverName,
             description,
             serverImageUrl,
-            channels, // Prisma will store this as JSON
+            channels, // JSON FORMAT -> See schema.prisma
             isPublic,
         };
 
@@ -55,8 +54,6 @@ export async function POST(req: Request) {
 
     } catch (error) {
         if (error instanceof ZodError) {
-            // This catch block might be redundant if safeParse is used above,
-            // but kept for robustness or if direct parse was used elsewhere.
             return new NextResponse(`Validation Error: ${error.message}`, { status: 400 });
         }
         console.log('!!!SERVER TEMPLATE POST ERROR!!!', error);
