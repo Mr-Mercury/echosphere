@@ -23,7 +23,7 @@ interface BotTemplateSelectorProps {
     maxSelection?: number; // Optional: if you want to limit total selections
 }
 
-const BOT_PAGE_SIZE = 9; // Number of bots to fetch per page
+const BOT_PAGE_SIZE = 28; // Number of bots to fetch per page
 
 const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
     isOpen,
@@ -34,7 +34,6 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
     maxSelection
 }) => {
     const [activeTab, setActiveTab] = useState('my-templates');
-    // const { onOpen } = useModal(); // No longer opening a global detail modal
     const [detailedBot, setDetailedBot] = useState<Bot | null>(null); // State for the detail view
     
     // States for each tab
