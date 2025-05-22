@@ -3,7 +3,7 @@ import { Bot } from '@/lib/entities/bot-display-types';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { CACHE_CONSTANTS } from '@/lib/config/cache-constants';
-import { AVAILABLE_MODELS, PROVIDER_COLORS } from '@/lib/config/models';
+import { AVAILABLE_MODELS, MODEL_DISPLAY } from '@/lib/config/models';
 
 // Calculate a popularity score based on copies created and like/dislike ratio
 export function calculatePopularityScore(copiesCreated: number, likes: number, dislikes: number) {
@@ -26,7 +26,7 @@ export function getModelDisplayName(modelId: string): string {
     return model.name;
   }
   
-  // Handle legacy models or models not in the config
+  // Handle legacy models or models not currently in the config
   const modelLower = modelId.toLowerCase();
   if (modelLower.includes('claude')) return 'Claude';
   if (modelLower.includes('gpt-4o')) return 'GPT-4o';
@@ -207,30 +207,32 @@ export async function fetchBotTemplatesWithFilters({
 
     // model filter with support for model families
     if (model && model !== 'All Models') {
-      // Handle specific model families
-      if (model === 'GPT') {
-        where.modelName = {
-          contains: 'gpt',
-          mode: 'insensitive'
-        };
-      } else if (model === 'Claude') {
-        where.modelName = {
-          contains: 'claude',
-          mode: 'insensitive'
-        };
-      } else if (model === 'Mistral') {
-        where.modelName = {
-          contains: 'mistral',
-          mode: 'insensitive'
-        };
-      } else if (model === 'Llama') {
-        where.modelName = {
-          contains: 'llama',
-          mode: 'insensitive'
-        };
+      const modelFamilyInfo = MODEL_DISPLAY[model as keyof typeof MODEL_DISPLAY];
+
+      if (modelFamilyInfo && modelFamilyInfo.provider) {
+        // This is a recognized model family with a provider (e.g., GPT, Claude)
+        const targetProvider = modelFamilyInfo.provider;
+        const modelIdsInFamily = Object.keys(AVAILABLE_MODELS).filter(
+          key => AVAILABLE_MODELS[key].provider === targetProvider
+        );
+
+        if (modelIdsInFamily.length > 0) {
+          where.modelName = { in: modelIdsInFamily };
+        } else {
+          // No models found for this provider in AVAILABLE_MODELS, so no results
+          where.modelName = { in: [] }; 
+        }
       } else {
-        // For specific model versions, match exactly
-        where.modelName = model;
+        // This is a specific model name (e.g., GPT-4o) or not a recognized family
+        // Use the logic from the previous step to find its ID
+        let modelIdToQuery = model; 
+        for (const id in AVAILABLE_MODELS) {
+          if (AVAILABLE_MODELS[id].name === model) {
+            modelIdToQuery = id; 
+            break;
+          }
+        }
+        where.modelName = modelIdToQuery;
       }
     }
     
