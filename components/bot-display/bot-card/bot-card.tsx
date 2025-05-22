@@ -135,7 +135,6 @@ const BotCard = ({
           </NavTooltip>
         ) : (
           // Default button
-          <NavTooltip label="Create a copy of this bot">
             <Button
               onClick={handleCopyButtonClick}
               variant="outline"
@@ -145,7 +144,6 @@ const BotCard = ({
               <Copy size={14} />
               Create a copy
             </Button>
-          </NavTooltip>
         )}
       </CardFooter>
     </Card>
