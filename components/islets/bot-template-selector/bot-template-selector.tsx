@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/use-debounce'; // Assuming you have or will
 import { Loader2, Search, X, PackageSearch, PlusCircle, CheckCircle } from 'lucide-react';
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip"; // Import user's NavTooltip
 import BotCard, { ActionButtonConfig } from '@/components/bot-display/bot-card/bot-card'; // Import ActionButtonConfig
+import ViewBotPromptDialog from '@/components/dialogs/view-bot-prompt-dialog'; // Added import
 
 // TODO: Create a more compact Bot display card if BotCard is too large for this context
 
@@ -51,6 +52,11 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
     const [hasMoreSearch, setHasMoreSearch] = useState(true);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+    // State for ViewBotPromptDialog
+    const [isViewPromptDialogOpen, setIsViewPromptDialogOpen] = useState(false);
+    const [promptToDisplay, setPromptToDisplay] = useState("");
+    const [botNameToDisplayForPrompt, setBotNameToDisplayForPrompt] = useState("");
 
     const loadMyTemplates = useCallback(async (page: number) => {
         console.log('[BotTemplateSelector] loadMyTemplates called for page:', page, 'with currentUserId:', currentUserId);
@@ -273,7 +279,7 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                     {/* Detail Pane Section ( occupies 1/3 width on md screens) */}
                     <div className="hidden md:block md:col-span-1 bg-zinc-800/50 rounded-lg p-4 overflow-y-auto">
                         {detailedBot ? (
-                            () => {
+                            (() => {
                                 const isSelected = selectedBotIds.includes(detailedBot.id);
                                 const buttonConfig: ActionButtonConfig = {
                                     text: isSelected ? "Deselect Bot" : "Select Bot",
@@ -286,8 +292,16 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                                         // if (isSelected && !selectedBotIds.includes(detailedBot.id)) setDetailedBot(null);
                                     }
                                 };
-                                return <BotCard {...detailedBot} actionButtonConfig={buttonConfig} />;
-                            }
+                                return <BotCard 
+                                    {...detailedBot} 
+                                    actionButtonConfig={buttonConfig} 
+                                    onViewPromptClick={(promptText) => {
+                                        setPromptToDisplay(promptText);
+                                        setBotNameToDisplayForPrompt(detailedBot.name); // Store name for dialog title
+                                        setIsViewPromptDialogOpen(true);
+                                    }}
+                                />;
+                            })
                         )() : (
                             <div className="flex flex-col items-center justify-center h-full text-zinc-400">
                                 <PackageSearch className="h-16 w-16 mb-4" /> {/* Example Icon */}
@@ -301,6 +315,20 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                     <Button variant="outline" onClick={onClose}>Done</Button>
                 </DialogFooter>
             </DialogContent>
+
+            {/* Render the ViewBotPromptDialog here, controlled by local state */}
+            {detailedBot && (
+                 <ViewBotPromptDialog
+                    isOpen={isViewPromptDialogOpen}
+                    onClose={() => {
+                        setIsViewPromptDialogOpen(false);
+                        setPromptToDisplay("");
+                        setBotNameToDisplayForPrompt("");
+                    }}
+                    promptText={promptToDisplay}
+                    botName={botNameToDisplayForPrompt}
+                />
+            )}
         </Dialog>
     );
 };

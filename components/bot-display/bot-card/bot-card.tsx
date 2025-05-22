@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Bot } from "lucide-react";
+import { Copy, Bot, Eye } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
@@ -26,6 +26,7 @@ interface BotCardProps {
   imageUrl: string;
   createdAt: string;
   actionButtonConfig?: ActionButtonConfig | null; // CUSTOM BUTTON PROP - used for select/deselect bot in create server template modal
+  onViewPromptClick?: (promptText: string) => void; // New prop
 }
 
 const BotCard = ({
@@ -37,7 +38,8 @@ const BotCard = ({
   model = 'Claude',
   imageUrl = 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
   createdAt = '2023-04-01',
-  actionButtonConfig
+  actionButtonConfig,
+  onViewPromptClick // Destructure new prop
 }: BotCardProps) => {
   const { onOpen } = useModal();
   // Get model color from the centralized configuration
@@ -98,7 +100,20 @@ const BotCard = ({
             <p className="text-xs text-zinc-400 line-clamp-3">{description}</p>
           </div>
           <div>
-            <span className="text-xs font-medium text-zinc-100">Prompt:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-zinc-100">Prompt:</span>
+              {onViewPromptClick && (
+                <NavTooltip label="View Full Prompt">
+                  <button 
+                    onClick={() => onViewPromptClick(prompt)}
+                    className="p-1 text-zinc-400 hover:text-indigo-400 transition-colors"
+                    aria-label="View full prompt"
+                  >
+                    <Eye size={16} />
+                  </button>
+                </NavTooltip>
+              )}
+            </div>
             <p className="text-xs text-zinc-400 line-clamp-2">{prompt}</p>
           </div>
         </div>
