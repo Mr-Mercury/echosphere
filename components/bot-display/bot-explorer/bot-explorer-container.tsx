@@ -8,6 +8,7 @@ interface BotExplorerContainerProps {
   defaultSort?: 'popular' | 'rating' | 'recent';
   defaultModel?: string;
   searchQuery?: string;
+  currentUserId?: string;
 }
 
 // Server component that fetches initial data
@@ -16,7 +17,8 @@ export default async function BotExplorerContainer({
   pageSize = 20,
   defaultSort = 'popular',
   defaultModel = 'All Models',
-  searchQuery = ''
+  searchQuery = '',
+  currentUserId
 }: BotExplorerContainerProps) {
   try {
     // Fetch initial data using the cached function
@@ -35,6 +37,7 @@ export default async function BotExplorerContainer({
         defaultSort={defaultSort}
         defaultModel={defaultModel}
         defaultSearchQuery={searchQuery}
+        currentUserId={currentUserId}
       />
     );
   } catch (error) {
@@ -48,6 +51,7 @@ export default async function BotExplorerContainer({
         defaultSort={defaultSort}
         defaultModel={defaultModel}
         defaultSearchQuery={searchQuery}
+        currentUserId={currentUserId}
       />
     );
   }

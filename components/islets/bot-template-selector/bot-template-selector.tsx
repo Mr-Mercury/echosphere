@@ -11,7 +11,6 @@ import { useDebounce } from '@/hooks/use-debounce'; // Assuming you have or will
 import { Loader2, Search, X, PackageSearch, PlusCircle, CheckCircle } from 'lucide-react';
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip"; // Import user's NavTooltip
 import BotCard, { ActionButtonConfig } from '@/components/bot-display/bot-card/bot-card'; // Import ActionButtonConfig
-import ViewBotPromptDialog from '@/components/dialogs/view-bot-prompt-dialog'; // Added import
 
 // TODO: Create a more compact Bot display card if BotCard is too large for this context
 
@@ -52,11 +51,6 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
     const [hasMoreSearch, setHasMoreSearch] = useState(true);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
-
-    // State for ViewBotPromptDialog
-    const [isViewPromptDialogOpen, setIsViewPromptDialogOpen] = useState(false);
-    const [promptToDisplay, setPromptToDisplay] = useState("");
-    const [botNameToDisplayForPrompt, setBotNameToDisplayForPrompt] = useState("");
 
     const loadMyTemplates = useCallback(async (page: number) => {
         console.log('[BotTemplateSelector] loadMyTemplates called for page:', page, 'with currentUserId:', currentUserId);
@@ -288,18 +282,11 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                                         if (isSelected || (maxSelection === undefined || selectedBotIds.length < maxSelection) || !isSelected ) {
                                             onSelectBot(detailedBot.id);
                                         }
-                                        // Optionally, clear detailedBot view after selection or if it's deselected and no longer in selectedBotIds
-                                        // if (isSelected && !selectedBotIds.includes(detailedBot.id)) setDetailedBot(null);
                                     }
                                 };
                                 return <BotCard 
                                     {...detailedBot} 
                                     actionButtonConfig={buttonConfig} 
-                                    onViewPromptClick={(promptText) => {
-                                        setPromptToDisplay(promptText);
-                                        setBotNameToDisplayForPrompt(detailedBot.name); // Store name for dialog title
-                                        setIsViewPromptDialogOpen(true);
-                                    }}
                                 />;
                             })
                         )() : (
@@ -315,20 +302,6 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                     <Button variant="outline" onClick={onClose}>Done</Button>
                 </DialogFooter>
             </DialogContent>
-
-            {/* Render the ViewBotPromptDialog here, controlled by local state */}
-            {detailedBot && (
-                 <ViewBotPromptDialog
-                    isOpen={isViewPromptDialogOpen}
-                    onClose={() => {
-                        setIsViewPromptDialogOpen(false);
-                        setPromptToDisplay("");
-                        setBotNameToDisplayForPrompt("");
-                    }}
-                    promptText={promptToDisplay}
-                    botName={botNameToDisplayForPrompt}
-                />
-            )}
         </Dialog>
     );
 };

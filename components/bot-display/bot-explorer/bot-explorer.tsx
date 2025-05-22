@@ -24,6 +24,7 @@ interface BotExplorerProps {
   defaultSort: 'popular' | 'rating' | 'recent';
   defaultModel: string;
   defaultSearchQuery: string;
+  currentUserId?: string;
 }
 
 const BotExplorer = ({
@@ -31,13 +32,15 @@ const BotExplorer = ({
   totalBots,
   defaultSort,
   defaultModel,
-  defaultSearchQuery
+  defaultSearchQuery,
+  currentUserId
 }: BotExplorerProps) => {
   // State
   const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
   const [selectedModel, setSelectedModel] = useState(defaultModel);
   const [sortBy, setSortBy] = useState(defaultSort);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(BOT_EXPLORER_DEFAULTS.VIEW_MODE);
+  const [filterMode, setFilterMode] = useState<'all' | 'my'>('all');
   
   // Ref for infinite scroll
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -52,6 +55,10 @@ const BotExplorer = ({
       searchQuery
     });
 
+    if (filterMode === 'my' && currentUserId) {
+      params.append('creatorId', currentUserId);
+    }
+
     const response = await axios.get(`/api/templates/bots?${params}`);
     return response.data;
   };
@@ -64,7 +71,7 @@ const BotExplorer = ({
     isFetchingNextPage,
     status
   } = useInfiniteQuery({
-    queryKey: ['bots', searchQuery, selectedModel, sortBy],
+    queryKey: ['bots', searchQuery, selectedModel, sortBy, filterMode, currentUserId],
     queryFn: fetchBots,
     initialPageParam: 1,
     initialData: {
@@ -118,6 +125,7 @@ const BotExplorer = ({
     setSearchQuery('');
     setSelectedModel(BOT_EXPLORER_DEFAULTS.MODEL);
     setSortBy(BOT_EXPLORER_DEFAULTS.SORT);
+    setFilterMode('all');
   };
 
   // Get all bots from all pages
@@ -128,8 +136,26 @@ const BotExplorer = ({
       <div className="flex items-center px-4 relative">
         <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Explore Bots</h1>
         <div className="flex gap-2 ml-auto">
-          <Button variant="outline" size="sm">All Templates</Button>
-          <Button variant="ghost" size="sm">My Templates</Button>
+          <Button 
+            variant={filterMode === 'all' ? 'default' : 'ghost'} 
+            size="sm"
+            onClick={() => setFilterMode('all')}
+          >
+            All Templates
+          </Button>
+          <Button 
+            variant={filterMode === 'my' ? 'default' : 'ghost'} 
+            size="sm"
+            onClick={() => {
+              if (currentUserId) {
+                setFilterMode('my');
+              } else {
+                console.warn("CurrentUserId not available for 'My Templates' filter.");
+              }
+            }}
+          >
+            My Templates
+          </Button>
         </div>
       </div>
       
@@ -194,7 +220,7 @@ const BotExplorer = ({
       </div>
       
       {/* Active filters display */}
-      {(searchQuery || selectedModel !== BOT_EXPLORER_DEFAULTS.MODEL) && (
+      {(searchQuery || selectedModel !== BOT_EXPLORER_DEFAULTS.MODEL || (filterMode === 'my' && currentUserId)) && (
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Active filters:</span>
@@ -207,6 +233,11 @@ const BotExplorer = ({
             {selectedModel !== BOT_EXPLORER_DEFAULTS.MODEL && (
               <Badge variant="outline" className="flex items-center gap-1">
                 Model: {selectedModel}
+              </Badge>
+            )}
+            {filterMode === 'my' && currentUserId && (
+              <Badge variant="outline" className="flex items-center gap-1">
+                My Templates
               </Badge>
             )}
             <Button 

@@ -1,7 +1,4 @@
-import BotCarousel from "@/components/bot-display/bot-carousel/bot-carousel";
 import ServerCarousel from "@/components/server-display/server-carousel/server-carousel";
-import BotExplorer from "@/components/bot-display/bot-explorer/bot-explorer";
-import { TemplateHeader } from "@/components/template/TemplateHeader";
 import { TemplateTabs } from "@/components/template/TemplateTabs";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
@@ -33,7 +30,7 @@ export default async function TemplatePage({ searchParams }: TemplatePageProps) 
 
     const botTemplatesContent = (
         <div className="px-4">
-            <BotExplorerContainer />
+            <BotExplorerContainer currentUserId={user.id} />
         </div>
     );
 

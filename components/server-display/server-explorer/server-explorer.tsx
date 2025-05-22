@@ -124,9 +124,10 @@ function createServerData() {
 
 interface ServerExplorerProps {
   onJoinServer?: (serverId: string) => void;
+  currentUserId?: string; // Added for "My Templates" filter
 }
 
-const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
+const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) => {
   // Create fresh server data using useRef to prevent re-creation on renders
   const allServersRef = useRef(createServerData());
   
@@ -136,6 +137,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredServers, setFilteredServers] = useState(allServersRef.current);
+  const [filterMode, setFilterMode] = useState<'all' | 'my'>('all'); // Added filterMode state
 
   // Apply filters and sort
   useEffect(() => {
@@ -155,6 +157,11 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
     if (selectedCategory !== 'All Categories') {
       result = result.filter(server => server.category === selectedCategory);
     }
+
+    // Filter by creatorId if "My Templates" filter is active and currentUserId is available
+    if (filterMode === 'my' && currentUserId) {
+      result = result.filter(server => server.creatorId === currentUserId);
+    }
     
     // Sort servers
     result = result.sort((a, b) => {
@@ -173,7 +180,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
     });
     
     setFilteredServers(result);
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, filterMode, currentUserId]);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -191,6 +198,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
     setSearchQuery('');
     setSelectedCategory('All Categories');
     setSortBy('popular');
+    setFilterMode('all'); // Reset filterMode as well
   };
 
   return (
@@ -198,8 +206,27 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
       <div className="flex items-center px-4 relative">
         <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Explore Servers</h1>
         <div className="flex gap-2 ml-auto">
-          <Button variant="outline" size="sm">All Templates</Button>
-          <Button variant="ghost" size="sm">My Templates</Button>
+          <Button 
+            variant={filterMode === 'all' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setFilterMode('all')} // Added onClick handler
+          >
+            All Templates
+          </Button>
+          <Button 
+            variant={filterMode === 'my' ? 'default' : 'ghost'} 
+            size="sm"
+            onClick={() => {
+              if (currentUserId) {
+                setFilterMode('my');
+              } else {
+                // Optionally, handle the case where currentUserId is not available
+                console.warn("CurrentUserId not available for 'My Templates' filter in ServerExplorer.");
+              }
+            }} // Added onClick handler
+          >
+            My Templates
+          </Button>
         </div>
       </div>
       
@@ -265,7 +292,7 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
       </div>
       
       {/* Active filters display */}
-      {(searchQuery || selectedCategory !== 'All Categories') && (
+      {(searchQuery || selectedCategory !== 'All Categories' || (filterMode === 'my' && currentUserId)) && (
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Active filters:</span>
@@ -278,6 +305,11 @@ const ServerExplorer = ({ onJoinServer }: ServerExplorerProps) => {
             {selectedCategory !== 'All Categories' && (
               <Badge variant="outline" className="flex items-center gap-1">
                 Category: {selectedCategory}
+              </Badge>
+            )}
+            {filterMode === 'my' && currentUserId && (
+              <Badge variant="outline" className="flex items-center gap-1">
+                My Templates
               </Badge>
             )}
             <Button 
