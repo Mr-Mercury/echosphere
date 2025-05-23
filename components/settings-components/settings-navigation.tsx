@@ -31,7 +31,7 @@ const SettingsNavigation = ({ user }: SettingsNavigationProps) => {
 
     return (
         <nav className="space-y-4 flex flex-col items-center p-3 border-r border-zinc-700 w-60 h-full bg-zinc-850">
-            <Link href="/chat" legacyBehavior passHref>
+            <Link href="/chat/server/personal" legacyBehavior passHref>
                 <UiButton variant="ghost" className="text-zinc-300 hover:text-zinc-100 hover:bg-zinc-700/50 w-full">
                     <ChevronLeft className="h-5 w-5 mr-1" />
                         Back to Chat
