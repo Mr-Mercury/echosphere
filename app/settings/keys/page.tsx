@@ -53,7 +53,6 @@ export default async function ManageApiKeysPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-medium text-zinc-100">Manage API Keys</h3>
                 <p className="text-sm text-zinc-400">
                     Add your personal API keys for supported AI providers. These keys will be used by your bots for all models from that provider.
                 </p>

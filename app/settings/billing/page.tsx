@@ -24,7 +24,6 @@ export default async function BillingPage() {
     return (
         <div className="space-y-8">
             <div>
-                <h3 className="text-lg font-medium text-zinc-100">Billing & Subscription</h3>
                 <p className="text-sm text-zinc-400">
                     Manage your subscription and payment details.
                 </p>

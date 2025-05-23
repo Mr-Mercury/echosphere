@@ -42,7 +42,7 @@ const SettingsNavigation = ({ user }: SettingsNavigationProps) => {
                 <Link href="/settings/profile" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
                     Manage Profile
                 </Link>
-                <Link href="/settings/notifications" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
+                <Link href="/settings/keys" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
                     Manage API Keys
                 </Link>                
                 <Link href="/settings/usage" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
@@ -55,7 +55,7 @@ const SettingsNavigation = ({ user }: SettingsNavigationProps) => {
                     Account Settings
                 </Link>
                 <Link href="/settings/privacy" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
-                    Privacy & Safety
+                    Privacy & Safety (WIP)
                 </Link>
                 <Link href="/settings/themes" className="text-zinc-400 hover:text-zinc-200 transition px-3 py-1.5 rounded-md hover:bg-zinc-700 text-sm">
                     Themes (WIP)

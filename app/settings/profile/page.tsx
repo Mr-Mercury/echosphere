@@ -32,6 +32,9 @@ export default async function ManageProfilePage() {
 
     return (
         <div className="space-y-6">
+            <p className="text-sm text-zinc-400">
+                Manage your profile information.
+            </p>
             <ProfileForm userProfile={userProfile} />
         </div>
     );

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, KeyRound } from 'lucide-react';
-import { ProviderData } from '@/app/settings/manage-keys/page'; // Importing the interface from the page
+import { ProviderData } from '@/app/settings/keys/page'; // Importing the interface from the page
 
 interface ApiKeyManagerProps {
     providers: ProviderData[];
