@@ -2,8 +2,8 @@ import { Hash } from "lucide-react";
 import { MobileToggle } from "../islets/mobile/mobile-toggle";
 import { UserAvatar } from "../islets/users/user-avatar";
 import { SocketIndicator } from "../islets/socket-indicator/socket-indicator";
-import { Settings } from "lucide-react";
-import Link from "next/link";
+import UserSettings from "../islets/users/user-settings";
+
 interface ChatHeaderProps {
     serverId: string;
     name: string;
@@ -27,9 +27,7 @@ const ChatHeader = ({serverId, name, type, imageUrl}: ChatHeaderProps) => {
             </p>
             <div className='ml-auto flex items-center'>
                 <SocketIndicator />
-                <Link href={`/settings`}>
-                    <Settings className='w-5 h-5 text-zinc-400 ml-2 cursor-pointer hover:text-zinc-200 transition'/>
-                </Link>
+                <UserSettings />
             </div>
         </div>
     )
