@@ -47,12 +47,7 @@ export function UserProfileEditForm({
     useEffect(() => { realNameForm.reset({ name: currentRealName || '' }); }, [currentRealName, realNameForm]);
     useEffect(() => { statusForm.reset({ statusMessage: currentStatusMessage || '' }); }, [currentStatusMessage, statusForm]);
 
-    const handleUsernameSubmit = (values: z.infer<typeof ChangeUsernameSchema>) => { /* ... */ }; // Assuming previous implementation is fine
-    const handleRealNameSubmit = (values: z.infer<typeof ChangeRealNameSchema>) => { /* ... */ }; // Assuming previous implementation is fine
-    const handleStatusSubmit = (values: z.infer<typeof ChangeStatusMessageSchema>) => { /* ... */ }; // Assuming previous implementation is fine
-
-    // Re-add full submit handlers to ensure logic is present
-    const fullHandleUsernameSubmit = (values: z.infer<typeof ChangeUsernameSchema>) => {
+    const handleUsernameSubmit = (values: z.infer<typeof ChangeUsernameSchema>) => {
         setUsernameMessage({});
         startTransition(() => {
             changeUsernameAction(values).then((data) => {
@@ -67,7 +62,7 @@ export function UserProfileEditForm({
         });
     };
 
-    const fullHandleRealNameSubmit = (values: z.infer<typeof ChangeRealNameSchema>) => {
+    const handleRealNameSubmit = (values: z.infer<typeof ChangeRealNameSchema>) => {
         setRealNameMessage({});
         startTransition(() => {
             changeRealNameAction(values).then((data) => {
@@ -92,13 +87,13 @@ export function UserProfileEditForm({
     useEffect(() => { let timer: NodeJS.Timeout; if (statusMsgState.success || statusMsgState.error) timer = setTimeout(() => setStatusMsgState({}), 3000); return () => clearTimeout(timer); }, [statusMsgState]);
 
     return (
-        <div className="space-y-4"> {/* Reduced overall spacing slightly */}
-            {/* Username Section - Inline Style */}
-            <div className="flex items-center py-2 min-h-[56px]"> {/* Added min-height to prevent layout shifts */}
+        <div className="space-y-4">
+            {/* Username Section */}
+            <div className="flex items-center py-2 min-h-[56px]"> {/* min-height to prevent layout shifts */}
                 <Label className="text-sm font-medium text-zinc-300 w-32 shrink-0">Username:</Label>
                 <div className="flex-grow ml-4">
                     {!isEditingUsername ? (
-                        <div className="flex items-center"> {/* Removed justify-between */}
+                        <div className="flex items-center">
                             <p className="text-sm text-zinc-100">{usernameForm.getValues('username') || 'Not set'}</p>
                             <NavTooltip label="Edit Username" side="right" align="center">
                                 <Button variant="ghost" size="icon" onClick={() => setIsEditingUsername(true)} className="text-zinc-400 hover:text-zinc-100 h-7 w-7 ml-3"> {/* Added ml-3 */}
@@ -108,7 +103,7 @@ export function UserProfileEditForm({
                         </div>
                     ) : (
                         <Form {...usernameForm}>
-                            <form onSubmit={usernameForm.handleSubmit(fullHandleUsernameSubmit)} className="space-y-2">
+                            <form onSubmit={usernameForm.handleSubmit(handleUsernameSubmit)} className="space-y-2">
                                 <div className="flex items-center space-x-2">
                                     <FormField
                                         control={usernameForm.control}
@@ -138,11 +133,11 @@ export function UserProfileEditForm({
             </div>
 
             {/* Real Name Section - Inline Style */}
-            <div className="flex items-center py-2 min-h-[56px]">  {/* Added min-height to prevent layout shifts */}
+            <div className="flex items-center py-2 min-h-[56px]">  {/* min-height to prevent layout shifts */}
                 <Label className="text-sm font-medium text-zinc-300 w-32 shrink-0">Real Name:</Label>
                 <div className="flex-grow ml-4">
                     {!isEditingRealName ? (
-                        <div className="flex items-center"> {/* Removed justify-between */}
+                        <div className="flex items-center"> 
                             <p className="text-sm text-zinc-100">{realNameForm.getValues('name') || 'Not set'}</p>
                             <NavTooltip label="Edit Real Name" side="right" align="center">
                                 <Button variant="ghost" size="icon" onClick={() => setIsEditingRealName(true)} className="text-zinc-400 hover:text-zinc-100 h-7 w-7 ml-3"> {/* Added ml-3 */}
@@ -152,13 +147,13 @@ export function UserProfileEditForm({
                         </div>
                     ) : (
                         <Form {...realNameForm}>
-                            <form onSubmit={realNameForm.handleSubmit(fullHandleRealNameSubmit)} className="space-y-2">
+                            <form onSubmit={realNameForm.handleSubmit(handleRealNameSubmit)} className="space-y-2">
                                 <div className="flex items-center space-x-2">
                                     <FormField
                                         control={realNameForm.control}
                                         name="name"
                                         render={({ field }) => (
-                                            <FormItem className="w-3/4 max-w-sm"> {/* Shortened field */}
+                                            <FormItem className="w-3/4 max-w-sm"> 
                                                 <FormControl>
                                                     <Input {...field} disabled={isPending} placeholder="Enter new real name" className="bg-zinc-900 border-zinc-700 h-9 text-sm" />
                                                 </FormControl>
@@ -204,7 +199,7 @@ export function UserProfileEditForm({
                                 </FormItem>
                             )}
                         />
-                        <div className="flex justify-start"> {/* Changed to justify-start */}
+                        <div className="flex justify-start"> 
                             <Button type="submit" size="sm" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
                                 Update Status
                             </Button>
