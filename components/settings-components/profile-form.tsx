@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Camera } from 'lucide-react';
 import NavTooltip from '@/components/server-listing-sidebar-components/nav-tooltip';
-import { UserProfileEditForm } from '@/components/profile/user-profile-edit-form';
+import { UserProfileEditForm } from '@/components/settings-components/user-profile-edit-form';
 
 // Define a more specific type for the profile data this form expects
 interface UserProfileData {

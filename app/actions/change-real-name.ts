@@ -20,7 +20,6 @@ export const changeRealNameAction = async (values: z.infer<typeof ChangeRealName
         return { error: "Unauthorized. Please log in." };
     }
     
-    // Check if the new name is the same as the current one
     if (user.name === name) {
         return { error: "This is already your name." };
     }

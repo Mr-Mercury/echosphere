@@ -1,7 +1,6 @@
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";
 import ProfileForm from "@/components/settings-components/profile-form"; // Use ProfileForm
-// import { UserProfileEditForm } from "@/components/profile/user-profile-edit-form"; // UserProfileEditForm is now used by ProfileForm
 import { Separator } from "@/components/ui/separator";
 
 // The ProfileForm component expects a userProfile object with fields defined 
@@ -28,7 +27,7 @@ export default async function ManageProfilePage() {
     };
 
     return (
-        <div className="space-y-8"> {/* Changed space-y-6 to space-y-8 for consistency with other settings pages */}
+        <div className="space-y-8"> 
             <div>
                 <h3 className="text-lg font-medium text-zinc-100">Profile Settings</h3>
                 <p className="text-sm text-zinc-400">

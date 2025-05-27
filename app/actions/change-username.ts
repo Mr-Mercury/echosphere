@@ -21,7 +21,6 @@ export const changeUsernameAction = async (values: z.infer<typeof ChangeUsername
         return { error: "Unauthorized. Please log in." };
     }
 
-    // Check if the new username is the same as the current one
     if (user.username === username) {
         return { error: "This is already your username." };
     }
