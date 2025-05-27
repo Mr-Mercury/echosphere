@@ -3,13 +3,12 @@
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Camera } from 'lucide-react';
 import NavTooltip from '@/components/server-listing-sidebar-components/nav-tooltip';
+import { UserProfileEditForm } from '@/components/profile/user-profile-edit-form';
 
 // Define a more specific type for the profile data this form expects
 interface UserProfileData {
@@ -28,34 +27,27 @@ interface ProfileFormProps {
 
 const ProfileForm = ({ userProfile }: ProfileFormProps) => {
     const [isPending, startTransition] = useTransition();
-    const [editableUsername, setEditableUsername] = useState(userProfile.username || '');
-    const [actualName, setActualName] = useState(userProfile.actualName || '');
     const [displayActualName, setDisplayActualName] = useState(!!userProfile.displayActualName);
-    const [statusMessage, setStatusMessage] = useState(userProfile.statusMessage || '');
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        startTransition(() => {
-            console.log('Form submitted (not implemented yet):', {
-                userId: userProfile.id,
-                username: editableUsername,
-                actualName,
-                displayActualName,
-                statusMessage,
-            });
-        });
-    };
 
     const handleChangePictureClick = () => {
         // TODO: Open modal for image upload
         console.log('Change picture clicked (modal not implemented yet)');
     };
 
+    const handleDisplayActualNameChange = (checked: boolean) => {
+        startTransition(() => {
+            setDisplayActualName(checked);
+            // TODO: Call a server action to update displayActualName preference
+            console.log('Display actual name toggled (server action not implemented yet):', checked);
+            // Example: updateDisplayPreferenceAction({ displayActualName: checked });
+        });
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="space-y-6">
             <div className="flex items-start space-x-6">
                 {userProfile.image && (
-                    <div className="relative group rounded-full w-24 h-24">
+                    <div className="relative group rounded-full w-24 h-24 flex-shrink-0">
                         <Image 
                             src={userProfile.image}
                             alt={userProfile.username || "User's profile image"}
@@ -77,74 +69,33 @@ const ProfileForm = ({ userProfile }: ProfileFormProps) => {
                         </NavTooltip>
                     </div>
                 )}
-                <div className="flex-grow pt-2">
+                <div className="flex-grow pt-1">
                     <h4 className="text-xl font-semibold text-zinc-100">{userProfile.username || 'N/A'}</h4>
-                    {userProfile.email && <p className="text-sm text-zinc-400 mb-2">{userProfile.email}</p>}
-                </div>
-            </div>
-
-            <Separator className="bg-zinc-700" />
-
-            <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="editableUsername" className="text-zinc-300">Username</Label>
-                    <Input 
-                        id="editableUsername" 
-                        value={editableUsername}
-                        onChange={(e) => setEditableUsername(e.target.value)}
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-zinc-500"
-                        disabled={isPending}
-                    />
-                    <p className="text-xs text-zinc-500">This is your unique username on Echosphere.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="actualName" className="text-zinc-300">Actual Name</Label>
-                        <Input 
-                            id="actualName" 
-                            value={actualName}
-                            onChange={(e) => setActualName(e.target.value)}
-                            className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-zinc-500"
-                            disabled={isPending}
-                        />
-                    </div>
-
-                    <div className="flex items-center space-x-2 pt-8">
+                    {userProfile.email && <p className="text-sm text-zinc-400 mb-3">{userProfile.email}</p>}
+                    
+                    <div className="flex items-center space-x-2 pt-2">
                         <Switch 
                             id="displayActualName"
                             checked={displayActualName}
-                            onCheckedChange={setDisplayActualName}
+                            onCheckedChange={handleDisplayActualNameChange}
                             disabled={isPending}
                             aria-label="Toggle display actual name"
                         />
-                        <Label htmlFor="displayActualName" className="text-zinc-300 cursor-pointer">
+                        <Label htmlFor="displayActualName" className="text-sm text-zinc-300 cursor-pointer">
                             Display actual name on profile
                         </Label>
                     </div>
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="statusMessage" className="text-zinc-300">Status Message</Label>
-                <Textarea 
-                    id="statusMessage"
-                    value={statusMessage}
-                    onChange={(e) => setStatusMessage(e.target.value)}
-                    placeholder="What's on your mind?"
-                    className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-zinc-500 min-h-[80px]"
-                    disabled={isPending}
-                />
-            </div>
-
             <Separator className="bg-zinc-700" />
 
-            <div className="flex justify-end">
-                <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                    {isPending ? 'Saving...' : 'Save Changes'}
-                </Button>
-            </div>
-        </form>
+            <UserProfileEditForm 
+                currentUsername={userProfile.username}
+                currentRealName={userProfile.actualName}
+                currentStatusMessage={userProfile.statusMessage}
+            />
+        </div>
     );
 };
 

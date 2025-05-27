@@ -53,6 +53,29 @@ export const ResetPasswordSchema = z.object({
     path: ["confirmNewPassword"], // path of error
 });
 
+export const ChangeUsernameSchema = z.object({
+    username: z.string().min(3, {
+        message: "Username must be at least 3 characters."
+    }).max(30, {
+        message: "Username cannot exceed 30 characters."
+    })
+    // Optional: Add regex for allowed characters if needed, e.g. .regex(/^[a-zA-Z0-9_]+$/, { message: "Username can only contain letters, numbers, and underscores." })
+});
+
+export const ChangeRealNameSchema = z.object({
+    name: z.string().min(1, {
+        message: "Name cannot be empty."
+    }).max(50, {
+        message: "Name cannot exceed 50 characters."
+    })
+});
+
+export const ChangeStatusMessageSchema = z.object({
+    statusMessage: z.string().max(200, { // Allow empty string, but limit max length
+        message: "Status message cannot exceed 200 characters."
+    }).optional() // Making it optional means an empty submission is fine
+});
+
 export const ServerSchema = z.object({
     name: z.string().min(1, {
         message: 'You need to name your server'

@@ -56,7 +56,7 @@ export default async function AccountSettingsPage() {
 
             {/* Section 2: Reset Password */}
             <section className="space-y-3 p-6 rounded-lg border border-zinc-700 bg-zinc-850/50 shadow-md">
-                <h4 className="text-xl font-semibold text-zinc-100 mb-1">Reset Password</h4>
+                <h4 className="text-xl font-semibold text-zinc-100 mb-1">Change Password</h4>
                 <p className="text-xs text-zinc-400 mb-4">Ensure your account is secure by regularly updating your password.</p>
                 <PasswordResetForm />
             </section>

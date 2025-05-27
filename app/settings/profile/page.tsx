@@ -1,6 +1,8 @@
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";
-import ProfileForm from "@/components/settings-components/profile-form";
+import ProfileForm from "@/components/settings-components/profile-form"; // Use ProfileForm
+// import { UserProfileEditForm } from "@/components/profile/user-profile-edit-form"; // UserProfileEditForm is now used by ProfileForm
+import { Separator } from "@/components/ui/separator";
 
 // The ProfileForm component expects a userProfile object with fields defined 
 // in its UserProfileData interface. This page component fetches the Prisma User model 
@@ -14,27 +16,27 @@ export default async function ManageProfilePage() {
     }
 
     // Construct the userProfile object for the ProfileForm component
+    // This matches the UserProfileData interface expected by ProfileForm
     const userProfile = {
-        id: user.id, 
-        username: user.username || "", 
-        email: user.email || "",       
-        image: user.image || "",         
-        actualName: user.name || "",     
-        statusMessage: user.statusMessage || "",
-        // The 'displayActualName' field is part of ProfileForm's UserProfileData interface,
-        // but it's NOT currently a field in the Prisma User model (see schema.prisma).
-        // By passing 'undefined' here, ProfileForm's useState hook:
-        // `useState(!!userProfile.displayActualName)` will correctly initialize it to `false`.
-        // If you add `displayActualName` to your User model, you would source it here, e.g.:
-        // displayActualName: user.displayActualName ?? false, 
-        displayActualName: undefined,
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        image: user.image,
+        actualName: user.name, // Prisma user.name maps to actualName
+        statusMessage: user.statusMessage,
+        displayActualName: (user as any).displayActualName === undefined ? undefined : !!(user as any).displayActualName,
     };
 
     return (
-        <div className="space-y-6">
-            <p className="text-sm text-zinc-400">
-                Manage your profile information.
-            </p>
+        <div className="space-y-8"> {/* Changed space-y-6 to space-y-8 for consistency with other settings pages */}
+            <div>
+                <h3 className="text-lg font-medium text-zinc-100">Profile Settings</h3>
+                <p className="text-sm text-zinc-400">
+                    Manage your public profile information.
+                </p>
+            </div>
+            <Separator className="bg-zinc-700"/>
+            {/* Render ProfileForm, which will internally use UserProfileEditForm */}
             <ProfileForm userProfile={userProfile} />
         </div>
     );
