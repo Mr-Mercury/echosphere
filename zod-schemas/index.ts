@@ -35,6 +35,24 @@ export const RegistrationSchema = z.object({
     imageUrl: z.string().optional()
 });
 
+export const ResetPasswordSchema = z.object({
+    currentPassword: z.string().min(1, {
+        message: 'Current password is required'
+    }),
+    newPassword: z.string().min(8, {
+        message: 'Password requires at least 8 chars'
+    })
+    .refine(passwordValidator, {
+        message: 'Password requires both lower and uppercase letters, at least one number, and a symbol'
+    }),
+    confirmNewPassword: z.string().min(1, {
+        message: 'Confirm new password is required'
+    })
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "New passwords do not match",
+    path: ["confirmNewPassword"], // path of error
+});
+
 export const ServerSchema = z.object({
     name: z.string().min(1, {
         message: 'You need to name your server'

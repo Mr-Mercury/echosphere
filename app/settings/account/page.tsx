@@ -2,37 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { AlertCircle, CheckCircle2, Send } from "lucide-react";
+import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
+import { AlertCircle, CheckCircle2, Send, LockKeyhole } from "lucide-react";
+import { handleResendConfirmationAction } from "@/app/actions/resend-confirmation";
+import { handleChangeEmailAction } from "@/app/actions/change-email";
+import { PasswordResetForm } from "../../../components/auth-components/password-reset-form";
 
 // Placeholder function for fetching current user data
 async function getAccountDetails() {
-    // In a real app: 
-    // const user = await currentUser();
-    // if (!user) return null;
-    // return { email: user.email, emailVerified: user.emailVerified };
-    return {
-        email: "user@example.com",
-        emailVerified: new Date(), // Simulate verified email by providing a date
-        // emailVerified: null, // Simulate unverified email
-    };
+    const user = await currentUser();
+    if (!user) return null;
+    return { email: user.email, emailVerified: user.emailVerified };
 }
 
 export default async function AccountSettingsPage() {
     const account = await getAccountDetails();
-
-    // Placeholder actions - these would be server actions in a real app
-    const handleChangeEmail = async (formData: FormData) => {
-        "use server";
-        const newEmail = formData.get("newEmail") as string;
-        console.log("Attempting to change email to:", newEmail);
-        // Add logic to update email and send verification for the new email
-    };
-
-    const handleResendConfirmation = async () => {
-        "use server";
-        console.log("Resending confirmation email to:", account?.email);
-        // Add logic to resend confirmation link
-    };
 
     return (
         <div className="space-y-8">
@@ -59,7 +43,7 @@ export default async function AccountSettingsPage() {
                     </div>
                 )}
                 {!account?.emailVerified && account?.email && (
-                    <form action={handleResendConfirmation} className="mt-4">
+                    <form action={handleResendConfirmationAction} className="mt-4">
                         <Button type="submit" variant="outline" className="text-zinc-300 border-zinc-600 hover:bg-zinc-700 hover:text-zinc-100">
                             <Send className="h-4 w-4 mr-2" />
                             Resend Confirmation Email
@@ -70,11 +54,20 @@ export default async function AccountSettingsPage() {
 
             <Separator className="bg-zinc-700" />
 
-            {/* Section 2: Change Email Address */}
+            {/* Section 2: Reset Password */}
+            <section className="space-y-3 p-6 rounded-lg border border-zinc-700 bg-zinc-850/50 shadow-md">
+                <h4 className="text-xl font-semibold text-zinc-100 mb-1">Reset Password</h4>
+                <p className="text-xs text-zinc-400 mb-4">Ensure your account is secure by regularly updating your password.</p>
+                <PasswordResetForm />
+            </section>
+
+            <Separator className="bg-zinc-700" />   
+
+            {/* Section 3: Change Email Address */}
             <section className="space-y-3 p-6 rounded-lg border border-zinc-700 bg-zinc-850/50 shadow-md">
                 <h4 className="text-xl font-semibold text-zinc-100 mb-1">Change Email Address</h4>
                 <p className="text-xs text-zinc-400 mb-4">Changing your email will require re-verification.</p>
-                <form action={handleChangeEmail} className="space-y-4">
+                <form action={handleChangeEmailAction} className="space-y-4">
                     <div className="space-y-1">
                         <Label htmlFor="newEmail" className="text-zinc-300">New Email Address</Label>
                         <Input 

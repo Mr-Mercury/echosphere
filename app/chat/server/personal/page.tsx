@@ -4,17 +4,21 @@ import ServerCarousel from "@/components/server-display/server-carousel/server-c
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import PopularBotsContainer from "@/components/bot-display/bot-carousel/popular-bots-container";
-
+import UserSettings from "@/components/islets/users/user-settings";
 export default async function Personal() {
     const user = await currentUser();
 
     return (
         <div className='w-full'>
             <div className="w-full bg-gradient-to-r from-zinc-800 to-zinc-900 to-zinc-800 py-3 shadow-lg sticky top-0 z-50">
-                <div className="h-full flex items-center justify-center">
+                <div className="h-full flex items-center justify-between px-4">
+                    <div className="w-[100px]"></div>
                     <h1 className="text-4xl font-extrabold text-white tracking-wider animate-pulse">
                         ECHOSPHERE
                     </h1>
+                    <div className="w-[100px] flex justify-end">
+                        <UserSettings />
+                    </div>
                 </div>
             </div>
             <div className="pt-4">
