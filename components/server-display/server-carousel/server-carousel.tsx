@@ -5,6 +5,7 @@ import ServerCard from '@/components/server-display/server-card/server-card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CATEGORY_COLORS } from "@/lib/config/categories";
+import { SAMPLE_SERVERS } from '@/lib/entities/server-display-types';
 
 // Sample data for demonstration - this would come from a real API in production
 

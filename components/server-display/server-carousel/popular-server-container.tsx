@@ -1,8 +1,8 @@
 import ServerCarousel from './server-carousel';
-import { SAMPLE_BOTS } from '@/lib/entities/bot-display-types';
-import { fetchPopularBotTemplatesWithRevalidation } from '@/lib/utilities/data/fetching/botTemplates';
+import { SAMPLE_SERVERS } from '@/lib/entities/server-display-types';
+import { fetchPopularServerTemplatesWithRevalidation } from '@/lib/utilities/data/fetching/serverTemplates';
 
-interface PopularBotsContainerProps {
+interface PopularServersContainerProps {
   title: string;
   onViewAll?: () => void;
   showTitle?: boolean;
@@ -18,21 +18,21 @@ function calculatePopularityScore(copiesCreated: number, likes: number, dislikes
 }
 
 // Server component that directly accesses the database
-export default async function PopularBotsContainer({ 
+export default async function PopularServersContainer({ 
   title, 
   onViewAll,
   showTitle = true 
-}: PopularBotsContainerProps) {
+}: PopularServersContainerProps) {
   try {
-    console.log("Fetching popular bots with time-based revalidation");
+    console.log("Fetching popular servers with time-based revalidation");
     
     // Use the time-based revalidation cached function
-    const transformedBots = await fetchPopularBotTemplatesWithRevalidation();
+    const transformedServers = await fetchPopularServerTemplatesWithRevalidation();
     
-    console.log(`Rendering BotCarousel with ${transformedBots.length} bots`);
+    console.log(`Rendering BotCarousel with ${transformedServers.length} servers`);
     
     // Pass the fetched data to the client component
-    return <BotCarousel title={title} bots={transformedBots} onViewAll={onViewAll} showTitle={showTitle} />;
+    return <ServerCarousel title={title} servers={transformedServers} onViewAll={onViewAll} showTitle={showTitle} />;
   } catch (error) {
     console.error("Failed to fetch popular bots:", error);
     
@@ -43,6 +43,6 @@ export default async function PopularBotsContainer({
     
     console.log("Falling back to sample bots");
     // Fallback to sample bots in case of error
-    return <BotCarousel title={title} bots={SAMPLE_BOTS} onViewAll={onViewAll} showTitle={showTitle} />;
+    return <ServerCarousel title={title} servers={SAMPLE_SERVERS} onViewAll={onViewAll} showTitle={showTitle} />;
   }
 }

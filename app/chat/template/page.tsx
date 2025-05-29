@@ -6,7 +6,8 @@ import ServerExplorer from "@/components/server-display/server-explorer/server-e
 
 import PopularBotsContainer from "@/components/bot-display/bot-carousel/popular-bots-container";
 import BotExplorerContainer from "@/components/bot-display/bot-explorer/bot-explorer-container";
-import PopularServersContainer from "@/components/server-display/server-carousel/popular-servers-container";
+import PopularServersContainer from "@/components/server-display/server-carousel/popular-server-container";
+
 import ServerExplorerContainer from "@/components/server-display/server-explorer/server-explorer-container";
 
 interface TemplatePageProps {
