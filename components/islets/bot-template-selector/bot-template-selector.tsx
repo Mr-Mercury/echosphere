@@ -68,7 +68,7 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
             });
             if (currentUserId) params.append('creatorId', currentUserId);
 
-            const response = await fetch(`/api/bot-templates/filter?${params.toString()}`);
+            const response = await fetch(`/api/templates/bots?${params.toString()}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.statusText}`);
             }
@@ -94,7 +94,7 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
         if (loadingPopular) return;
         setLoadingPopular(true);
         try {
-            const response = await fetch('/api/bot-templates/popular');
+            const response = await fetch('/api/templates/bots/popular');
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.statusText}`);
             }
@@ -127,7 +127,7 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
                 sort: 'popular',
             });
 
-            const response = await fetch(`/api/bot-templates/filter?${params.toString()}`);
+            const response = await fetch(`/api/templates/bots?${params.toString()}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.statusText}`);
             }

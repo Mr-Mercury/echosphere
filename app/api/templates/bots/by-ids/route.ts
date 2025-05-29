@@ -42,7 +42,7 @@ export async function POST(request: Request) {
         return NextResponse.json(transformedBots);
 
     } catch (error) {
-        console.error('Error in /api/bot-templates/by-ids:', error);
+        console.error('Error in /api/templates/bots/by-ids:', error); // Updated error log path
         let errorMessage = 'Failed to fetch bot templates by IDs';
         if (error instanceof Error) {
             errorMessage = error.message;

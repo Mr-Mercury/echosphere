@@ -6,7 +6,7 @@ export async function GET() {
         const popularTemplates = await fetchPopularBotTemplates();
         return NextResponse.json(popularTemplates);
     } catch (error) {
-        console.error('Error in /api/bot-templates/popular:', error);
+        console.error('Error in /api/templates/bots/popular:', error); // Updated error log path
         return NextResponse.json({ error: 'Failed to fetch popular bot templates' }, { status: 500 });
     }
 } 

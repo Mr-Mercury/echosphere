@@ -160,7 +160,7 @@ const CopyBotModal = ({ data }: CopyBotModalProps) => {
                 try {
                     // Fetch bot template to copy
                     const query = qs.stringifyUrl({
-                        url: '/api/templates/single-template',
+                        url: '/api/templates/bots',
                         query: { id: templateId }
                     });
 

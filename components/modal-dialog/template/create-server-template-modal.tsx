@@ -71,7 +71,7 @@ const CreateServerTemplateModal = () => {
 
         if (idsToFetch.length > 0) {
             setLoadingBotDetails(true);
-            axios.post<Bot[]>('/api/bot-templates/by-ids', { ids: idsToFetch })
+            axios.post<Bot[]>('/api/templates/bots/by-ids', { ids: idsToFetch })
                 .then(response => {
                     setSelectedBotObjects(prevObjs => {
                         const newBotsMap = new Map(response.data.map(bot => [bot.id, bot]));
@@ -114,7 +114,7 @@ const CreateServerTemplateModal = () => {
 
     const onSubmit = async (values: z.infer<typeof ServerTemplateCreateSchema>) => {
         try {
-            await axios.post('/api/server-templates', values);
+            await axios.post('/api/templates/servers', values);
             form.reset();
             setSelectedBotTemplateIds([]);
             setChannels([]);
