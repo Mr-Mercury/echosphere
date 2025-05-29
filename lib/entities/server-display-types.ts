@@ -24,7 +24,9 @@ export interface Server {
     activeMembers?: number;
 
     creator?: {
+      id: string;
       name: string | null;
+      username?: string | null;
       image: string | null;
     };
     tags?: string[];

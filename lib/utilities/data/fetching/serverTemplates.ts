@@ -85,7 +85,9 @@ async function fetchPopularServerTemplatesImpl(): Promise<Server[]> {
       include: {
         creator: {
           select: {
+            id: true,
             name: true,
+            username: true,
             image: true,
           },
         },
@@ -109,7 +111,9 @@ async function fetchPopularServerTemplatesImpl(): Promise<Server[]> {
       include: {
         creator: {
           select: {
+            id: true,
             name: true,
+            username: true,
             image: true,
           },
         },
@@ -153,7 +157,7 @@ async function fetchPopularServerTemplatesImpl(): Promise<Server[]> {
     createdAt: st.createdAt.toISOString(),
     memberCount: undefined, // Not directly available on ServerTemplate
     activeMembers: undefined, // Not directly available on ServerTemplate
-    creator: st.creator ? { name: st.creator.name, image: st.creator.image } : undefined,
+    creator: st.creator ? { id: st.creator.id, name: st.creator.name, username: st.creator.username, image: st.creator.image } : undefined,
     tags: parseTags(st.tags),
     isPublic: st.isPublic,
     usageCount: st.usageCount,
@@ -268,7 +272,9 @@ export async function fetchServerTemplatesWithFilters({
         include: {
           creator: {
             select: {
+              id: true,
               name: true,
+              username: true,
               image: true,
             },
           },
@@ -294,7 +300,7 @@ export async function fetchServerTemplatesWithFilters({
       createdAt: st.createdAt.toISOString(),
       memberCount: undefined,
       activeMembers: undefined,
-      creator: st.creator ? { name: st.creator.name, image: st.creator.image } : undefined,
+      creator: st.creator ? { id: st.creator.id, name: st.creator.name, username: st.creator.username, image: st.creator.image } : undefined,
       tags: parseTags(st.tags),
       isPublic: st.isPublic,
       usageCount: st.usageCount,

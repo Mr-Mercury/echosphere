@@ -6,210 +6,151 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, List, Grid3X3, Star, Users, Copy } from 'lucide-react';
+import { Search, Filter, List, Grid3X3 } from 'lucide-react';
 import { CATEGORY_COLORS } from "@/lib/config/categories";
+import { Server } from '@/lib/entities/server-display-types';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { VIEW_MODES } from '@/lib/config/ui-constants';
 
-// Category filter options
-const CATEGORY_OPTIONS = ['All Categories', ...Object.keys(CATEGORY_COLORS)];
-
-// Sort options
-const SORT_OPTIONS = [
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'rating', label: 'Highest Rated' },
-  { value: 'active', label: 'Most Active' },
+// Placeholder/Adapted Config (Ideally from lib/config/server-explorer.ts)
+const SERVER_CATEGORY_OPTIONS = ['All Categories', ...Object.keys(CATEGORY_COLORS)];
+const SERVER_SORT_OPTIONS = [
+  { value: 'popular', label: 'Most Popular' }, // Based on usageCount
   { value: 'recent', label: 'Most Recent' },
+  { value: 'name', label: 'Name (A-Z)' }, // Added for name sorting
 ];
-
-// Define a function to create the server data instead of direct imports
-function createServerData() {
-  // Sample base servers
-  const baseServers = [
-    {
-      id: 'server-1',
-      name: 'Movie Buffs',
-      description: 'A community for movie enthusiasts to discuss their favorite films, share reviews, and discover new releases.',
-      category: 'Movies',
-      rating: 9.2,
-      memberCount: 1587,
-      activeMembers: 342,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-09-15',
-    },
-    {
-      id: 'server-2',
-      name: 'TV Series Club',
-      description: 'A server for TV show fans to discuss episodes, share theories, and keep up with the latest series.',
-      category: 'TV',
-      rating: 9.5,
-      memberCount: 2104,
-      activeMembers: 487,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-08-22',
-    },
-    {
-      id: 'server-3',
-      name: 'Comic Book Universe',
-      description: 'Connect with comic book fans, discuss storylines, and explore the world of graphic novels.',
-      category: 'Comics',
-      rating: 8.9,
-      memberCount: 1372,
-      activeMembers: 210,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-10-05',
-    },
-    {
-      id: 'server-4',
-      name: 'Anime World',
-      description: 'A community for anime fans to discuss their favorite shows, share recommendations, and explore Japanese animation.',
-      category: 'Anime',
-      rating: 9.3,
-      memberCount: 918,
-      activeMembers: 145,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-11-12',
-    },
-    {
-      id: 'server-5',
-      name: 'News & Events',
-      description: 'Stay updated with the latest news, discuss current events, and engage in meaningful conversations.',
-      category: 'Current Events',
-      rating: 9.1,
-      memberCount: 892,
-      activeMembers: 178,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-07-30',
-    },
-  ];
-  
-  // Additional servers 
-  const additionalServers = [
-    {
-      id: 'server-6',
-      name: 'Classic Films',
-      description: 'A server for classic movie enthusiasts to discuss timeless films and cinema history.',
-      category: 'Movies',
-      rating: 8.7,
-      memberCount: 1243,
-      activeMembers: 156,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-12-01',
-    },
-    {
-      id: 'server-7',
-      name: 'Streaming Shows',
-      description: 'Discuss your favorite streaming series, share recommendations, and stay updated with new releases.',
-      category: 'TV',
-      rating: 9.1,
-      memberCount: 1512,
-      activeMembers: 289,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-09-28',
-    },
-    {
-      id: 'server-8',
-      name: 'Manga & Comics',
-      description: 'A community for manga and comic book fans to discuss their favorite series and discover new ones.',
-      category: 'Comics',
-      rating: 9.3,
-      memberCount: 1678,
-      activeMembers: 312,
-      imageUrl: 'https://utfs.io/f/ae34682c-5a6c-4320-92ca-681cd4d93376-plqwlq.jpg',
-      createdAt: '2023-10-15',
-    },
-  ];
-  
-  // Return the combined data
-  return [...baseServers, ...additionalServers];
-}
+const SERVER_PAGINATION = { PAGE_SIZE: 12 }; // Example page size
+const SERVER_EXPLORER_DEFAULTS = {
+  SORT: 'popular',
+  CATEGORY: 'All Categories',
+  VIEW_MODE: 'grid' as 'grid' | 'list',
+};
 
 interface ServerExplorerProps {
-  onJoinServer?: (serverId: string) => void;
-  currentUserId?: string; // Added for "My Templates" filter
+  initialServers: Server[];
+  totalServers: number;
+  defaultSort: 'popular' | 'recent' | 'name';
+  defaultCategory: string;
+  defaultSearchQuery: string;
+  currentUserId?: string;
+  pageSize: number;
 }
 
-const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) => {
-  // Create fresh server data using useRef to prevent re-creation on renders
-  const allServersRef = useRef(createServerData());
+const ServerExplorer = ({
+  initialServers,
+  totalServers,
+  defaultSort,
+  defaultCategory,
+  defaultSearchQuery,
+  currentUserId,
+  pageSize,
+}: ServerExplorerProps) => {
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
+  const [sortBy, setSortBy] = useState(defaultSort);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(SERVER_EXPLORER_DEFAULTS.VIEW_MODE);
+  const [filterMode, setFilterMode] = useState<'all' | 'my'>('all');
   
-  // State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [sortBy, setSortBy] = useState('popular');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredServers, setFilteredServers] = useState(allServersRef.current);
-  const [filterMode, setFilterMode] = useState<'all' | 'my'>('all'); // Added filterMode state
+  const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Apply filters and sort
-  useEffect(() => {
-    let result = [...allServersRef.current];
-    
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        server => 
-          server.name.toLowerCase().includes(query) || 
-          server.description.toLowerCase().includes(query)
-      );
-    }
-    
-    // Filter by category
-    if (selectedCategory !== 'All Categories') {
-      result = result.filter(server => server.category === selectedCategory);
-    }
-
-    // Filter by creatorId if "My Templates" filter is active and currentUserId is available
-    if (filterMode === 'my' && currentUserId) {
-      result = result.filter(server => server.creatorId === currentUserId);
-    }
-    
-    // Sort servers
-    result = result.sort((a, b) => {
-      switch (sortBy) {
-        case 'popular':
-          return b.memberCount - a.memberCount;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'active':
-          return b.activeMembers - a.activeMembers;
-        case 'recent':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        default:
-          return 0;
-      }
+  const fetchServers = async ({ pageParam = 1 }) => {
+    const params = new URLSearchParams({
+      page: pageParam.toString(),
+      pageSize: pageSize.toString(),
+      sort: sortBy,
+      category: selectedCategory,
+      searchQuery,
+      isPublic: 'true', // Fetch only public templates by default in explorer
     });
-    
-    setFilteredServers(result);
-  }, [searchQuery, selectedCategory, sortBy, filterMode, currentUserId]);
 
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+    if (filterMode === 'my' && currentUserId) {
+      params.append('creatorId', currentUserId);
+    }
+
+    // This endpoint /api/templates/servers needs to be created to handle these params
+    const response = await axios.get(`/api/templates/servers?${params.toString()}`);
+    return response.data; // Expects { servers: Server[], total: number }
   };
 
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-  };
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    isPending,
+    isError,
+    isSuccess,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ['servers', searchQuery, selectedCategory, sortBy, filterMode, currentUserId],
+    queryFn: fetchServers,
+    initialPageParam: 1,
+    initialData: {
+      pages: [{ servers: initialServers, total: totalServers }],
+      pageParams: [1]
+    },
+    getNextPageParam: (lastPage, pages) => {
+      const nextPage = pages.length + 1;
+      return nextPage * pageSize <= (lastPage.total || 0) ? nextPage : undefined;
+    },
+    enabled: typeof window !== 'undefined', // Only run query on client-side initially
+  });
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  // Refetch when primary filters change
+  useEffect(() => {
+    // Don't refetch on initial mount if initialData is present from SSR
+    if (data?.pages.length === 1 && data.pages[0].servers === initialServers) {
+      return;
+    }
+    refetch();
+  }, [searchQuery, selectedCategory, sortBy, filterMode, currentUserId, refetch]);
 
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, loaderRef]);
+
+
+  const handleCategoryChange = (value: string) => setSelectedCategory(value);
+  const handleSortChange = (value: string) => setSortBy(value as 'popular' | 'recent' | 'name');
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value);
   const clearFilters = () => {
     setSearchQuery('');
-    setSelectedCategory('All Categories');
-    setSortBy('popular');
-    setFilterMode('all'); // Reset filterMode as well
+    setSelectedCategory(SERVER_EXPLORER_DEFAULTS.CATEGORY);
+    setSortBy(SERVER_EXPLORER_DEFAULTS.SORT as 'popular' | 'recent' | 'name');
+    setFilterMode('all');
   };
+
+  const allServers = data?.pages.flatMap(page => page.servers) ?? [];
 
   return (
     <div className="w-full py-6 space-y-6">
       <div className="flex items-center px-4 relative">
-        <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Explore Servers</h1>
+        <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Explore Server Templates</h1>
         <div className="flex gap-2 ml-auto">
           <Button 
-            variant={filterMode === 'all' ? 'default' : 'outline'} 
+            variant={filterMode === 'all' ? 'default' : 'ghost'} 
             size="sm"
-            onClick={() => setFilterMode('all')} // Added onClick handler
+            onClick={() => setFilterMode('all')} 
           >
             All Templates
           </Button>
@@ -217,39 +158,33 @@ const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) =>
             variant={filterMode === 'my' ? 'default' : 'ghost'} 
             size="sm"
             onClick={() => {
-              if (currentUserId) {
-                setFilterMode('my');
-              } else {
-                // Optionally, handle the case where currentUserId is not available
-                console.warn("CurrentUserId not available for 'My Templates' filter in ServerExplorer.");
-              }
-            }} // Added onClick handler
+              if (currentUserId) setFilterMode('my');
+              else console.warn("CurrentUserId not available for 'My Templates' filter in ServerExplorer.");
+            }} 
           >
             My Templates
           </Button>
         </div>
       </div>
       
-      {/* Filters and Controls - flex row in parent and filter divs 
-      to ease separating search and filters and spacing */}
-      <div className="flex w-full flex-row gap-4 justify-center items-center">
-        <div className="relative w-1/2">
+      <div className="flex w-full flex-row gap-4 justify-center items-center px-4">
+        <div className="relative flex-grow max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search servers by name or description..." 
+            placeholder="Search templates by name or description..." 
             value={searchQuery}
             onChange={handleSearch}
             className="pl-10"
           />
         </div>
         
-        <div className="flex flex-row gap-2 sm:flex-row sm:gap-4">
+        <div className="flex flex-row gap-2 sm:flex-row sm:gap-4 items-center">
           <Select value={selectedCategory} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORY_OPTIONS.map((category) => (
+              {SERVER_CATEGORY_OPTIONS.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
                 </SelectItem>
@@ -262,7 +197,7 @@ const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) =>
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              {SORT_OPTIONS.map((option) => (
+              {SERVER_SORT_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -272,18 +207,18 @@ const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) =>
           
           <div className="flex items-center border rounded-md">
             <Button 
-              variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+              variant={viewMode === VIEW_MODES.GRID ? 'default' : 'ghost'} 
               size="sm" 
               className="rounded-r-none"
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode(VIEW_MODES.GRID)}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
             <Button 
-              variant={viewMode === 'list' ? 'default' : 'ghost'} 
+              variant={viewMode === VIEW_MODES.LIST ? 'default' : 'ghost'} 
               size="sm" 
               className="rounded-l-none"
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode(VIEW_MODES.LIST)}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -291,124 +226,61 @@ const ServerExplorer = ({ onJoinServer, currentUserId }: ServerExplorerProps) =>
         </div>
       </div>
       
-      {/* Active filters display */}
-      {(searchQuery || selectedCategory !== 'All Categories' || (filterMode === 'my' && currentUserId)) && (
-        <div className="flex items-center gap-2">
+      {(searchQuery || selectedCategory !== SERVER_EXPLORER_DEFAULTS.CATEGORY || (filterMode === 'my' && currentUserId)) && (
+        <div className="px-4 flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Active filters:</span>
           <div className="flex flex-wrap gap-2">
-            {searchQuery && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                Search: {searchQuery}
-              </Badge>
-            )}
-            {selectedCategory !== 'All Categories' && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                Category: {selectedCategory}
-              </Badge>
-            )}
-            {filterMode === 'my' && currentUserId && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                My Templates
-              </Badge>
-            )}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 text-xs"
-              onClick={clearFilters}
-            >
-              Clear all
-            </Button>
+            {searchQuery && <Badge variant="outline">Search: {searchQuery}</Badge>}
+            {selectedCategory !== SERVER_EXPLORER_DEFAULTS.CATEGORY && <Badge variant="outline">Category: {selectedCategory}</Badge>}
+            {filterMode === 'my' && currentUserId && <Badge variant="outline">My Templates</Badge>}
+            <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={clearFilters}>Clear all</Button>
           </div>
         </div>
       )}
       
-      {/* Results count */}
-      <div className="text-sm pl-5 text-muted-foreground">
-        Showing {filteredServers.length} {filteredServers.length === 1 ? 'server' : 'servers'}
+      <div className="px-4 text-sm text-muted-foreground">
+         Showing {allServers.length} of {data?.pages[0]?.total ?? 0} server templates
       </div>
       
-      {/* Server displays */}
-      {filteredServers.length === 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-lg text-muted-foreground">No servers found matching your criteria.</p>
-          <Button variant="link" onClick={clearFilters}>
-            Clear filters
-          </Button>
+      {isPending && <p className="px-4 text-center">Loading...</p>}
+      {isError && <p className="px-4 text-center text-red-500">Error fetching server templates.</p>}
+      
+      {allServers.length === 0 && isSuccess && (
+        <div className="py-12 text-center px-4">
+          <p className="text-lg text-muted-foreground">No server templates found matching your criteria.</p>
+          <Button variant="link" onClick={clearFilters}>Clear filters</Button>
         </div>
-      ) : viewMode === 'grid' ? (
-        <div className="pl-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredServers.map((server) => (
-            <ServerCard
-              key={server.id}
-              {...server}
-              onJoinServer={() => onJoinServer?.(server.id)}
-            />
+      )}
+
+      {allServers.length > 0 && viewMode === VIEW_MODES.GRID && (
+        <div className="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {allServers.map((server) => (
+            <ServerCard key={server.id} {...server} />
           ))}
         </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredServers.map((server) => (
-            <div 
-              key={server.id} 
-              className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
-            >
-              <div className="flex items-center gap-4 md:w-64">
-                <div 
-                  className="relative w-16 h-16 rounded-full overflow-hidden border-2"
-                  style={{ borderColor: CATEGORY_COLORS[server.category as keyof typeof CATEGORY_COLORS] || '#888888' }}
-                >
-                  <img
-                    src={server.imageUrl}
-                    alt={server.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-semibold">{server.name}</h3>
-                  <Badge variant="outline" className="text-xs mt-1">
-                    {server.category}
-                  </Badge>
-                </div>
+      )}
+      {allServers.length > 0 && viewMode === VIEW_MODES.LIST && (
+        <div className="px-4 space-y-4">
+          {allServers.map((server) => (
+            // Simplified List Item - can be expanded similar to BotExplorer if needed
+            <div key={server.id} className="flex gap-4 p-4 border rounded-lg bg-zinc-900/30 hover:bg-zinc-800/50 transition-colors">
+              <img src={server.imageUrl} alt={server.name} className="w-16 h-16 rounded-md object-cover"/>
+              <div className="flex-grow">
+                <h3 className="font-semibold text-lg text-zinc-100">{server.name}</h3>
+                <p className="text-xs text-zinc-400 line-clamp-2">{server.description}</p>
+                 <div className="text-xs text-zinc-500 mt-1">
+                    Category: {server.category} | Copies: {server.usageCount}
+                    {server.creator?.username && ` | By: ${server.creator.username}`}
+                 </div>
               </div>
-              <div className="flex-grow space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={14}
-                        className={i < Math.floor(server.rating / 2) ? "fill-yellow-400 text-yellow-400" : "text-zinc-300"}
-                      />
-                    ))}
-                    <span className="text-xs ml-1">{server.rating.toFixed(1)}/10</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
-                    <span className="flex items-center gap-1">
-                      <Copy className="h-3 w-3" /> {server.memberCount} times copied
-                    </span>
-                    <span>{server.activeMembers} echoes</span>
-                    <span>Created: {server.createdAt}</span>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {server.description}
-                </p>
-                <div className="flex justify-end">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => onJoinServer?.(server.id)}
-                  >
-                    Join Server
-                  </Button>
-                </div>
-              </div>
+              <Button size="sm" onClick={() => console.log('Use template:', server.id)}>Use Template</Button> 
             </div>
           ))}
         </div>
       )}
+       <div ref={loaderRef} className="h-10 col-span-full" />
+       {isFetchingNextPage && <p className="text-center py-4 col-span-full">Loading more...</p>}
     </div>
   );
 };

@@ -5,22 +5,24 @@ import ServerCard from '@/components/server-display/server-card/server-card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CATEGORY_COLORS } from "@/lib/config/categories";
-import { SAMPLE_SERVERS } from '@/lib/entities/server-display-types';
+import { SAMPLE_SERVERS, Server } from '@/lib/entities/server-display-types';
 
 // Sample data for demonstration - this would come from a real API in production
 
 interface ServerCarouselProps {
   title: string;
-  servers?: typeof SAMPLE_SERVERS;
+  servers?: Server[];
   onViewAll?: () => void;
   onJoinServer?: (serverId: string) => void;
+  showTitle?: boolean;
 }
 
 const ServerCarousel = ({
   title = 'Popular Servers',
-  servers = SAMPLE_SERVERS,
+  servers = SAMPLE_SERVERS as Server[],
   onViewAll,
-  onJoinServer
+  onJoinServer,
+  showTitle = true
 }: ServerCarouselProps) => {
   const carouselRef = React.useRef<HTMLDivElement>(null);
 
@@ -44,14 +46,16 @@ const ServerCarousel = ({
 
   return (
     <div className="w-full px-6 py-6">
-      <div className="flex justify-center text-center items-center mb-4">
-        <h2 className="text-2xl font-bold">{title}</h2>
-        {onViewAll && (
-          <Button variant="link" onClick={onViewAll} className="absolute right-6">
-            View all
-          </Button>
-        )}
-      </div>
+      {showTitle && (
+        <div className="flex justify-center text-center items-center mb-4">
+          <h2 className="text-2xl font-bold">{title}</h2>
+          {onViewAll && (
+            <Button variant="link" onClick={onViewAll} className="absolute right-6">
+              View all
+            </Button>
+          )}
+        </div>
+      )}
       
       <div className="relative px-8">
         <Button 
@@ -75,6 +79,7 @@ const ServerCarousel = ({
             <div key={server.id} className="flex-shrink-0">
               <ServerCard
                 {...server}
+                rating={server.rating ?? 0}
                 onJoinServer={() => onJoinServer?.(server.id)}
               />
             </div>

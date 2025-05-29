@@ -29,7 +29,7 @@ export default async function TemplatePage({ searchParams }: TemplatePageProps) 
     const featuredContent = (
         <div className="px-4 space-y-6">
             <PopularBotsContainer title="Featured Bots" />
-            <ServerCarousel title="Featured Servers" />
+            <PopularServersContainer title="Featured Servers" />
         </div>
     );
 
@@ -41,7 +41,7 @@ export default async function TemplatePage({ searchParams }: TemplatePageProps) 
 
     const serverTemplatesContent = (
         <div className="px-4">
-            <ServerExplorer />
+            <ServerExplorerContainer currentUserId={user.id} />
         </div>
     );
     

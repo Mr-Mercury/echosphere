@@ -72,7 +72,9 @@ const BotCard = ({
                 />
               </div>
               <div>
-                <h3 className="font-semibold text-lg line-clamp-1 text-zinc-100">{name}</h3>
+                <NavTooltip label={name}>
+                  <h3 className="font-semibold text-lg line-clamp-1 text-zinc-100 cursor-default">{name}</h3>
+                </NavTooltip>
                 <div className="flex items-center">
                   <Badge 
                     variant="outline" 
