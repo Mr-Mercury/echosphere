@@ -239,11 +239,23 @@ export async function fetchBotTemplatesWithFilters({
     // search query
     if (searchQuery) {
       where.OR = [
-        { botName: { contains: searchQuery, mode: 'insensitive' } },
-        { description: { contains: searchQuery, mode: 'insensitive' } },
-        { prompt: { contains: searchQuery, mode: 'insensitive' } }
+        { botName: { contains: searchQuery } },
+        { description: { contains: searchQuery } },
+        { prompt: { contains: searchQuery } }
       ];
     }
+
+    // Create a separate where clause for count
+    let whereCount = { ...where };
+    if (searchQuery) {
+      whereCount.OR = [
+        { botName: { contains: searchQuery } },
+        { description: { contains: searchQuery } },
+        { prompt: { contains: searchQuery } }
+      ];
+    }
+    // If other filters in 'where' might also use 'mode', they'd need similar stripping for whereCount.
+    // For now, only searchQuery uses it.
 
     // pagination
     const skip = (page - 1) * pageSize;
@@ -282,7 +294,7 @@ export async function fetchBotTemplatesWithFilters({
           }
         }
       }),
-      db.botTemplate.count({ where })
+      db.botTemplate.count({ where: whereCount })
     ]);
 
     // Transform the data to match Bot display type

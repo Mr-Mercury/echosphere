@@ -107,11 +107,18 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
     }, []);
 
     const loadSearchResults = useCallback(async (query: string, page: number) => {
+        console.log('[BotTemplateSelector] loadSearchResults called with query:', query, 'page:', page);
         if (loadingSearch || !query) {
-            if (!query) setSearchResults([]); // Clear results if query is empty
+            if (!query) {
+                console.log('[BotTemplateSelector] loadSearchResults skipped: Query is empty. Clearing search results.');
+                setSearchResults([]);
+            } else {
+                console.log('[BotTemplateSelector] loadSearchResults skipped: Already loading search results.');
+            }
             return;
         }
         setLoadingSearch(true);
+        console.log('[BotTemplateSelector] Attempting to fetch search results for query:', query, 'page:', page);
         try {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -126,12 +133,20 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
             }
             const { bots, total } = await response.json();
 
-            setSearchResults(prev => page === 1 ? bots : [...prev, ...bots]);
+            console.log('[BotTemplateSelector] Fetched search results:', bots, 'Total:', total, 'for query:', query);
+            setSearchResults(prev => {
+                const newResults = page === 1 ? bots : [...prev, ...bots];
+                console.log('[BotTemplateSelector] Updating searchResults state to:', newResults);
+                return newResults;
+            });
             setHasMoreSearch(bots.length === BOT_PAGE_SIZE && (page * BOT_PAGE_SIZE) < total);
+            console.log('[BotTemplateSelector] hasMoreSearch set to:', bots.length === BOT_PAGE_SIZE && (page * BOT_PAGE_SIZE) < total);
         } catch (error) {
-            console.error("Failed to load search results:", error);
+            console.error(`[BotTemplateSelector] Failed to load search results for query: ${query}:`, error);
+            // TODO: Add user feedback
         }
         setLoadingSearch(false);
+        console.log('[BotTemplateSelector] loadSearchResults finished for query:', query);
     }, []);
 
     // Initial load and tab change effects
@@ -153,8 +168,10 @@ const BotTemplateSelector: React.FC<BotTemplateSelectorProps> = ({
         setSearchResults([]);
         setSearchPage(1);
         if (isOpen && activeTab === 'search' && debouncedSearchQuery) {
+            console.log('[BotTemplateSelector] Search useEffect: Triggering loadSearchResults for debouncedQuery:', debouncedSearchQuery);
             loadSearchResults(debouncedSearchQuery, 1);
-        } else if (!debouncedSearchQuery) {
+        } else if (isOpen && activeTab === 'search' && !debouncedSearchQuery) {
+            console.log('[BotTemplateSelector] Search useEffect: Debounced query is empty, ensuring results are cleared for search tab.');
             setSearchResults([]);
         }
     }, [isOpen, activeTab, debouncedSearchQuery, loadSearchResults]);
