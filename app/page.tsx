@@ -1,12 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { AuthButton } from "@/components/islets/auth/auth-button";
 import { cn } from "@/lib/utilities/clsx/utils";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 
 // NOTE - REMEMBER TO PROGRAMMATICALLY SKIP THIS PAGE AND JUMP TO CHAT OR THE 
 // DASHBOARD OR RESPONSE TABLES IF USER HAS A PREVIOUS SESSION
 
-const Home = () => {
+const Home = async () => {
+    const session = await auth();
+
+    if (session?.user) {
+        redirect('/chat/server/personal');
+    }
 
     return (
         <main className='flex h-full h-screen flex-col items-center 
