@@ -50,7 +50,7 @@ export class BotServiceManager {
         }
         catch (error) {
             console.error(`Failed to start bot ${config.botName}:`, error);
-            await this.cleanupBot(config.id);
+            this.deactivateBotInMemory(config.id);
             throw error;
         }
     }
@@ -92,7 +92,9 @@ export class BotServiceManager {
                 // Convert messages per minute to delay in milliseconds
                 const baseFrequencyInSeconds = 60 / messagesPerMinute;
                 const nextMessageDelay = Math.floor(baseFrequencyInSeconds * randomMultiplier * 1000);
-                console.log(`Scheduling next message for ${config.botName} in ${Math.floor(nextMessageDelay / 1000)} seconds`);
+                // Ensure delay is at least a minimum, e.g., 1 second, to prevent overly rapid scheduling
+                const effectiveDelay = Math.max(nextMessageDelay, 1000);
+                console.log(`Scheduling next message for ${config.botName} in ${Math.floor(effectiveDelay / 1000)} seconds`);
                 const timer = setTimeout(async () => {
                     try {
                         // Double check bot is still active before sending and scheduling next
@@ -143,11 +145,14 @@ export class BotServiceManager {
                 }
                 else {
                     // Deactivation
-                    const deactivated = await this.deactivateBot(botId);
-                    if (!deactivated) {
-                        throw new Error(`Failed to deactivate bot ${botId}`);
+                    const deactivatedInMemory = this.deactivateBotInMemory(botId);
+                    if (!deactivatedInMemory) {
+                        // Bot was not in memory, which might be okay if it was already stopped
+                        console.warn(`Bot ${botId} was not found in active bots map during toggle to deactivate, but DB record updated.`);
                     }
-                    console.log('Bot deactivated successfully');
+                    else {
+                        console.log('Bot deactivated successfully from memory');
+                    }
                 }
                 return config;
             });
@@ -163,14 +168,19 @@ export class BotServiceManager {
             throw error;
         }
     }
-    async cleanupBot(botId) {
+    deactivateBotInMemory(botId) {
         const existingBot = this.bots.get(botId);
         if (existingBot) {
             existingBot.channelTimers.forEach((timer) => {
                 clearTimeout(timer.timer);
             });
+            existingBot.channelTimers.clear(); // Clear the map itself
             this.bots.delete(botId);
+            console.log(`Bot ${botId} deactivated from memory and timers cleared.`);
+            return true;
         }
+        console.log(`Bot ${botId} not found in active bots for in-memory deactivation.`);
+        return false;
     }
     async sendMessage(config, channelId, channelName) {
         try {
@@ -180,7 +190,11 @@ export class BotServiceManager {
                 console.log(`Bot ${config.botName} is no longer active, skipping message send`);
                 return;
             }
-            const message = await this.generateMessage(config, channelId, channelName);
+            const messageData = await this.generateMessage(config, channelId, channelName);
+            if (!messageData) {
+                console.log(`Message generation skipped for ${config.botName} as it was deactivated or an error occurred.`);
+                return;
+            }
             // Second check in case bot was deactivated while generating message
             if (!this.bots.has(config.id)) {
                 console.log(`Bot ${config.botName} was deactivated while generating message, skipping send`);
@@ -193,11 +207,11 @@ export class BotServiceManager {
                 channelId,
                 conversationId: null,
                 fileUrl: null,
-                content: message.content,
-                modelName: message.modelName,
+                content: messageData.content,
+                modelName: messageData.modelName, // Use modelName from processed message
                 type: 'channel'
             };
-            console.log(`Bot ${config.botName} sending message: "${message.content.substring(0, 30)}..."`);
+            console.log(`Bot ${config.botName} sending message: "${messageData.content.substring(0, 30)}..."`);
             const result = await messagePostHandler(params);
             if (!result.message) {
                 throw new Error('Failed to save message to database');
@@ -220,6 +234,11 @@ export class BotServiceManager {
     }
     async generateMessage(config, channelId, channelName) {
         try {
+            // Check 1: Before any heavy operation
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} is no longer active (check 1), skipping message generation in generateMessage`);
+                return null;
+            }
             const recentMessages = await db.message.findMany({
                 where: {
                     channelId,
@@ -239,55 +258,35 @@ export class BotServiceManager {
             });
             const userPrompt = generatePrompt(recentMessages, channelName);
             console.log(`Generated prompt for ${config.botName}:`, userPrompt.substring(0, 100) + "...");
+            // Check 2: Before LLM API call (if prompt generation was long)
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} is no longer active (check 2), skipping LLM call.`);
+                return null;
+            }
             const response = await llmApi(config, userPrompt);
+            // Check 3: After LLM API call
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} was deactivated during LLM call (check 3), skipping message processing.`);
+                return null;
+            }
             console.log(`LLM API response object for ${config.botName}:`, response);
-            // Direct check for message property
             if (response && response.message) {
                 console.log(`Using standard response format for ${config.botName}`);
-                const processedMessage = processMessage(response.message, config.botName, config.botUserId, response.modelName);
-                return processedMessage;
+                return processMessage(response.message, config.botName, config.botUserId, response.modelName);
             }
-            // Fallback to default message
             else {
-                console.log(`Using fallback message for ${config.botName}`);
+                console.log(`Using fallback message for ${config.botName} due to missing/null LLM response message.`);
                 return processMessage("I'm having trouble generating a response right now.", config.botName, config.botUserId, config.modelName);
             }
         }
         catch (error) {
             console.error(`Failed to generate message for bot ${config.botName}:`, error);
+            // Check 4: In case of error, ensure bot is still active before returning fallback
+            if (!this.bots.has(config.id)) {
+                console.log(`Bot ${config.botName} was deactivated during error handling in generateMessage (check 4).`);
+                return null;
+            }
             return processMessage("I'm having trouble generating a response right now.", config.botName, config.botUserId, config.modelName);
-        }
-    }
-    async deactivateBot(botId) {
-        try {
-            console.log(`Attempting to deactivate bot ${botId}`);
-            const botInstance = this.bots.get(botId);
-            if (!botInstance) {
-                console.log(`Bot ${botId} not found in active bots map`);
-                return true;
-            }
-            // Clear all channel timers
-            for (const [channelId, timer] of botInstance.channelTimers) {
-                try {
-                    clearTimeout(timer.timer);
-                    console.log(`Cleared timer for channel ${channelId}`);
-                }
-                catch (error) {
-                    console.error(`Failed to clear timer for channel ${channelId}:`, error);
-                }
-            }
-            botInstance.channelTimers.clear();
-            const removed = this.bots.delete(botId);
-            if (!removed) {
-                console.error(`Failed to remove bot ${botId} from bot map`);
-                return false;
-            }
-            console.log(`Bot ${botId} successfully deactivated and removed from bot map`);
-            return true;
-        }
-        catch (error) {
-            console.error('Failed to deactivate bot:', botId, error);
-            return false;
         }
     }
     // STRICTLY for error scenarios - do not use for normal bot deactivation
@@ -325,166 +324,170 @@ export class BotServiceManager {
     async stopAll() {
         console.log('Stopping all bots...');
         const botIds = Array.from(this.bots.keys());
-        for (const botId of botIds) {
-            try {
-                await this.deactivateBot(botId);
-                console.log(`Bot ${botId} stopped successfully`);
-            }
-            catch (error) {
-                console.error(`Failed to stop bot ${botId}:`, error);
-            }
+        if (botIds.length === 0) {
+            console.log('No active bots to stop.');
+            return { count: 0, results: { successful: [], failed: [] } };
         }
-        console.log(`All bots stopped: ${botIds.length} bots`);
+        try {
+            // Batch update DB
+            await db.botConfiguration.updateMany({
+                where: { id: { in: botIds } },
+                data: { isActive: false }
+            });
+            console.log(`Batch DB update successful for stopping ${botIds.length} bots.`);
+            let deactivatedCount = 0;
+            for (const botId of botIds) {
+                if (this.deactivateBotInMemory(botId)) {
+                    deactivatedCount++;
+                    console.log(`Bot ${botId} stopped (in-memory) successfully`);
+                }
+                else {
+                    // This case should be rare if botIds came from this.bots.keys()
+                    console.warn(`Bot ${botId} was expected to be in memory but not found during stopAll.`);
+                }
+            }
+            console.log(`All bots processed for stopping: ${deactivatedCount}/${botIds.length} bots successfully deactivated in memory.`);
+            // For simplicity, results here just reflect the count. Detailed results would require more tracking.
+            return { count: deactivatedCount, results: { successful: botIds.map(id => ({ id, name: 'Unknown' })), failed: [] } }; // Simplified result
+        }
+        catch (error) {
+            console.error('Failed to stop all bots during batch DB update or in-memory cleanup:', error);
+            // In case of batch DB error, bots might still be in memory. Attempt force cleanup for all known.
+            for (const botId of botIds) {
+                await this.forceCleanupBot(botId); // Fallback to force cleanup
+            }
+            throw error; // Re-throw the original error
+        }
     }
     async stopAllServerBots(serverId) {
         console.log(`Stopping all bots for server ${serverId}...`);
-        const botIds = Array.from(this.bots.keys());
-        const results = {
-            successful: [],
-            failed: []
-        };
-        // Filter bots belonging to this server first
-        const serverBotIds = botIds.filter(botId => {
-            const botInstance = this.bots.get(botId);
-            return botInstance && botInstance.config.homeServerId === serverId;
-        });
+        const serverBotInstances = Array.from(this.bots.values()).filter(botInstance => botInstance.config.homeServerId === serverId);
+        const serverBotIds = serverBotInstances.map(instance => instance.config.id);
+        const results = { successful: [], failed: [] };
         if (serverBotIds.length === 0) {
             console.log(`No active bots found for server ${serverId}`);
             return { count: 0, results };
         }
-        // Process all bots in parallel
-        const stopPromises = serverBotIds.map(async (botId) => {
-            const botInstance = this.bots.get(botId);
-            if (!botInstance)
-                return;
-            try {
-                // Use a transaction for each bot to keep DB and runtime state in sync
-                await db.$transaction(async (tx) => {
-                    // Deactivate bot in memory
-                    const deactivated = await this.deactivateBot(botId);
-                    if (!deactivated) {
-                        throw new Error(`Failed to deactivate bot ${botId} in memory`);
-                    }
-                    // Update database within transaction
-                    await tx.botConfiguration.update({
-                        where: { id: botId },
-                        data: { isActive: false }
-                    });
-                });
-                console.log(`Bot ${botId} (${botInstance.config.botName}) stopped successfully`);
-                return {
-                    success: true,
-                    data: {
-                        id: botId,
-                        name: botInstance.config.botName
-                    }
-                };
-            }
-            catch (error) {
-                console.error(`Failed to stop bot ${botId} (${botInstance.config.botName}):`, error);
-                // Attempt recovery for this specific bot
-                await this.forceCleanupBot(botId);
-                return {
-                    success: false,
-                    data: {
-                        id: botId,
+        try {
+            // Batch update database
+            await db.botConfiguration.updateMany({
+                where: {
+                    id: { in: serverBotIds },
+                    homeServerId: serverId // Ensure we only update bots of this server
+                },
+                data: { isActive: false }
+            });
+            console.log(`Batch DB update successful for stopping ${serverBotIds.length} bots on server ${serverId}.`);
+            // Deactivate in memory
+            for (const botInstance of serverBotInstances) {
+                if (this.deactivateBotInMemory(botInstance.config.id)) {
+                    results.successful.push({ id: botInstance.config.id, name: botInstance.config.botName });
+                }
+                else {
+                    // This should ideally not happen if serverBotInstances came from this.bots
+                    results.failed.push({
+                        id: botInstance.config.id,
                         name: botInstance.config.botName,
-                        error: error instanceof Error ? error.message : 'Unknown error'
-                    }
-                };
+                        error: 'Failed to deactivate bot in memory (was not found or error during cleanup)'
+                    });
+                    console.warn(`Bot ${botInstance.config.botName} (${botInstance.config.id}) failed in-memory deactivation during stopAllServerBots.`);
+                }
             }
-        });
-        // Wait for all operations to complete
-        const stopResults = await Promise.all(stopPromises);
-        // Process results
-        stopResults.forEach(result => {
-            if (!result)
-                return; // Skip null results from non-existent bots
-            if (result.success) {
-                results.successful.push(result.data);
+            const stopCount = results.successful.length;
+            console.log(`Server ${serverId} bots stopped: ${stopCount}/${serverBotIds.length} bots processed.`);
+            return { count: stopCount, results };
+        }
+        catch (error) {
+            console.error(`Failed to stop all bots for server ${serverId}:`, error);
+            // Attempt recovery for these specific bots if batch DB update failed or other error
+            // forceCleanupBot also updates DB, so it's a robust fallback.
+            for (const botInstance of serverBotInstances) {
+                try {
+                    await this.forceCleanupBot(botInstance.config.id);
+                    results.failed.push({
+                        id: botInstance.config.id,
+                        name: botInstance.config.botName,
+                        error: error instanceof Error ? error.message : 'Main operation failed, cleanup attempted.'
+                    });
+                }
+                catch (cleanupError) {
+                    results.failed.push({
+                        id: botInstance.config.id,
+                        name: botInstance.config.botName,
+                        error: `Main op failed, and cleanup also failed: ${cleanupError}`
+                    });
+                }
             }
-            else {
-                results.failed.push(result.data);
-            }
-        });
-        const stopCount = results.successful.length;
-        console.log(`Server ${serverId} bots stopped: ${stopCount}/${serverBotIds.length} bots`);
-        return { count: stopCount, results };
+            // Adjust successful count based on which ones might have been in results.successful before error
+            results.successful = results.successful.filter(s => !results.failed.some(f => f.id === s.id));
+            return { count: results.successful.length, results };
+        }
     }
     async startAllServerBots(serverId) {
         console.log(`Starting all bots for server ${serverId}...`);
-        const results = {
-            successful: [],
-            failed: []
-        };
+        const results = { successful: [], failed: [] };
         try {
-            // Get all inactive bot configurations for this server
-            const botConfigs = await db.botConfiguration.findMany({
-                where: {
-                    homeServerId: serverId,
-                    isActive: false
-                }
+            // Get all bot configurations for this server
+            const allServerBotConfigs = await db.botConfiguration.findMany({
+                where: { homeServerId: serverId }
             });
-            if (botConfigs.length === 0) {
-                console.log(`No inactive bots found for server ${serverId}`);
+            // Filter for bots that are not currently active in memory
+            const botConfigsToStart = allServerBotConfigs.filter(config => !this.bots.has(config.id));
+            if (botConfigsToStart.length === 0) {
+                console.log(`No inactive bots found to start for server ${serverId}`);
                 return { count: 0, results };
             }
-            // Process all bots in parallel
-            const startPromises = botConfigs.map(async (config) => {
+            const botIdsToStart = botConfigsToStart.map(config => config.id);
+            // Batch update database to set isActive: true
+            await db.botConfiguration.updateMany({
+                where: {
+                    id: { in: botIdsToStart },
+                    homeServerId: serverId // Ensure we only update bots of this server
+                },
+                data: { isActive: true }
+            });
+            console.log(`Batch DB update successful for starting ${botIdsToStart.length} bots on server ${serverId}.`);
+            // Start bots in memory
+            for (const config of botConfigsToStart) {
                 try {
-                    // Use a transaction for each bot to keep DB and runtime state in sync
-                    await db.$transaction(async (tx) => {
-                        // Update database within transaction
-                        await tx.botConfiguration.update({
-                            where: { id: config.id },
-                            data: { isActive: true }
-                        });
-                    });
-                    // Start the bot
-                    await this.startBot(config);
-                    console.log(`Bot ${config.id} (${config.botName}) started successfully`);
-                    return {
-                        success: true,
-                        data: {
-                            id: config.id,
-                            name: config.botName
-                        }
-                    };
+                    // Ensure the config object reflects isActive: true for startBot
+                    const updatedConfig = { ...config, isActive: true };
+                    await this.startBot(updatedConfig); // startBot handles cold/warm start
+                    results.successful.push({ id: config.id, name: config.botName });
                 }
                 catch (error) {
-                    console.error(`Failed to start bot ${config.id} (${config.botName}):`, error);
+                    console.error(`Failed to start bot ${config.id} (${config.botName}) in memory:`, error);
                     // Attempt recovery for this specific bot
-                    await this.forceCleanupBot(config.id);
-                    return {
-                        success: false,
-                        data: {
-                            id: config.id,
-                            name: config.botName,
-                            error: error instanceof Error ? error.message : 'Unknown error'
-                        }
-                    };
+                    await this.forceCleanupBot(config.id); // This will set isActive: false in DB
+                    results.failed.push({
+                        id: config.id,
+                        name: config.botName,
+                        error: error instanceof Error ? error.message : 'Unknown error during in-memory start'
+                    });
                 }
-            });
-            // Wait for all operations to complete
-            const startResults = await Promise.all(startPromises);
-            // Process results
-            startResults.forEach(result => {
-                if (!result)
-                    return; // Skip null results from non-existent bots
-                if (result.success) {
-                    results.successful.push(result.data);
-                }
-                else {
-                    results.failed.push(result.data);
-                }
-            });
+            }
             const startCount = results.successful.length;
-            console.log(`Server ${serverId} bots started: ${startCount}/${botConfigs.length} bots`);
+            console.log(`Server ${serverId} bots started: ${startCount}/${botConfigsToStart.length} bots processed.`);
             return { count: startCount, results };
         }
         catch (error) {
             console.error(`Failed to start all bots for server ${serverId}:`, error);
-            throw error;
+            // If the batch DB update failed, or another top-level error
+            const botConfigsToAttemptCleanup = (await db.botConfiguration.findMany({
+                where: { homeServerId: serverId, id: { in: results.failed.map(f => f.id) } // or all potential ones
+                }
+            }));
+            for (const config of botConfigsToAttemptCleanup) {
+                try {
+                    await this.forceCleanupBot(config.id);
+                }
+                catch (cleanupError) {
+                    console.error(`Error during force cleanup for ${config.id} after startAllServerBots failure: ${cleanupError}`);
+                }
+            }
+            // Adjust successful count
+            results.successful = results.successful.filter(s => !results.failed.some(f => f.id === s.id));
+            return { count: results.successful.length, results }; // Return whatever partial success/failure we have
         }
     }
 }

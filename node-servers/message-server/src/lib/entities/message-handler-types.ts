@@ -81,3 +81,10 @@ export interface MessageData {
     memberId: string;
     member: MemberWithUser;
 }
+
+export interface ProcessedMessage {
+    content: string;
+    botName: string;
+    botUserId: string;
+    modelName: string;
+}
