@@ -62,6 +62,7 @@ const ChatMessages = ({
     const heightBeforeLoadRef = useRef(0);
     const scrollPositionRef = useRef(0);
     const hasScrolledToBottomRef = useRef(true);
+    const initialMessagesLoadedRef = useRef(false);
 
     const queryKey = `chat:${chatId}`;
     const addKey = `chat:${chatId}:messages`;
@@ -89,24 +90,39 @@ const ChatMessages = ({
         setLoadingMore(true);
     };
 
-    // Restore scroll position after loading more messages with absolute precision
+    // Restore scroll position after loading more messages
     const restoreScrollPosition = () => {
         if (!chatContainerRef.current || !loadingMore) return;
         
+        // Ensure scroll is instant for restoration
+        chatContainerRef.current.style.scrollBehavior = 'auto';
+
         const newScrollHeight = chatContainerRef.current.scrollHeight;
         const heightDifference = newScrollHeight - heightBeforeLoadRef.current;
         
         if (heightDifference > 0) {
-            // Set scroll position immediately with no animation to prevent any visible jump
             chatContainerRef.current.scrollTop = scrollPositionRef.current + heightDifference;
         }
         
         setLoadingMore(false);
     };
 
-    // Scroll to bottom for new messages
+    // Scroll to bottom using direct scrollTop manipulation and style.scrollBehavior
     const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-        bottomRef.current?.scrollIntoView({ behavior });
+        if (!chatContainerRef.current) return;
+
+        if (behavior === 'smooth') {
+            chatContainerRef.current.style.scrollBehavior = 'smooth';
+            // Use rAF to ensure style is applied before scroll operation
+            requestAnimationFrame(() => {
+                if (chatContainerRef.current) { // Re-check ref in async callback
+                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                }
+            });
+        } else { // 'auto' or any other value for instant scroll
+            chatContainerRef.current.style.scrollBehavior = 'auto';
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
     };
 
     // Handle loading previous messages when scrolling to top
@@ -114,11 +130,9 @@ const ChatMessages = ({
         const container = chatContainerRef.current;
         if (!container) return;
         
-        // Check if near bottom
-        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 10;
         hasScrolledToBottomRef.current = isNearBottom;
         
-        // Check if at top and should load more
         const isAtTop = container.scrollTop < 60;
         if (isAtTop && hasNextPage && !isFetchingNextPage && !loadingMore) {
             saveScrollPosition();
@@ -138,17 +152,29 @@ const ChatMessages = ({
     // Restore scroll position after loading completes
     useEffect(() => {
         if (!isFetchingNextPage && loadingMore) {
-            // Use requestAnimationFrame to ensure the DOM has been updated before adjusting scroll
             requestAnimationFrame(() => {
                 restoreScrollPosition();
             });
         }
     }, [isFetchingNextPage, loadingMore]);
     
-    // Auto-scroll to bottom for new messages if already at bottom
+    // Auto-scroll based on message updates (initial and new)
     useEffect(() => {
-        if (hasScrolledToBottomRef.current) {
-            scrollToBottom();
+        if (!data?.pages?.[0]?.items?.length) {
+            return;
+        }
+    
+        if (!initialMessagesLoadedRef.current) {
+            scrollToBottom('auto'); 
+            hasScrolledToBottomRef.current = true; 
+            initialMessagesLoadedRef.current = true;
+        } else {
+            if (hasScrolledToBottomRef.current) {
+                scrollToBottom('smooth'); 
+                // Optimistically set to true, assuming smooth scroll will take them to the bottom.
+                // This helps if another message arrives while a smooth scroll is in progress.
+                hasScrolledToBottomRef.current = true; 
+            }
         }
     }, [data?.pages?.[0]?.items]);
     
@@ -167,20 +193,11 @@ const ChatMessages = ({
         if (socket && chatId) {
             socket.emit('subscribe_to_channel', chatId);
             
-            // Fix return type by explicitly returning void
             return () => {
                 socket.emit('unsubscribe_from_channel', chatId);
             };
         }
     }, [socket, chatId]);
-    
-    // Initial scroll to bottom when first loading
-    useEffect(() => {
-        if (status === 'success' && !hasScrolledToBottomRef.current) {
-            scrollToBottom();
-            hasScrolledToBottomRef.current = true;
-        }
-    }, [status]);
 
     if (status === 'pending') {
         return (

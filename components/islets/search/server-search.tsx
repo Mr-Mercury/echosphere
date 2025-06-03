@@ -41,10 +41,16 @@ const ServerSearch = ({
     useEffect(() => {
         const fetchServer = async () => {
             try {
-                const user = await currentUser();
-                if (!user) return;
-                
-                const serverData = await getServerChannelsById(params?.serverId as string, user.id);
+                if (!params?.serverId) return;
+
+                const response = await fetch(`/api/server-details/${params.serverId}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Failed to fetch server data via API:', response.status, errorText);
+                    return;
+                }
+                const serverData = await response.json();
+
                 if (serverData) {
                     setServer(serverData);
                 }

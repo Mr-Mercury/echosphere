@@ -74,10 +74,19 @@ export const ServerMember = ({
     useEffect(() => {
         const fetchServerData = async () => {
             try {
-                const user = await currentUser();
-                if (!user) return;
+                // const user = await currentUser(); // Removed direct call
+                // if (!user) return; // Removed direct call
                 
-                const serverData = await getServerChannelsById(server.id, user.id);
+                // const serverData = await getServerChannelsById(server.id, user.id); // Removed direct call
+                const response = await fetch(`/api/server-details/${server.id}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Failed to fetch server data via API:", response.status, errorText);
+                     // Potentially set an error state here to inform the user
+                    return;
+                }
+                const serverData = await response.json();
+
                 if (serverData) {
                     setServerWithMembers(serverData);
                 }
@@ -86,7 +95,7 @@ export const ServerMember = ({
             }
         };
         fetchServerData();
-    }, [server.id]);
+    }, [server.id]); // Dependency remains server.id
 
     // Sync with bot status store
     const botStatuses = useBotToggleStore((state) => state.botStatuses);
