@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot } from '@/lib/entities/bot-display-types'; // Assuming Bot type is suitable for display
-import { useDebounce } from '@/hooks/use-debounce'; // Assuming you have or will create this hook
+import { Bot } from '@/lib/entities/bot-display-types'; 
+import { useDebounce } from '@/hooks/use-debounce'; 
 import { Loader2, Search, X, PackageSearch, PlusCircle, CheckCircle } from 'lucide-react';
-import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip"; // Import user's NavTooltip
-import BotCard, { ActionButtonConfig } from '@/components/bot-display/bot-card/bot-card'; // Import ActionButtonConfig
+import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip"; 
+import BotCard, { ActionButtonConfig } from '@/components/bot-display/bot-card/bot-card';
 
 // TODO: Create a more compact Bot display card if BotCard is too large for this context
 
