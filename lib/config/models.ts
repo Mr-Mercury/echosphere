@@ -1,4 +1,5 @@
 import { AIModel } from "../entities/ai-model";
+import { OPENROUTER_MODELS } from "./openrouter";
 
 // Define color scheme for providers
 export const PROVIDER_COLORS = {
@@ -13,6 +14,18 @@ export const PROVIDER_COLORS = {
     'google': {
         primary: '#4285F4', // google blue
         secondary: '#64B5F6', // slightly darker blue
+    },
+    'mistralai': {
+        primary: '#0095ff',
+        secondary: '#66c2ff',
+    },
+    'meta-llama': {
+        primary: '#ff4500',
+        secondary: '#ff8c66',
+    },
+    'nousresearch': {
+        primary: '#ff69b4', // hot pink
+        secondary: '#ff99cc',
     },
     'other': {
         primary: '#22c55e',
@@ -63,6 +76,7 @@ export const AVAILABLE_MODELS: Record<string, AIModel> = {
         provider: 'google',
         maxSystemPromptLength: 3000,
     },
+    ...OPENROUTER_MODELS
 };
 
 export const AVAILABLE_MODELS_IDS = Object.keys(AVAILABLE_MODELS);
@@ -113,6 +127,36 @@ export const MODEL_DISPLAY = {
         color: PROVIDER_COLORS.google.primary,
         displayName: 'Gemini 2.0 Flash Lite',
         provider: 'google'
+    },
+    'Mistral Large': {
+        color: PROVIDER_COLORS.mistralai.primary,
+        displayName: 'Mistral Large',
+        provider: 'mistralai'
+    },
+    'Llama 3 70B Instruct': {
+        color: PROVIDER_COLORS['meta-llama'].primary,
+        displayName: 'Llama 3 70B Instruct',
+        provider: 'meta-llama'
+    },
+    'Nous Hermes 2 Mixtral 8x7B DPO': {
+        color: PROVIDER_COLORS.nousresearch.primary,
+        displayName: 'Nous Hermes 2 Mixtral 8x7B DPO',
+        provider: 'nousresearch'
+    },
+    'Llama 3 Lumimaid 70B': {
+        color: PROVIDER_COLORS['meta-llama'].primary,
+        displayName: 'Llama 3 Lumimaid 70B',
+        provider: 'meta-llama'
+    },
+    'Aion-RP 1.0 (8B)': {
+        color: PROVIDER_COLORS.other.primary,
+        displayName: 'Aion-RP 1.0 (8B)',
+        provider: 'other'
+    },
+    'Llama 3 Soliloquy 8B v2': {
+        color: PROVIDER_COLORS['meta-llama'].primary,
+        displayName: 'Llama 3 Soliloquy 8B v2',
+        provider: 'meta-llama'
     },
     'default': {
         color: PROVIDER_COLORS.default,
