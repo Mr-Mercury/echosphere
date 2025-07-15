@@ -4,8 +4,12 @@
       "module": "NodeNext",                  // Use ES modules
       "moduleResolution": "NodeNext",          // Resolve modules like Node.js
       "outDir": "./dist",                  // Output directory for compiled files
-      "rootDir": "./src",  
-      "sourceMap": true,     // Root directory containing the source files
+      "sourceMap": true,     // Generate source maps
+      "baseUrl": "./src",                  // Base directory for resolving non-relative modules
+      "paths": {
+        "@shared/*": ["../../../shared/*"],
+        "@lib/*": ["../../../lib/*"]
+      },
       "esModuleInterop": true,             // Enables ES Module interop
       "allowSyntheticDefaultImports": true,// Allow default imports from modules with no default export
       "strict": true,                      // Enable all strict type-checking options
@@ -17,7 +21,9 @@
       "incremental": true              // Ensure each file can be safely transpiled without relying on other imports
     },
     "include": [
-      "src/**/*.ts"             // Files to include
+      "src/**/*.ts",            // Files to include
+      "../../shared/**/*.ts",   // Include shared config
+      "../../lib/entities/**/*.ts"  // Include shared entities
     ],
     "exclude": [
       "node_modules",                      // Exclude node_modules

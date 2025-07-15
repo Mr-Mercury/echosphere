@@ -1,5 +1,5 @@
-import { AIModel } from "../entities/ai-model";
-import { OPENROUTER_MODELS } from "../../shared/config/openrouter";
+import { AIModel } from "../../lib/entities/ai-model";
+import { OPENROUTER_MODELS } from "./openrouter";
 
 // Define color scheme for providers
 export const PROVIDER_COLORS = {
