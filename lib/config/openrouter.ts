@@ -1,6 +1,6 @@
 import { AIModel } from '../entities/ai-model';
 
-// A selection of models available through OpenRouter
+// Models we'll access through OpenRouter
 export const OPENROUTER_MODELS: Record<string, AIModel> = {
   'mistralai/mistral-large': {
     name: 'Mistral Large',
