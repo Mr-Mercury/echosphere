@@ -1,0 +1,42 @@
+import { db } from "@/lib/db/db";
+export const getServerById = async (serverId, userId) => {
+    const server = await db.server.findUnique({
+        where: {
+            id: serverId,
+            members: {
+                some: {
+                    userId
+                }
+            }
+        }
+    });
+    return server;
+};
+export const getServerChannelsById = async (serverId, userId) => {
+    const server = await db.server.findUnique({
+        where: {
+            id: serverId,
+        },
+        include: {
+            channels: {
+                orderBy: {
+                    createdAt: 'asc'
+                },
+            },
+            members: {
+                include: {
+                    user: {
+                        include: {
+                            botConfig: true
+                        }
+                    },
+                },
+                orderBy: {
+                    role: 'asc'
+                }
+            }
+        }
+    });
+    return server;
+};
+//# sourceMappingURL=serverData.js.map

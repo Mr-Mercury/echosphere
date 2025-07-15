@@ -87,10 +87,39 @@ export const registerServerBotAction = async (
         }
 
         if (ourApiKey === true) {
-            apiKey.id = 'our-api-key';
-            apiKey.key = process.env.OPENAI_API_KEY ?? null;
+            // Import the AVAILABLE_MODELS to determine the provider
+            const { AVAILABLE_MODELS } = await import('@/lib/config/models');
+            const modelConfig = AVAILABLE_MODELS[model];
+            
+            if (!modelConfig) {
+                return { error: `Unknown model: ${model}` };
+            }
+            
+            // Set API key based on provider
+            switch (modelConfig.provider) {
+                case 'openai':
+                    apiKey.id = 'our-openai-key';
+                    apiKey.key = process.env.OPENAI_API_KEY ?? null;
+                    break;
+                case 'google':
+                    apiKey.id = 'our-google-key';
+                    apiKey.key = process.env.GOOGLE_API_KEY ?? null;
+                    break;
+            // OPENROUTER PROVIDED MODELS //
+                case 'anthropic':
+                case 'mistralai':
+                case 'meta-llama':
+                case 'nousresearch':
+                case 'other':
+                    apiKey.id = 'our-openrouter-key';
+                    apiKey.key = process.env.OPENROUTER_API_KEY ?? null;
+                    break;
+                default:
+                    return { error: `Unsupported provider: ${modelConfig.provider}` };
+            }
+            
             if (!apiKey.key) {
-                return { error: `No API key found for model: ${model}` };
+                return { error: `No API key configured for provider: ${modelConfig.provider}` };
             }
         }
 

@@ -7,7 +7,7 @@
       "sourceMap": true,     // Generate source maps
       "baseUrl": "./src",                  // Base directory for resolving non-relative modules
       "paths": {
-        "@shared/*": ["../../../shared/*"],
+        "@shared/*": ["shared-types/*"],
         "@lib/*": ["../../../lib/*"]
       },
       "esModuleInterop": true,             // Enables ES Module interop
@@ -22,7 +22,6 @@
     },
     "include": [
       "src/**/*.ts",            // Files to include
-      "../../shared/**/*.ts",   // Include shared config
       "../../lib/entities/**/*.ts"  // Include shared entities
     ],
     "exclude": [

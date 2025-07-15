@@ -1,0 +1,7 @@
+export const CACHE_CONSTANTS = {
+    POPULAR_BOTS: 86400,
+    POPULAR_SERVERS: 86400,
+    BOT_TEMPLATES: 300,
+    SERVER_TEMPLATES: 300,
+};
+//# sourceMappingURL=cache-constants.js.map
