@@ -3,6 +3,8 @@ import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { getConversationsByUserId } from "@/lib/utilities/data/fetching/userConversations";
 import { redirect } from "next/navigation";
 import { DmSidebar } from "@/components/chat-sidebar-components/dm-sidebar/dm-sidebar";
+import { getPersonalBotConversationsByUserId } from "@/lib/utilities/data/fetching/personalBotConversations";
+import { PersonalBot, PersonalBotConversation } from "@prisma/client";
 
 type ConversationNode = {
     userId: string;
@@ -12,20 +14,26 @@ type ConversationNode = {
     image: string;
 }
 
+type PersonalBotConversationWithBot = PersonalBotConversation & {
+    bot: PersonalBot;
+};
+
 // NOTE: THIS DATA AND STRUCTURAL PATTERN IS INTENDED TO ALLOW USERS TO 
 // HAVE CONVERSATIONS WITH THE "SAME" BOT, BUT WITH DIFFERENT SHARED SERVER CONTEXT, 
-// AS EACH CONVERSATION IS OWNED BY A DIFFERENT SERVER MEMBERSHIP
+// AS EACH CONversation IS OWNED BY A DIFFERENT SERVER MEMBERSHIP
 
 const ConversationLayout = async ({ children }: {
     children: React.ReactNode;
 }) => {    
     
     let activeConversations: ConversationNode[] = [];
+    let botConversations: PersonalBotConversationWithBot[] = [];
     try {
         const user = await currentUser();
         if (!user) return redirect('/');
 
         const conversations = await getConversationsByUserId(user.id);
+        botConversations = await getPersonalBotConversationsByUserId(user.id) as PersonalBotConversationWithBot[];
 
         activeConversations = conversations.map(conv => {
             const otherUser = user.id === conv.memberOne.user.id 
@@ -49,7 +57,7 @@ const ConversationLayout = async ({ children }: {
     return (
         <div className='h-full'>
             <div className='hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0'>
-                <DmSidebar />
+                <DmSidebar botConversations={botConversations}/>
                 <ConversationSidebar activeConversations={activeConversations}/>
             </div>
             <main className='h-full w-full md:pl-60'>
