@@ -2,7 +2,7 @@
 
 import qs from 'query-string';
 import { PersonalBotSchema } from "@/zod-schemas";
-import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { AVAILABLE_MODELS } from '@/shared/config/models';
 import axios from 'axios';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

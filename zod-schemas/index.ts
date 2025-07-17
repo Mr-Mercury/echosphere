@@ -1,5 +1,5 @@
 import { ChannelType } from '@prisma/client';
-import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { AVAILABLE_MODELS } from '@/shared/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import * as z from 'zod';
 

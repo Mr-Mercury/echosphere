@@ -2,7 +2,7 @@
 
 import qs from 'query-string';
 import { ServerBotSchema, BotTemplateSchema } from "@/zod-schemas";
-import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { AVAILABLE_MODELS } from '@/shared/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import axios from 'axios';
 import * as z from 'zod';

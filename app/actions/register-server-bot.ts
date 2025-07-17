@@ -88,24 +88,23 @@ export const registerServerBotAction = async (
 
         if (ourApiKey === true) {
             // Import the AVAILABLE_MODELS to determine the provider
-            const { AVAILABLE_MODELS } = await import('@/lib/config/models');
+            const { AVAILABLE_MODELS } = await import('@/shared/config/models');
             const modelConfig = AVAILABLE_MODELS[model];
             
             if (!modelConfig) {
                 return { error: `Unknown model: ${model}` };
             }
             
-            // Set API key based on provider
+            // Use provider-specific API key format
             switch (modelConfig.provider) {
                 case 'openai':
                     apiKey.id = 'our-openai-key';
-                    apiKey.key = process.env.OPENAI_API_KEY ?? null;
+            apiKey.key = process.env.OPENAI_API_KEY ?? null;
                     break;
                 case 'google':
                     apiKey.id = 'our-google-key';
-                    apiKey.key = process.env.GOOGLE_API_KEY ?? null;
+                    apiKey.key = process.env.GOOGLE_GEMINI_API_KEY ?? null;
                     break;
-            // OPENROUTER PROVIDED MODELS //
                 case 'anthropic':
                 case 'mistralai':
                 case 'meta-llama':

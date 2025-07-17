@@ -7,8 +7,7 @@
       "sourceMap": true,     // Generate source maps
       "baseUrl": "./src",                  // Base directory for resolving non-relative modules
       "paths": {
-        "@shared/*": ["shared-types/*"],
-        "@lib/*": ["../../../lib/*"]
+        "@shared/*": ["shared-types/*"]
       },
       "esModuleInterop": true,             // Enables ES Module interop
       "allowSyntheticDefaultImports": true,// Allow default imports from modules with no default export
@@ -21,8 +20,7 @@
       "incremental": true              // Ensure each file can be safely transpiled without relying on other imports
     },
     "include": [
-      "src/**/*.ts",            // Files to include
-      "../../lib/entities/**/*.ts"  // Include shared entities
+      "src/**/*.ts"            // Files to include
     ],
     "exclude": [
       "node_modules",                      // Exclude node_modules

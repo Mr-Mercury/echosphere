@@ -1,4 +1,4 @@
-import { AVAILABLE_MODELS, PROVIDER_COLORS } from "@/lib/config/models";
+import { AVAILABLE_MODELS, PROVIDER_COLORS } from "@/shared/config/models";
 import ApiKeyManager from "@/components/settings-components/api-key-manager";
 
 export interface ProviderData {

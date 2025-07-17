@@ -8,30 +8,30 @@ export const PROVIDER_COLORS = {
         secondary: '#6366f1', // indigo-500
     },
     'anthropic': {
-        primary: '#8b5cf6', // violet-500
-        secondary: '#a78bfa', // violet-400
+        primary: '#ff4500', // orange (swapped with meta-llama)
+        secondary: '#ff8c66', // lighter orange
     },
     'google': {
         primary: '#4285F4', // google blue
         secondary: '#64B5F6', // slightly darker blue
     },
     'mistralai': {
-        primary: '#0095ff',
-        secondary: '#66c2ff',
+        primary: '#0095ff', // blue
+        secondary: '#66c2ff', // lighter blue
     },
     'meta-llama': {
-        primary: '#ff4500',
-        secondary: '#ff8c66',
+        primary: '#8b5cf6', // violet (swapped with anthropic)
+        secondary: '#a78bfa', // lighter violet
     },
     'nousresearch': {
         primary: '#ff69b4', // hot pink
         secondary: '#ff99cc',
     },
     'other': {
-        primary: '#22c55e',
-        secondary: '#22c55e',
+        primary: '#9ca3af', // light gray
+        secondary: '#d1d5db', // lighter gray
     },
-    'default': '#22c55e', // green-500
+    'default': '#9ca3af', // light gray
 } as const;
 
 export const AVAILABLE_MODELS: Record<string, AIModel> = {

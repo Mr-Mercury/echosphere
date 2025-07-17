@@ -46,6 +46,37 @@ export async function PATCH(req: Request) {
             fullPromptControl
         } = parsedBody;
 
+        // Use provider-specific API key format
+        let finalApiKeyId = apiKeyId;
+        if (useSystemKey) {
+            // Import the AVAILABLE_MODELS to determine the provider
+            const { AVAILABLE_MODELS } = await import('@/shared/config/models');
+            const modelConfig = AVAILABLE_MODELS[modelName];
+            
+            if (!modelConfig) {
+                return new NextResponse(`Unknown model: ${modelName}`, { status: 400 });
+            }
+            
+            // Set provider-specific API key ID
+            switch (modelConfig.provider) {
+                case 'openai':
+                    finalApiKeyId = 'our-openai-key';
+                    break;
+                case 'google':
+                    finalApiKeyId = 'our-google-key';
+                    break;
+                case 'anthropic':
+                case 'mistralai':
+                case 'meta-llama':
+                case 'nousresearch':
+                case 'other':
+                    finalApiKeyId = 'our-openrouter-key';
+                    break;
+                default:
+                    return new NextResponse(`Unsupported provider: ${modelConfig.provider}`, { status: 400 });
+            }
+        }
+
         // Sanitize the system prompt
         const sanitizedSystemPrompt = sanitizeInput(systemPrompt);
         
@@ -79,7 +110,7 @@ export async function PATCH(req: Request) {
                     chatFrequency,
                     useSystemKey,
                     messagesPerMinute,
-                    apiKeyId,
+                    apiKeyId: finalApiKeyId,
                     botName
                 }
             }),

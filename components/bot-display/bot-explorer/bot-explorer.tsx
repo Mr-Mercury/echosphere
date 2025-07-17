@@ -17,6 +17,7 @@ import {
   BOT_EXPLORER_DEFAULTS
 } from '@/lib/config/bot-explorer';
 import { VIEW_MODES } from '@/lib/config/ui-constants';
+import { MODEL_DISPLAY } from '@/shared/config/models';
 
 interface BotExplorerProps {
   initialData: Bot[];
@@ -284,9 +285,10 @@ const BotExplorer = ({
               className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
             >
               <div className="flex items-center gap-4 md:w-64">
+                {/* TODO: CHECK IF THIS IS BUSTED, old solution                   style={{ borderColor: bot.model === 'Claude' ? '#7963d2' : bot.model === 'GPT-4' ? '#10a37f' : bot.model === 'Mistral' ? '#0095ff' : bot.model === 'Llama' ? '#ff4500' : '#888888' }} */}
                 <div 
                   className="relative w-16 h-16 rounded-full overflow-hidden border-2"
-                  style={{ borderColor: bot.model === 'Claude' ? '#7963d2' : bot.model === 'GPT-4' ? '#10a37f' : bot.model === 'Mistral' ? '#0095ff' : bot.model === 'Llama' ? '#ff4500' : '#888888' }}
+                  style={{ borderColor: MODEL_DISPLAY[bot.model as keyof typeof MODEL_DISPLAY]?.color || MODEL_DISPLAY.default.color }}
                 >
                   <img
                     src={bot.imageUrl}

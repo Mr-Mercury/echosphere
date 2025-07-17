@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { AVAILABLE_MODELS } from '@/shared/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 
 export async function GET(req: Request) {

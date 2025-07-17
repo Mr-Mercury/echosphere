@@ -1,7 +1,7 @@
 import { Bot, ShieldAlert, ShieldCheck } from "lucide-react";
 import { MemberRole } from "@prisma/client";
 import { cn } from "@/lib/utilities/clsx/utils";
-import { AVAILABLE_MODELS, PROVIDER_COLORS } from "@/lib/config/models";
+import { AVAILABLE_MODELS, PROVIDER_COLORS } from "@/shared/config/models";
 
 // For message window - no margin since parent div has -ml-2
 export const roleIconMap = {

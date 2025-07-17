@@ -3,7 +3,7 @@ import { Bot } from '@/lib/entities/bot-display-types';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { CACHE_CONSTANTS } from '@/lib/config/cache-constants';
-import { AVAILABLE_MODELS, MODEL_DISPLAY } from '@/lib/config/models';
+import { AVAILABLE_MODELS, MODEL_DISPLAY } from '@/shared/config/models';
 
 // Calculate a popularity score based on copies created and like/dislike ratio
 export function calculatePopularityScore(copiesCreated: number, likes: number, dislikes: number) {

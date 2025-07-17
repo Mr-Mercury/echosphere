@@ -8,7 +8,7 @@ import { Copy, Bot, Eye } from "lucide-react";
 import { cn } from "@/lib/utilities/clsx/utils";
 import NavTooltip from "@/components/server-listing-sidebar-components/nav-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
-import { MODEL_DISPLAY } from "@/lib/config/models";
+import { MODEL_DISPLAY } from "@/shared/config/models";
 import ViewBotPromptDialog from '@/components/dialogs/view-bot-prompt-dialog';
 
 export interface ActionButtonConfig {

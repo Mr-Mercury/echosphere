@@ -3,7 +3,7 @@
 import qs from 'query-string';
 import { Server } from '@prisma/client';
 import { ServerBotSchema } from "@/zod-schemas";
-import { AVAILABLE_MODELS } from '@/lib/config/models';
+import { AVAILABLE_MODELS } from '@/shared/config/models';
 import { ChatFrequency } from '@/lib/config/chat-variables';
 import { currentUser } from '@/lib/utilities/data/fetching/currentUser';
 import axios from 'axios';
