@@ -25,13 +25,13 @@ const formatMessageDate = (date: Date | string | null) => {
 
 interface ChatMessagesProps {
     name: string;
-    member: Member;
+    member?: Member;
     chatId: string;
     messageApiUrl: string;
     socketQuery: Record<string, string>;
     paramKey: 'channelId' | 'conversationId';
     paramValue: string;
-    type: 'channel' | 'dm';
+    type: 'channel' | 'dm' | 'botConversation';
 }
 
 type MessageWithMemberWithUser = Message & {
@@ -64,9 +64,9 @@ const ChatMessages = ({
     const hasScrolledToBottomRef = useRef(true);
     const initialMessagesLoadedRef = useRef(false);
 
-    const queryKey = `chat:${chatId}`;
-    const addKey = `chat:${chatId}:messages`;
-    const updateKey = `chat:${chatId}:messages:update`;
+    const queryKey = type === 'botConversation' ? `bot-chat:${chatId}` : `chat:${chatId}`;
+    const addKey = type === 'botConversation' ? `bot-chat:${chatId}:messages` : `chat:${chatId}:messages`;
+    const updateKey = type === 'botConversation' ? `bot-chat:${chatId}:messages:update` : `chat:${chatId}:messages:update`;
 
     const {
         data, 
@@ -253,23 +253,51 @@ const ChatMessages = ({
             <div className='flex flex-col-reverse mt-auto'>
                 {data?.pages?.map((group, index) => (
                     <Fragment key={index}>
-                        {group.items.map((message: MessageWithMemberWithUser) => (
-                            <ChatItem 
-                                key={message.id}
-                                id={message.id}
-                                currentMember={member}
-                                member={message.member}
-                                content={message.content}
-                                fileUrl={message.fileUrl}
-                                deleted={message.deleted}
-                                timestamp={formatMessageDate(message.createdAt)}
-                                isUpdated={message.updatedAt !== message.createdAt}
-                                messageApiUrl={messageApiUrl}
-                                socketQuery={socketQuery}
-                                modelName={message.modelName}
-                                type={type} 
-                            />
-                        ))}
+                        {group.items.map((message: any) => {
+                            // Handle different message types
+                            if (type === 'botConversation') {
+                                // Bot messages don't have member data
+                                return (
+                                    <ChatItem 
+                                        key={message.id}
+                                        id={message.id}
+                                        currentMember={member}
+                                        content={message.content}
+                                        fileUrl={message.fileUrl}
+                                        deleted={message.deleted}
+                                        timestamp={formatMessageDate(message.createdAt)}
+                                        isUpdated={message.updatedAt !== message.createdAt}
+                                        messageApiUrl={messageApiUrl}
+                                        socketQuery={socketQuery}
+                                        modelName={message.modelName}
+                                        type={type}
+                                        isBotMessage={true}
+                                        botName={message.bot?.name}
+                                        botImageUrl={message.bot?.imageUrl}
+                                        fromBot={message.fromBot}
+                                    />
+                                );
+                            } else {
+                                // Regular messages with member data
+                                return (
+                                    <ChatItem 
+                                        key={message.id}
+                                        id={message.id}
+                                        currentMember={member}
+                                        member={message.member}
+                                        content={message.content}
+                                        fileUrl={message.fileUrl}
+                                        deleted={message.deleted}
+                                        timestamp={formatMessageDate(message.createdAt)}
+                                        isUpdated={message.updatedAt !== message.createdAt}
+                                        messageApiUrl={messageApiUrl}
+                                        socketQuery={socketQuery}
+                                        modelName={message.modelName}
+                                        type={type} 
+                                    />
+                                );
+                            }
+                        })}
                     </Fragment>
                 ))}
             </div>

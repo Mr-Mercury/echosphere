@@ -23,18 +23,23 @@ import { getRoleIcon } from "@/lib/utilities/role-icons";
 interface ChatItemProps {
     id: string;
     content: string;
-    member: Member & {
+    member?: Member & {
         user: User;
     };
     timestamp: string;
     fileUrl: string | null;
     deleted: boolean;
-    currentMember: Member;
+    currentMember?: Member;
     isUpdated: boolean;
     messageApiUrl: string;
     socketQuery: Record<string, string>;
-    type: 'dm' | 'channel';
+    type: 'dm' | 'channel' | 'botConversation';
     modelName?: string;
+    // Bot-specific props
+    isBotMessage?: boolean;
+    botName?: string;
+    botImageUrl?: string;
+    fromBot?: boolean;
 }
 
 const formSchema = z.object({
@@ -44,10 +49,66 @@ const formSchema = z.object({
 const ChatItem = ({
     id, content, member, timestamp, fileUrl, deleted,
     currentMember, isUpdated, modelName,
-    messageApiUrl, socketQuery, type
+    messageApiUrl, socketQuery, type,
+    isBotMessage, botName, botImageUrl, fromBot
 }: ChatItemProps) => {
-    if (!id || !member || !currentMember) {
-        console.error('Missing required props:', { id, member, currentMember });
+    if (!id) {
+        console.error('Missing required props:', { id });
+        return null;
+    }
+
+    // Early return for bot messages
+    if (isBotMessage) {
+        return (
+            <div className='relative group flex items-center hover:bg-black/5 p-4 transition w-full'>
+                <div className='group flex gap-x-2 items-start w-full'>
+                    <div className='cursor-pointer hover:drop-shadow-md transition'>
+                        <UserAvatar src={botImageUrl || ''} />
+                    </div>
+                    <div className='flex flex-col w-full'>
+                        <div className='flex items-center gap-x-2'>
+                            <div className='flex items-center'>
+                                <p className='font-semibold text-sm ml-1'>
+                                    {botName}
+                                    {fromBot && <span className='text-xs text-zinc-400 ml-2'>(Bot)</span>}
+                                </p>
+                            </div>
+                            <span className='text-xs text-zinc-400'>
+                                {timestamp}
+                            </span>
+                        </div>
+                        {fileUrl && (
+                            <div className='relative flex items-center p-2 mt-2 rounded-md bg-background/10'>
+                                <FileIcon className='h-10 w-10 fill-indigo-200 stroke-indigo-400' />
+                                <a href={fileUrl} target='_blank' rel='noopener noreferrer' className='ml-2 text-sm text-indigo-400 hover:underline'>
+                                    File attachment
+                                </a>
+                            </div>
+                        )}
+                        {!fileUrl && (
+                            <p className={cn(
+                                'text-sm text-zinc-300',
+                                deleted && 'italic text-zinc-400 text-xs mt-1'
+                            )}>
+                                {content}
+                                {isUpdated && !deleted && (
+                                    <span className='text-[10px] mx-2 text-zinc-400'>
+                                        (edited)
+                                    </span>
+                                )}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    /*
+        ==========================MESSAGES TO USERS OR CHANNELS====================================
+    */
+    if (!member || !currentMember) {
+        console.error('Missing required props for regular message:', { member, currentMember });
         return null;
     }
 

@@ -2,9 +2,8 @@ import { useSocket } from "@/components/providers/socket-provider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Member, Message, User } from "@prisma/client";
-import { Socket } from "socket.io-client";
 
-type ChatSocketProps = {
+type ChatSocketProps<T extends { id: string } = MessageWithMemberWithUser> = {
     addKey: string;
     updateKey: string;
     queryKey: string;
@@ -17,16 +16,16 @@ type MessageWithMemberWithUser = Message & {
     }
 }
 
-export const useChatSocket = ({
+export const useChatSocket = <T extends { id: string } = MessageWithMemberWithUser>({
     addKey, updateKey, queryKey, onError
-}: ChatSocketProps) => {
+}: ChatSocketProps<T>) => {
     const {socket} = useSocket();
     const queryClient = useQueryClient();
 
     useEffect(() => {
         if (!socket) { return };
 
-        socket.on(updateKey, (message: MessageWithMemberWithUser) => {
+        socket.on(updateKey, (message: T) => {
             try {
                 queryClient.setQueryData([queryKey], (oldData: any) => {
                     
@@ -37,7 +36,7 @@ export const useChatSocket = ({
                     const newData = oldData.pages.map((page: any) => {
                         return {
                             ...page,
-                            items: page.items.map((item: MessageWithMemberWithUser) => {
+                            items: page.items.map((item: T) => {
                                 if (item.id === message.id) {
                                     return message;
                                 }
@@ -60,7 +59,7 @@ export const useChatSocket = ({
             }
         });
 
-        socket.on(addKey, (message: MessageWithMemberWithUser) => {
+        socket.on(addKey, (message: T) => {
             try {
                 queryClient.setQueryData([queryKey], (oldData: any) => {
                     if (!oldData || !oldData.pages || oldData.pages.length === 0) {
