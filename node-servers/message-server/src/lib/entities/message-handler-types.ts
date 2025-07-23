@@ -15,7 +15,7 @@ export type MessagePostHandlerParams = {
     conversationId: string | null;
     fileUrl: string | null;
     content: string;
-    type: 'channel' | 'conversation';
+    type: 'channel' | 'conversation' | 'personalBotDm';
 }
 
 export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
@@ -33,6 +33,13 @@ export type ConversationPostHandlerParams = Omit<MessagePostHandlerParams, 'type
     conversationId: string;
 }
 
+export type PersonalBotDmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'personalBotDm';
+    serverId: null;
+    channelId: null;
+    conversationId: string;
+}
+
 // TODO - remove nulls from userId
 export type MessageEditHandlerParams = {
     userId: string;
@@ -41,7 +48,7 @@ export type MessageEditHandlerParams = {
     channelId: string | null;
     conversationId: string | null;
     content: string;
-    type: 'channel' | 'conversation';
+    type: 'channel' | 'conversation' | 'personalBotDm';
     method: 'DELETE' | 'EDIT';
 }
 
@@ -54,6 +61,13 @@ export type ChannelEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | '
 
 export type ConversationEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
     type: 'conversation';
+    serverId: null;
+    channelId: null;
+    conversationId: string;
+}
+
+export type PersonalBotDmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'personalBotDm';
     serverId: null;
     channelId: null;
     conversationId: string;

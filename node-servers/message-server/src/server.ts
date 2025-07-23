@@ -192,7 +192,7 @@
                 }
                 res.status(result.status).json(result.message); 
             } else {
-                res.status(result.status || 500).json({ error: result.error || 'Failed to post message' });
+                res.status(result.status || 500).json({ error: 'error' in result ? result.error : 'Failed to post message' });
             }
         } catch (error) {
             console.log('MESSAGE SERVER POST ERROR', error);
@@ -337,7 +337,7 @@
                 const content = values.content;
                 let channelKey;
                 
-                if (type !== 'conversation' && type !== 'channel') return { status: 400, error: 'Invalid message type!'};
+                if (type !== 'conversation' && type !== 'channel' && type !== 'personalBotDm') return { status: 400, error: 'Invalid message type!'};
 
                 if (type === 'channel') {
                     if (!serverId) return { status: 400, error: 'Server Id missing!'};
@@ -350,6 +350,11 @@
                 if (type === 'conversation') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     channelKey = `chat:${conversationId}:messages`;
+                }
+
+                if (type === 'personalBotDm') {
+                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                    channelKey = `bot-chat:${conversationId}:messages`;
                 }
 
                 const params = { 

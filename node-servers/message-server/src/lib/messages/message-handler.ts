@@ -2,7 +2,9 @@ import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 import { MessagePostHandlerParams, MessageEditHandlerParams,
     MessageResponse, MessageUpdateResponse, ChannelPostHandlerParams, 
-    ConversationPostHandlerParams, ChannelEditHandlerParams, ConversationEditHandlerParams } from "../entities/message-handler-types.js";
+    ConversationPostHandlerParams, ChannelEditHandlerParams, ConversationEditHandlerParams,
+    PersonalBotDmPostHandlerParams
+ } from "../entities/message-handler-types.js";
 
 
 
@@ -15,6 +17,8 @@ export async function messagePostHandler(
         return channelPostHandler(params as ChannelPostHandlerParams);
     } else if (type === 'conversation') {
         return conversationPostHandler(params as ConversationPostHandlerParams);
+    } else if (type === 'personalBotDm') {
+        return personalBotDmPostHandler(params as PersonalBotDmPostHandlerParams);
     }
 
     return { status: 400, error: 'Invalid message type!'};
@@ -70,6 +74,18 @@ async function channelPostHandler(params: ChannelPostHandlerParams) {
     });
 
     return {status: 200, message}
+}
+
+async function personalBotDmPostHandler(params: PersonalBotDmPostHandlerParams) {
+    const { userId, conversationId, fileUrl, content } = params;
+    console.log("Personal bot DM handler hit with params:", params);
+    // TODO: Implement the logic for handling personal bot DMs
+    // 1. Save user message to PersonalBotMessage table
+    // 2. Trigger bot response generation
+    // 3. Save bot message to PersonalBotMessage table
+    // 4. Return a response (or handle socket emission elsewhere)
+
+    return { status: 200, message: "Handler hit successfully" as any };
 }
 
 async function conversationPostHandler(params: ConversationPostHandlerParams) {
