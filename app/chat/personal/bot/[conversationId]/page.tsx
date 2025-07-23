@@ -38,25 +38,24 @@ const BotDmPage = async ({ params }: BotDmPageProps) => {
         <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
             <ChatHeader 
                 name={bot.name}
-                type="conversation"
+                type="botConversation"
                 imageUrl={bot.imageUrl || undefined}
             />
             <ChatMessages 
                 name={bot.name}
                 member={{} as any} // Not needed for bot chat
                 chatId={conversation.id}
-                apiUrl="/api/personal-bot-messages"
-                socketUrl="/api/socket/messages"
+                messageApiUrl="/api/personal-bot-messages"
                 socketQuery={{
                     conversationId: conversation.id,
                 }}
                 paramKey="conversationId"
                 paramValue={conversation.id}
-                type="personalBot"
+                type="botConversation"
             />
             <ChatInput 
                 name={bot.name}
-                type="conversation"
+                type="botConversation"
                 apiUrl="/api/socket/messages"
                 query={{
                     conversationId: conversation.id,

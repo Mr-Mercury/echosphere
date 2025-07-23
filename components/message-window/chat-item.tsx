@@ -33,7 +33,7 @@ interface ChatItemProps {
     isUpdated: boolean;
     messageApiUrl: string;
     socketQuery: Record<string, string>;
-    type: 'dm' | 'channel' | 'botConversation';
+    type: 'botConversation' | 'channel' | 'conversation';
     modelName?: string;
     // Bot-specific props
     isBotMessage?: boolean;

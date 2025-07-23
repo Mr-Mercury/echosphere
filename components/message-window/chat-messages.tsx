@@ -31,7 +31,7 @@ interface ChatMessagesProps {
     socketQuery: Record<string, string>;
     paramKey: 'channelId' | 'conversationId';
     paramValue: string;
-    type: 'channel' | 'dm' | 'botConversation';
+    type: 'channel' | 'botConversation' | 'conversation';
 }
 
 type MessageWithMemberWithUser = Message & {

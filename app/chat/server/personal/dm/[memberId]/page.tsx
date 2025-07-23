@@ -49,7 +49,7 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
             <ChatHeader imageUrl={otherMember!.user!.image!} 
             name={otherMember!.user!.username!}
             serverId={params.serverId}
-            type='dm'/>
+            type='conversation'/>
             <ChatMessages 
                 member={currentMember} 
                 name={otherMember.user.username!}
@@ -58,13 +58,13 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
                 socketQuery={{ conversationId: conversation.id }}
                 paramKey='conversationId'
                 paramValue={conversation.id}
-                type='dm'
+                type='conversation'
             />
             <ChatInput 
                 apiUrl={messageHandlerApiUrl}
                 query={ {conversationId: conversation.id} }                
                 name={otherMember.user.username!}
-                type='dm'
+                type='conversation'
             />
         </div>
     )

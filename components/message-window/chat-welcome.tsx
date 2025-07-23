@@ -2,7 +2,7 @@ import { Hash } from "lucide-react";
 
 interface ChatWelcomeProps {
     name: string;
-    type: 'channel' | 'dm';
+    type: 'channel' | 'botConversation' | 'conversation';
 }
 
 const ChatWelcome = ({name, type}: ChatWelcomeProps) => {

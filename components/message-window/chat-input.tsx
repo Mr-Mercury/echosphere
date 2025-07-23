@@ -18,7 +18,7 @@ interface ChatInputProps {
     apiUrl: string;
     query: Record<string, any>;
     name: string;
-    type: 'dm' | 'channel';
+    type: 'botConversation' | 'channel' | 'conversation';
 }
 
 const formSchema = z.object({
@@ -98,7 +98,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                             disabled={isLoading} 
                                             className='px-14 py-6 bg-zinc-700/70 border-none 
                                             border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-200'
-                                            placeholder={`Message ${type === 'dm' ? name : '#' + name}`}
+                                            placeholder={`Message ${type === 'botConversation' ? name : '#' + name}`}
                                             autoComplete="off"
                                         />
                                         <div className='absolute top-7 right-8'>
