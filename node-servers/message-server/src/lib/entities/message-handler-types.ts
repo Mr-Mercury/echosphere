@@ -15,7 +15,7 @@ export type MessagePostHandlerParams = {
     conversationId: string | null;
     fileUrl: string | null;
     content: string;
-    type: 'channel' | 'dm';
+    type: 'channel' | 'conversation';
 }
 
 export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
@@ -26,8 +26,8 @@ export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | '
     modelName: string | null;
 }
 
-export type DmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
-    type: 'dm';
+export type ConversationPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
+    type: 'conversation';
     serverId: null;
     channelId: null;
     conversationId: string;
@@ -41,7 +41,7 @@ export type MessageEditHandlerParams = {
     channelId: string | null;
     conversationId: string | null;
     content: string;
-    type: string; // TODO: Change to 'channel' | 'dm' for better type safety (when I can make sure things don't break)
+    type: 'channel' | 'conversation';
     method: 'DELETE' | 'EDIT';
 }
 
@@ -52,8 +52,8 @@ export type ChannelEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | '
     conversationId: null;
 }
 
-export type DmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
-    type: 'dm';
+export type ConversationEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'conversation';
     serverId: null;
     channelId: null;
     conversationId: string;

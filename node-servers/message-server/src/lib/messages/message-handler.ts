@@ -2,7 +2,7 @@ import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 import { MessagePostHandlerParams, MessageEditHandlerParams,
     MessageResponse, MessageUpdateResponse, ChannelPostHandlerParams, 
-    DmPostHandlerParams, ChannelEditHandlerParams, DmEditHandlerParams } from "../entities/message-handler-types.js";
+    ConversationPostHandlerParams, ChannelEditHandlerParams, ConversationEditHandlerParams } from "../entities/message-handler-types.js";
 
 
 
@@ -13,8 +13,8 @@ export async function messagePostHandler(
     
     if (type === 'channel') {
         return channelPostHandler(params as ChannelPostHandlerParams);
-    } else if (type === 'dm') {
-        return dmPostHandler(params as DmPostHandlerParams);
+    } else if (type === 'conversation') {
+        return conversationPostHandler(params as ConversationPostHandlerParams);
     }
 
     return { status: 400, error: 'Invalid message type!'};
@@ -72,7 +72,7 @@ async function channelPostHandler(params: ChannelPostHandlerParams) {
     return {status: 200, message}
 }
 
-async function dmPostHandler(params: DmPostHandlerParams) {
+async function conversationPostHandler(params: ConversationPostHandlerParams) {
     const { userId, conversationId, fileUrl, content } = params;
 
     if (!conversationId) return {status: 400, error: 'Conversation ID missing!'};
@@ -140,11 +140,9 @@ export async function messageEditHandler (
 
     if (type === 'channel') {
         return channelEditHandler(params as ChannelEditHandlerParams);
-    } else if (type === 'dm') {
-        return dmEditHandler(params as DmEditHandlerParams);
+    } else if (type === 'conversation') {
+        return conversationEditHandler(params as ConversationEditHandlerParams);
     }
-
-    return { status: 400, error: 'Invalid message type!'};
 }
 
 async function channelEditHandler(params: ChannelEditHandlerParams) {
@@ -264,7 +262,7 @@ async function channelEditHandler(params: ChannelEditHandlerParams) {
     }
 }
 
-async function dmEditHandler(params: DmEditHandlerParams) {
+async function conversationEditHandler(params: ConversationEditHandlerParams) {
     const { userId, messageId, conversationId, content, method } = params;
 
     if (!conversationId) return {status: 400, error: 'Conversation ID missing!'};

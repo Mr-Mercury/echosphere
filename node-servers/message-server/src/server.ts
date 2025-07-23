@@ -159,14 +159,14 @@
                 return res.status(400).json({ error: 'Invalid server or channel ID format' });
             }
 
-            const isDm = !!conversationId;
-            const messageType = isDm ? 'dm' : 'channel';
+            const isConversation = !!conversationId;
+            const messageType = isConversation ? 'conversation' : 'channel';
 
             const params: MessagePostHandlerParams = { 
                 userId: session.user.id,
-                serverId: isDm ? null : serverId,
-                channelId: isDm ? null : channelId,
-                conversationId: isDm ? conversationId.toString() : null,
+                serverId: isConversation ? null : serverId,
+                channelId: isConversation ? null : channelId,
+                conversationId: isConversation ? conversationId.toString() : null,
                 fileUrl,
                 content,
                 type: messageType
@@ -181,7 +181,7 @@
                 if (messageType === 'channel' && params.channelId) {
                     roomToEmitTo = params.channelId;
                     eventKey = `chat:${params.channelId}:messages`;
-                } else if (messageType === 'dm' && params.conversationId) {
+                } else if (messageType === 'conversation' && params.conversationId) {
                     roomToEmitTo = params.conversationId; // Assuming DM rooms are identified by conversationId
                     eventKey = `chat:${params.conversationId}:messages`;
                 }
