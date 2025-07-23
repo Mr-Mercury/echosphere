@@ -12,7 +12,7 @@ import DeleteServerModal from "../modal-dialog/servers/delete-server-modal";
 import DeleteChannelModal from "../modal-dialog/channels/delete-channel-modal";
 import EditChannelModal from "../modal-dialog/channels/edit-channel-modal";
 import MessageFileModal from "../modal-dialog/message-file-modal";
-import CreateDMModal from "../modal-dialog/chat-bots/create-dm-modal";
+import CreateDMModal from "../modal-dialog/chat-bots/create-botConversation-modal";
 import CreateServerBotModal from "../modal-dialog/chat-bots/create-srv-bot-modal";
 import EditBotModal from "../modal-dialog/chat-bots/edit-bot-modal";
 import CopyBotModal from "../modal-dialog/chat-bots/copy-bot-modal";
