@@ -31,7 +31,7 @@ interface ChatMessagesProps {
     socketQuery: Record<string, string>;
     paramKey: 'channelId' | 'conversationId';
     paramValue: string;
-    type: 'channel' | 'botConversation' | 'conversation';
+    type: 'channel' | 'serverContextDm' | 'personalBotDm';
 }
 
 type MessageWithMemberWithUser = Message & {
@@ -64,9 +64,9 @@ const ChatMessages = ({
     const hasScrolledToBottomRef = useRef(true);
     const initialMessagesLoadedRef = useRef(false);
 
-    const queryKey = type === 'botConversation' ? `bot-chat:${chatId}` : `chat:${chatId}`;
-    const addKey = type === 'botConversation' ? `bot-chat:${chatId}:messages` : `chat:${chatId}:messages`;
-    const updateKey = type === 'botConversation' ? `bot-chat:${chatId}:messages:update` : `chat:${chatId}:messages:update`;
+    const queryKey = type === 'personalBotDm' ? `bot-chat:${chatId}` : `chat:${chatId}`;
+    const addKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages` : `chat:${chatId}:messages`;
+    const updateKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages:update` : `chat:${chatId}:messages:update`;
 
     const {
         data, 
@@ -255,7 +255,7 @@ const ChatMessages = ({
                     <Fragment key={index}>
                         {group.items.map((message: any) => {
                             // Handle different message types
-                            if (type === 'botConversation') {
+                            if (type === 'personalBotDm') {
                                 // Bot messages don't have member data
                                 return (
                                     <ChatItem 

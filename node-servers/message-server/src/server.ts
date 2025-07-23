@@ -337,7 +337,7 @@
                 const content = values.content;
                 let channelKey;
                 
-                if (type !== 'dm' && type !== 'channel') return { status: 400, error: 'Invalid message type!'};
+                if (type !== 'conversation' && type !== 'channel') return { status: 400, error: 'Invalid message type!'};
 
                 if (type === 'channel') {
                     if (!serverId) return { status: 400, error: 'Server Id missing!'};
@@ -347,7 +347,7 @@
                     socket.join(channelId);
                 }
 
-                if (type === 'dm') {
+                if (type === 'conversation') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     channelKey = `chat:${conversationId}:messages`;
                 }
@@ -391,7 +391,7 @@
                     updateKey = `chat:${channelId}:messages:update`;
                 }
 
-                if (type === 'dm') {
+                if (type === 'conversation') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     updateKey = `chat:${conversationId}:messages:update`;
                     console.log('updateKey is: ' + updateKey);

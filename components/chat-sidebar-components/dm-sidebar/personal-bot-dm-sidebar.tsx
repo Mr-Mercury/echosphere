@@ -10,11 +10,12 @@ type PersonalBotConversationWithBot = PersonalBotConversation & {
     bot: PersonalBot;
 };
 
-interface DmSidebarProps {
-    botConversations: PersonalBotConversationWithBot[];
+interface PersonalBotDmSidebarProps {
+    personalBotDms: PersonalBotConversationWithBot[];
 }
 
-export const DmSidebar = ({ botConversations }: DmSidebarProps) => {
+
+export const PersonalBotDmSidebar = ({ personalBotDms }: PersonalBotDmSidebarProps) => {
 
     const router = useRouter();
 
@@ -31,7 +32,7 @@ export const DmSidebar = ({ botConversations }: DmSidebarProps) => {
                 <h2 className="px-4 text-xs uppercase font-semibold text-zinc-400">
                     Bot DMs
                 </h2>
-                {botConversations.map((conversation) => (
+                {personalBotDms.map((conversation) => (
                     <BotDmMember 
                         key={conversation.id}
                         id={conversation.id}

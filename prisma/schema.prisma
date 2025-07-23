@@ -112,6 +112,14 @@ model PersonalBot {
   @@index([creatorId])
 }
 
+// ====================================================================================
+// ARCHITECTURAL NOTE:
+// The `PersonalBotConversation` model is for private, serverless DMs between a user
+// and their personal bot instance. This is a completely separate system from the
+// server-context DMs and does NOT have a server context.
+// ====================================================================================
+
+
 model PersonalBotConversation {
   id String @id @default(cuid())
 
@@ -281,6 +289,13 @@ model Message {
   @@index([memberId])
 }
 
+// ====================================================================================
+// ARCHITECTURAL NOTE:
+// The `Conversation` model is for any DM that happens *within a server's context*.
+// It links two `Member` records. Since a `Member` can be a human or a bot
+// (`User.human` can be `false`), this single model correctly handles both
+// user-user DMs and DMs with a "server bot".
+// ====================================================================================
 model Conversation {
   id String @id @default(uuid())
 
