@@ -99,13 +99,13 @@ app.post('/message', async (req, res) => {
         if (typeof serverId !== 'string' || typeof channelId !== 'string') {
             return res.status(400).json({ error: 'Invalid server or channel ID format' });
         }
-        const isDm = !!conversationId;
-        const messageType = isDm ? 'dm' : 'channel';
+        const isConversation = !!conversationId;
+        const messageType = isConversation ? 'userDm' : 'channel';
         const params = {
             userId: session.user.id,
-            serverId: isDm ? null : serverId,
-            channelId: isDm ? null : channelId,
-            conversationId: isDm ? conversationId.toString() : null,
+            serverId: isConversation ? null : serverId,
+            channelId: isConversation ? null : channelId,
+            conversationId: isConversation ? conversationId.toString() : null,
             fileUrl,
             content,
             type: messageType
@@ -118,9 +118,9 @@ app.post('/message', async (req, res) => {
                 roomToEmitTo = params.channelId;
                 eventKey = `chat:${params.channelId}:messages`;
             }
-            else if (messageType === 'dm' && params.conversationId) {
+            else if (messageType === 'userDm' && params.conversationId) {
                 roomToEmitTo = params.conversationId; // Assuming DM rooms are identified by conversationId
-                eventKey = `chat:${params.conversationId}:messages`;
+                eventKey = `user-chat:${params.conversationId}:messages`;
             }
             if (roomToEmitTo && eventKey) {
                 io.to(roomToEmitTo).emit(eventKey, result.message);
@@ -129,7 +129,7 @@ app.post('/message', async (req, res) => {
             res.status(result.status).json(result.message);
         }
         else {
-            res.status(result.status || 500).json({ error: result.error || 'Failed to post message' });
+            res.status(result.status || 500).json({ error: 'error' in result ? result.error : 'Failed to post message' });
         }
     }
     catch (error) {
@@ -255,7 +255,7 @@ io.on('connection', (socket) => {
             const fileUrl = values.fileUrl;
             const content = values.content;
             let channelKey;
-            if (type !== 'dm' && type !== 'channel')
+            if (type !== 'channel' && type !== 'personalBotDm' && type !== 'userDm')
                 return { status: 400, error: 'Invalid message type!' };
             if (type === 'channel') {
                 if (!serverId)
@@ -266,10 +266,15 @@ io.on('connection', (socket) => {
                 // Join the channel room when sending a message
                 socket.join(channelId);
             }
-            if (type === 'dm') {
+            if (type === 'personalBotDm') {
                 if (!conversationId)
                     return { status: 400, error: 'Conversation Id missing!' };
-                channelKey = `chat:${conversationId}:messages`;
+                channelKey = `bot-chat:${conversationId}:messages`;
+            }
+            if (type === 'userDm') {
+                if (!conversationId)
+                    return { status: 400, error: 'Conversation Id missing!' };
+                channelKey = `user-chat:${conversationId}:messages`;
             }
             const params = {
                 userId, serverId, channelId, conversationId, fileUrl, content, type
@@ -310,16 +315,18 @@ io.on('connection', (socket) => {
                     return { status: 400, error: 'Channel Id missing!' };
                 updateKey = `chat:${channelId}:messages:update`;
             }
-            if (type === 'dm') {
+            if (type === 'userDm') {
                 if (!conversationId)
                     return { status: 400, error: 'Conversation Id missing!' };
-                updateKey = `chat:${conversationId}:messages:update`;
+                updateKey = `user-chat:${conversationId}:messages:update`;
                 console.log('updateKey is: ' + updateKey);
             }
             if (!updateKey)
                 return { status: 400, error: 'Update key is undefined!' };
             const response = await messageEditHandler(params);
-            io.emit(updateKey, response?.message);
+            if (response && 'message' in response && response.message) {
+                io.emit(updateKey, response.message);
+            }
             return response;
         }
         catch (error) {

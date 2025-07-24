@@ -1,3 +1,9 @@
+// ==================== DEPRECATED ==================== 
+// This utility handles the old broken server-scoped DM system.
+// Use global-conversation.ts instead for global user-to-user DMs.
+// TODO: Remove this file after migration is complete
+// ====================================================
+
 import { db } from "../db/db"
 
 export const conversationUtil = async (memberOneId: string, memberTwoId: string) => {

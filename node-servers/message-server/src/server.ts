@@ -160,7 +160,7 @@
             }
 
             const isConversation = !!conversationId;
-            const messageType = isConversation ? 'conversation' : 'channel';
+            const messageType = isConversation ? 'userDm' : 'channel';
 
             const params: MessagePostHandlerParams = { 
                 userId: session.user.id,
@@ -181,9 +181,9 @@
                 if (messageType === 'channel' && params.channelId) {
                     roomToEmitTo = params.channelId;
                     eventKey = `chat:${params.channelId}:messages`;
-                } else if (messageType === 'conversation' && params.conversationId) {
+                } else if (messageType === 'userDm' && params.conversationId) {
                     roomToEmitTo = params.conversationId; // Assuming DM rooms are identified by conversationId
-                    eventKey = `chat:${params.conversationId}:messages`;
+                    eventKey = `user-chat:${params.conversationId}:messages`;
                 }
 
                 if (roomToEmitTo && eventKey) {
@@ -337,7 +337,7 @@
                 const content = values.content;
                 let channelKey;
                 
-                if (type !== 'conversation' && type !== 'channel' && type !== 'personalBotDm') return { status: 400, error: 'Invalid message type!'};
+                if (type !== 'channel' && type !== 'personalBotDm' && type !== 'userDm') return { status: 400, error: 'Invalid message type!'};
 
                 if (type === 'channel') {
                     if (!serverId) return { status: 400, error: 'Server Id missing!'};
@@ -347,14 +347,14 @@
                     socket.join(channelId);
                 }
 
-                if (type === 'conversation') {
-                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
-                    channelKey = `chat:${conversationId}:messages`;
-                }
-
                 if (type === 'personalBotDm') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     channelKey = `bot-chat:${conversationId}:messages`;
+                }
+
+                if (type === 'userDm') {
+                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                    channelKey = `user-chat:${conversationId}:messages`;
                 }
 
                 const params = { 
@@ -363,7 +363,11 @@
                 // Send required info to message Handler followed by emission & key
                 const result = await messagePostHandler(params);
                 if (!channelKey) return { status: 400, error: 'Channel key is undefined!'};
-                io.to(channelId).emit(channelKey, result.message); 
+                
+                // Emit to the correct room based on message type
+                const roomId = type === 'channel' ? channelId : conversationId;
+                if (!roomId) return { status: 400, error: 'Room ID is undefined!'};
+                io.to(roomId).emit(channelKey, result.message); 
             } catch (error) {
                 console.log('SOCKET MESSAGE POST ERROR: ', error);
                 io.emit('error', { status: 500, error: 'SOCKET MESSAGE POST ERROR'});
@@ -396,16 +400,18 @@
                     updateKey = `chat:${channelId}:messages:update`;
                 }
 
-                if (type === 'conversation') {
+                if (type === 'userDm') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
-                    updateKey = `chat:${conversationId}:messages:update`;
+                    updateKey = `user-chat:${conversationId}:messages:update`;
                     console.log('updateKey is: ' + updateKey);
                 }
 
                 if (!updateKey) return { status: 400, error: 'Update key is undefined!'};
 
                 const response = await messageEditHandler(params);
-                io.emit(updateKey, response?.message);
+                if (response && 'message' in response && response.message) {
+                    io.emit(updateKey, response.message);
+                }
 
                 return response;
             } catch (error) {

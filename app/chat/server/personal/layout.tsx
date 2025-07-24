@@ -66,7 +66,6 @@ const UnifiedDmLayout = async ({ children }: {
     return (
         <div className='h-full'>
             <div className='hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0'>
-                <PersonalBotDmSidebar personalBotDms={personalBotDms}/>
                 <ServerDmSidebar serverDms={serverDms}/>
             </div>
             <main className='h-full w-full md:pl-60'>

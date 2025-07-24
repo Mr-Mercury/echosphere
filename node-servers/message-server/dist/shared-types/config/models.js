@@ -6,30 +6,30 @@ export const PROVIDER_COLORS = {
         secondary: '#6366f1', // indigo-500
     },
     'anthropic': {
-        primary: '#8b5cf6', // violet-500
-        secondary: '#a78bfa', // violet-400
+        primary: '#ff4500', // orange 
+        secondary: '#ff8c66', // lighter orange
     },
     'google': {
         primary: '#4285F4', // google blue
         secondary: '#64B5F6', // slightly darker blue
     },
     'mistralai': {
-        primary: '#0095ff',
-        secondary: '#66c2ff',
+        primary: '#0095ff', // blue
+        secondary: '#66c2ff', // lighter blue
     },
     'meta-llama': {
-        primary: '#ff4500',
-        secondary: '#ff8c66',
+        primary: '#8b5cf6', // violet 
+        secondary: '#a78bfa', // lighter violet
     },
     'nousresearch': {
         primary: '#ff69b4', // hot pink
         secondary: '#ff99cc',
     },
     'other': {
-        primary: '#22c55e',
-        secondary: '#22c55e',
+        primary: '#9ca3af', // light gray
+        secondary: '#d1d5db', // lighter gray
     },
-    'default': '#22c55e', // green-500
+    'default': '#9ca3af', // light gray
 };
 export const AVAILABLE_MODELS = {
     'gpt-4o': {
@@ -108,14 +108,14 @@ export const MODEL_DISPLAY = {
         provider: 'anthropic'
     },
     'Mistral': {
-        color: '#0095ff', // Blue for Mistral
+        color: PROVIDER_COLORS.mistralai.primary,
         displayName: 'Mistral',
         provider: 'mistral'
     },
     'Llama': {
-        color: '#ff4500', // Orange for Llama
+        color: PROVIDER_COLORS['meta-llama'].primary,
         displayName: 'Llama',
-        provider: 'meta'
+        provider: 'meta-llama'
     },
     'Gemini 2.0 Flash Lite': {
         color: PROVIDER_COLORS.google.primary,

@@ -1,19 +1,11 @@
-// ==================== DEPRECATED ==================== 
-// This API route handles the old broken server-scoped DM system.
-// Use /api/user-dms instead for global user-to-user DMs.
-// TODO: Remove this file after migration is complete
-// ====================================================
-
 import { db } from "@/lib/db/db";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
-import { Dm } from "@prisma/client";
+import { UserDm } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const NUMBER_OF_MESSAGES = 10;
 
-export async function GET(
-    req: Request
-) {
+export async function GET(req: Request) {
     try {
         const user = await currentUser();
         const { searchParams } = new URL(req.url);
@@ -24,10 +16,24 @@ export async function GET(
         if (!user) return new NextResponse('Unauthorized', {status: 401});
         if (!conversationId) return new NextResponse('Conversation ID missing!', {status: 400});
 
-        let messages: Dm[] = [];
+        const conversation = await db.userConversation.findFirst({
+            where: {
+                id: conversationId,
+                OR: [
+                    { userOneId: user.id },
+                    { userTwoId: user.id }
+                ]
+            }
+        });
+
+        if (!conversation) {
+            return new NextResponse('Conversation not found or access denied', {status: 404});
+        }
+
+        let messages: UserDm[] = [];
 
         if (cursor) {
-            messages = await db.dm.findMany({
+            messages = await db.userDm.findMany({
                 take: NUMBER_OF_MESSAGES,
                 skip: 1,
                 cursor: {
@@ -35,11 +41,15 @@ export async function GET(
                 },
                 where: {
                     conversationId,
+                    deleted: false
                 },
                 include: {
-                    member: {
-                        include: {
-                            user: true,
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            image: true,
+                            human: true
                         }
                     }
                 },
@@ -48,15 +58,19 @@ export async function GET(
                 }
             })
         } else {
-            messages = await db.dm.findMany({
+            messages = await db.userDm.findMany({
                 take: NUMBER_OF_MESSAGES,
                 where: {
                     conversationId,
+                    deleted: false
                 },
                 include: {
-                    member: {
-                        include: {
-                            user: true,
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            image: true,
+                            human: true
                         }
                     }
                 },
@@ -70,14 +84,15 @@ export async function GET(
 
         if (messages.length === NUMBER_OF_MESSAGES) {
             nextCursor = messages[NUMBER_OF_MESSAGES - 1].id;
-        };
+        }
 
         return NextResponse.json({
             items: messages,
             nextCursor
-        })
+        });
 
     } catch (error) {
-        return new NextResponse('Interal Error', {status: 500})
+        console.log('[USER_DMS_GET]', error);
+        return new NextResponse('Internal Error', { status: 500 });
     }
-}
+} 

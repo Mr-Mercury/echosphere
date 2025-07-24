@@ -7,7 +7,7 @@ import UserSettings from "../islets/users/user-settings";
 interface ChatHeaderProps {
     serverId?: string;
     name: string;
-    type: 'channel' | 'serverContextDm' | 'personalBotDm'
+    type: 'channel' | 'userDm' | 'personalBotDm'
     imageUrl?: string;
 }
 
@@ -19,7 +19,7 @@ const ChatHeader = ({serverId, name, type, imageUrl}: ChatHeaderProps) => {
             {type === 'channel' && (
                 <Hash className='w-5 h-5 text-zinc-400 mr-2' />
             )}
-            {(type === 'personalBotDm') && (
+            {(type === 'personalBotDm' || type === 'userDm') && (
                 <UserAvatar src={imageUrl} className='h-8 w-8 md:h-8 md:w-8 mr-2'/>
             )}
             <p className='font-semibold text-md text-secondary'>

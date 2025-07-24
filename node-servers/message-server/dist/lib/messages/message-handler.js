@@ -5,8 +5,11 @@ export async function messagePostHandler(params) {
     if (type === 'channel') {
         return channelPostHandler(params);
     }
-    else if (type === 'dm') {
-        return dmPostHandler(params);
+    else if (type === 'personalBotDm') {
+        return personalBotDmPostHandler(params);
+    }
+    else if (type === 'userDm') {
+        return userDmPostHandler(params);
     }
     return { status: 400, error: 'Invalid message type!' };
 }
@@ -56,59 +59,61 @@ async function channelPostHandler(params) {
     });
     return { status: 200, message };
 }
-async function dmPostHandler(params) {
+async function personalBotDmPostHandler(params) {
+    const { userId, conversationId, fileUrl, content } = params;
+    console.log("Personal bot DM handler hit with params:", params);
+    // TODO: Implement the logic for handling personal bot DMs
+    // 1. Save user message to PersonalBotMessage table
+    // 2. Trigger bot response generation
+    // 3. Save bot message to PersonalBotMessage table
+    // 4. Return a response (or handle socket emission elsewhere)
+    return { status: 200, message: "Handler hit successfully" };
+}
+async function userDmPostHandler(params) {
     const { userId, conversationId, fileUrl, content } = params;
     if (!conversationId)
         return { status: 400, error: 'Conversation ID missing!' };
     if (!content && !fileUrl)
         return { status: 400, error: 'No content or file URL provided!' };
-    const conversation = await db.conversation.findFirst({
+    // Verify the conversation exists and user has access
+    const conversation = await db.userConversation.findFirst({
         where: {
             id: conversationId,
             OR: [
-                {
-                    memberOne: {
-                        userId: userId
-                    }
-                },
-                {
-                    memberTwo: {
-                        userId: userId
-                    }
-                }
+                { userOneId: userId },
+                { userTwoId: userId }
             ]
         },
         include: {
-            memberOne: {
-                include: {
-                    user: true,
-                }
-            },
-            memberTwo: {
-                include: {
-                    user: true,
-                }
-            },
+            userOne: true,
+            userTwo: true,
         }
     });
     if (!conversation)
         return { status: 404, error: 'Conversation not found!' };
-    const member = conversation?.memberOne.userId === userId ?
-        conversation.memberOne : conversation.memberTwo;
-    const message = await db.dm.create({
+    // Create the message in the UserDm table
+    const message = await db.userDm.create({
         data: {
             content,
             fileUrl,
             conversationId: conversationId,
-            memberId: member.id,
+            userId: userId,
         },
         include: {
-            member: {
-                include: {
-                    user: true,
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    image: true,
+                    human: true
                 }
             }
         }
+    });
+    // Update conversation timestamp
+    await db.userConversation.update({
+        where: { id: conversationId },
+        data: { updatedAt: new Date() }
     });
     return { status: 200, message };
 }
@@ -117,10 +122,13 @@ export async function messageEditHandler(params) {
     if (type === 'channel') {
         return channelEditHandler(params);
     }
-    else if (type === 'dm') {
-        return dmEditHandler(params);
+    else if (type === 'userDm') {
+        return userDmEditHandler(params);
     }
-    return { status: 400, error: 'Invalid message type!' };
+    else if (type === 'personalBotDm') {
+        return personalBotDmEditHandler(params);
+    }
+    return { status: 400, error: 'Invalid message type for editing' };
 }
 async function channelEditHandler(params) {
     const { userId, messageId, serverId, channelId, content, method } = params;
@@ -227,116 +235,12 @@ async function channelEditHandler(params) {
         return { status: 500, error: 'Internal server error' };
     }
 }
-async function dmEditHandler(params) {
-    const { userId, messageId, conversationId, content, method } = params;
-    if (!conversationId)
-        return { status: 400, error: 'Conversation ID missing!' };
-    if (!userId)
-        return { status: 400, error: 'User ID missing!' };
-    if (!content)
-        return { status: 400, error: 'No content provided!' };
-    try {
-        const conversation = await db.conversation.findFirst({
-            where: {
-                id: conversationId,
-                OR: [
-                    {
-                        memberOne: {
-                            userId: userId,
-                        }
-                    },
-                    {
-                        memberTwo: {
-                            userId: userId,
-                        }
-                    }
-                ]
-            },
-            include: {
-                memberOne: {
-                    include: {
-                        user: true,
-                    }
-                },
-                memberTwo: {
-                    include: {
-                        user: true,
-                    }
-                }
-            }
-        });
-        if (!conversation)
-            return { status: 404, error: 'Conversation not found!' };
-        const member = conversation.memberOne.userId === userId ?
-            conversation.memberOne : conversation.memberTwo;
-        let message = await db.dm.findFirst({
-            where: {
-                id: messageId,
-                conversationId: conversationId,
-            },
-            include: {
-                member: {
-                    include: {
-                        user: true,
-                    }
-                }
-            }
-        });
-        if (!message || message.deleted) {
-            return { status: 404, error: 'Message not found!' };
-        }
-        const isMessageOwner = message.memberId === member.id;
-        const canModify = isMessageOwner;
-        if (!canModify) {
-            return { status: 401, error: 'Unauthorized!' };
-        }
-        ;
-        if (method === 'DELETE') {
-            message = await db.dm.update({
-                where: {
-                    id: messageId,
-                },
-                data: {
-                    fileUrl: null,
-                    content: 'This message has been deleted',
-                    deleted: true,
-                },
-                include: {
-                    member: {
-                        include: {
-                            user: true,
-                        }
-                    }
-                }
-            });
-            // Note to self - tanstack requires you to return the updateKey to trigger rerenders/updates
-            return { status: 200, message };
-        }
-        if (method === 'EDIT') {
-            if (!isMessageOwner)
-                return { status: 401, error: 'Unauthorized to edit message!' };
-            message = await db.dm.update({
-                where: {
-                    id: messageId,
-                },
-                data: {
-                    content,
-                },
-                include: {
-                    member: {
-                        include: {
-                            user: true,
-                        }
-                    }
-                }
-            });
-            return { status: 200, message };
-        }
-        return { status: 400, error: 'Invalid method' };
-    }
-    catch (error) {
-        console.log('EDIT DM HANDLER ERROR', error);
-        return { status: 500, error: 'Internal server error' };
-    }
+async function userDmEditHandler(params) {
+    // TODO: Implement userDm edit handler
+    return { status: 501, error: 'User DM editing not implemented yet' };
+}
+async function personalBotDmEditHandler(params) {
+    // TODO: Implement personalBotDm edit handler  
+    return { status: 501, error: 'Personal bot DM editing not implemented yet' };
 }
 //# sourceMappingURL=message-handler.js.map

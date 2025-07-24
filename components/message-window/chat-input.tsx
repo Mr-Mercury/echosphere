@@ -18,7 +18,7 @@ interface ChatInputProps {
     apiUrl: string;
     query: Record<string, any>;
     name: string;
-    type: 'channel' | 'serverContextDm' | 'personalBotDm';
+    type: 'channel' | 'personalBotDm' | 'userDm';
 }
 
 const formSchema = z.object({
@@ -87,7 +87,7 @@ const ChatInput = ({apiUrl, query, name, type}: ChatInputProps) => {
                                     <div className='relative p-4 pb-6'>
                                         <button 
                                             type='button' 
-                                            onClick={()=>{onOpen('messageFile', { apiUrl, query })}}
+                                            onClick={()=>{onOpen('messageFile', { apiUrl, query, type })}}
                                             className='absolute top-7 left-8 h-[24px] w-[24px] 
                                             bg-zinc-400 hover:bg-zinc-300 transition rounded-full 
                                             p-1 flex items-center justify-center'>

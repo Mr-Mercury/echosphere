@@ -37,6 +37,12 @@ model User {
   apiKeys                  ApiKey[]
   botTemplates             BotTemplate[]
   createdServerTemplates   ServerTemplate[]
+  
+  // Global user-to-user DMs (fixed architecture)
+  userConversationsInitiated UserConversation[] @relation("UserConversationOne")
+  userConversationsReceived  UserConversation[] @relation("UserConversationTwo")
+  userDirectMessages         UserDm[]           @relation("UserDmSender")
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -290,11 +296,10 @@ model Message {
 }
 
 // ====================================================================================
-// ARCHITECTURAL NOTE:
-// The `Conversation` model is for any DM that happens *within a server's context*.
-// It links two `Member` records. Since a `Member` can be a human or a bot
-// (`User.human` can be `false`), this single model correctly handles both
-// user-user DMs and DMs with a "server bot".
+// DEPRECATED MODELS - REMOVE AFTER MIGRATION
+// These models implement the old broken server-scoped DM system.
+// They create separate conversations for the same users across different servers.
+// Use UserConversation and UserDm models instead for global user-to-user DMs.
 // ====================================================================================
 model Conversation {
   id String @id @default(uuid())
@@ -331,12 +336,56 @@ model Dm {
   @@index([conversationId])
 }
 
+// ====================================================================================
+// GLOBAL USER DMs 
+// These models handle user-to-user DMs
+// One conversation per pair of users, regardless of # of shared servers.
+// ====================================================================================
+
+model UserConversation {
+  id String @id @default(uuid())
+
+  userOneId String
+  userOne   User @relation("UserConversationOne", fields: [userOneId], references: [id], onDelete: Cascade)
+
+  userTwoId String
+  userTwo   User @relation("UserConversationTwo", fields: [userTwoId], references: [id], onDelete: Cascade)
+
+  directMessages UserDm[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userOneId, userTwoId])
+  @@index([userTwoId])
+}
+
+model UserDm {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
+
+  userId String
+  user   User @relation("UserDmSender", fields: [userId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation   UserConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted Boolean @default(false)
+
+  @@index([userId])
+  @@index([conversationId])
+}
+
 model BotTemplate {
   id             String  @id @default(uuid())
 
   // Copied from BotConfiguration if pre-existing bot is used
   botName        String
-  imageUrl           String? @db.Text
+  imageUrl       String? @db.Text
   botType        String?
   systemPrompt   String? @db.Text
   modelName      String?

@@ -19,6 +19,7 @@ interface ModalData {
     member?: any;
     userId?: string;
     bot?: Bot;
+    type?: 'channel' | 'personalBotDm' | 'userDm';
 }
 
 interface ModalStore {

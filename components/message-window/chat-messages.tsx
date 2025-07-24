@@ -31,7 +31,7 @@ interface ChatMessagesProps {
     socketQuery: Record<string, string>;
     paramKey: 'channelId' | 'conversationId';
     paramValue: string;
-    type: 'channel' | 'serverContextDm' | 'personalBotDm';
+    type: 'channel' | 'personalBotDm' | 'userDm';
 }
 
 type MessageWithMemberWithUser = Message & {
@@ -64,9 +64,12 @@ const ChatMessages = ({
     const hasScrolledToBottomRef = useRef(true);
     const initialMessagesLoadedRef = useRef(false);
 
-    const queryKey = type === 'personalBotDm' ? `bot-chat:${chatId}` : `chat:${chatId}`;
-    const addKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages` : `chat:${chatId}:messages`;
-    const updateKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages:update` : `chat:${chatId}:messages:update`;
+    const queryKey = type === 'personalBotDm' ? `bot-chat:${chatId}` : 
+                     type === 'userDm' ? `user-chat:${chatId}` : `chat:${chatId}`;
+    const addKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages` : 
+                  type === 'userDm' ? `user-chat:${chatId}:messages` : `chat:${chatId}:messages`;
+    const updateKey = type === 'personalBotDm' ? `bot-chat:${chatId}:messages:update` : 
+                     type === 'userDm' ? `user-chat:${chatId}:messages:update` : `chat:${chatId}:messages:update`;
 
     const {
         data, 

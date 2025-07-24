@@ -6,7 +6,11 @@ import { conversationUtil } from "@/lib/utilities/conversation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";
 
-// TODO: Change to friendId???? current implementation based on servers...
+// ==================== DEPRECATED ==================== 
+// This page uses the old broken server-scoped DM system.
+// Users should be redirected to /chat/personal/dm/[userId] instead.
+// TODO: Remove this file after migration is complete
+// ====================================================
 interface MemberIdPageProps {
     params: {
         memberId: string;
@@ -49,7 +53,7 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
             <ChatHeader imageUrl={otherMember!.user!.image!} 
             name={otherMember!.user!.username!}
             serverId={params.serverId}
-            type='serverContextDm'/>
+            type='userDm'/>
             <ChatMessages 
                 member={currentMember} 
                 name={otherMember.user.username!}
@@ -58,13 +62,13 @@ const MemberIdPage = async ({params}: MemberIdPageProps) => {
                 socketQuery={{ conversationId: conversation.id }}
                 paramKey='conversationId'
                 paramValue={conversation.id}
-                type='serverContextDm'
+                type='userDm'
             />
             <ChatInput 
                 apiUrl={messageHandlerApiUrl}
                 query={ {conversationId: conversation.id} }                
                 name={otherMember.user.username!}
-                type='serverContextDm'
+                type='userDm'
             />
         </div>
     )

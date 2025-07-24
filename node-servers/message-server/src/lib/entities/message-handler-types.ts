@@ -15,7 +15,7 @@ export type MessagePostHandlerParams = {
     conversationId: string | null;
     fileUrl: string | null;
     content: string;
-    type: 'channel' | 'conversation' | 'personalBotDm';
+    type: 'channel' | 'personalBotDm' | 'userDm';
 }
 
 export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
@@ -26,15 +26,15 @@ export type ChannelPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | '
     modelName: string | null;
 }
 
-export type ConversationPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId' | 'conversationId'> & {
-    type: 'conversation';
+export type PersonalBotDmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'personalBotDm';
     serverId: null;
     channelId: null;
     conversationId: string;
 }
 
-export type PersonalBotDmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId'> & {
-    type: 'personalBotDm';
+export type UserDmPostHandlerParams = Omit<MessagePostHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'userDm';
     serverId: null;
     channelId: null;
     conversationId: string;
@@ -48,7 +48,7 @@ export type MessageEditHandlerParams = {
     channelId: string | null;
     conversationId: string | null;
     content: string;
-    type: 'channel' | 'conversation' | 'personalBotDm';
+    type: 'channel' | 'personalBotDm' | 'userDm';
     method: 'DELETE' | 'EDIT';
 }
 
@@ -59,15 +59,15 @@ export type ChannelEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | '
     conversationId: null;
 }
 
-export type ConversationEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
-    type: 'conversation';
+export type PersonalBotDmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'personalBotDm';
     serverId: null;
     channelId: null;
     conversationId: string;
 }
 
-export type PersonalBotDmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
-    type: 'personalBotDm';
+export type UserDmEditHandlerParams = Omit<MessageEditHandlerParams, 'type' | 'serverId' | 'channelId'> & {
+    type: 'userDm';
     serverId: null;
     channelId: null;
     conversationId: string;

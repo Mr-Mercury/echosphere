@@ -2,8 +2,7 @@ import { MemberRole } from "@prisma/client";
 import { db } from "./messageDbConnection.js";
 import { MessagePostHandlerParams, MessageEditHandlerParams,
     MessageResponse, MessageUpdateResponse, ChannelPostHandlerParams, 
-    ConversationPostHandlerParams, ChannelEditHandlerParams, ConversationEditHandlerParams,
-    PersonalBotDmPostHandlerParams
+    ChannelEditHandlerParams, PersonalBotDmPostHandlerParams, UserDmPostHandlerParams, UserDmEditHandlerParams, PersonalBotDmEditHandlerParams
  } from "../entities/message-handler-types.js";
 
 
@@ -15,10 +14,10 @@ export async function messagePostHandler(
     
     if (type === 'channel') {
         return channelPostHandler(params as ChannelPostHandlerParams);
-    } else if (type === 'conversation') {
-        return conversationPostHandler(params as ConversationPostHandlerParams);
     } else if (type === 'personalBotDm') {
         return personalBotDmPostHandler(params as PersonalBotDmPostHandlerParams);
+    } else if (type === 'userDm') {
+        return userDmPostHandler(params as UserDmPostHandlerParams);
     }
 
     return { status: 400, error: 'Invalid message type!'};
@@ -88,65 +87,59 @@ async function personalBotDmPostHandler(params: PersonalBotDmPostHandlerParams) 
     return { status: 200, message: "Handler hit successfully" as any };
 }
 
-async function conversationPostHandler(params: ConversationPostHandlerParams) {
+async function userDmPostHandler(params: UserDmPostHandlerParams) {
     const { userId, conversationId, fileUrl, content } = params;
 
-    if (!conversationId) return {status: 400, error: 'Conversation ID missing!'};
-    if (!content && !fileUrl) return {status: 400, error: 'No content or file URL provided!'};
+    if (!conversationId) return { status: 400, error: 'Conversation ID missing!' };
+    if (!content && !fileUrl) return { status: 400, error: 'No content or file URL provided!' };
 
-    const conversation = await db.conversation.findFirst({
+    // Verify the conversation exists and user has access
+    const conversation = await db.userConversation.findFirst({
         where: {
             id: conversationId as string,
             OR: [
-                {
-                    memberOne: {
-                        userId: userId
-                    }
-                },
-                {
-                    memberTwo: {
-                        userId: userId
-                    }
-                }
+                { userOneId: userId },
+                { userTwoId: userId }
             ]
         },
         include: {
-            memberOne: {
-                include: {
-                    user: true,
-                }
-            },
-            memberTwo: {
-                include: {
-                    user: true,
-                }
-            },
+            userOne: true,
+            userTwo: true,
         }
     });
 
-    if (!conversation) return {status: 404, error: 'Conversation not found!'};
+    if (!conversation) return { status: 404, error: 'Conversation not found!' };
 
-    const member = conversation?.memberOne.userId === userId ? 
-    conversation.memberOne : conversation.memberTwo;
-    
-    const message = await db.dm.create({
+    // Create the message in the UserDm table
+    const message = await db.userDm.create({
         data: {
             content,
             fileUrl,
             conversationId: conversationId as string,
-            memberId: member.id,
+            userId: userId,
         },
         include: {
-            member: {
-                include: {
-                    user: true,
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    image: true,
+                    human: true
                 }
             }
         }
     });
 
-    return {status: 200, message};
+    // Update conversation timestamp
+    await db.userConversation.update({
+        where: { id: conversationId as string },
+        data: { updatedAt: new Date() }
+    });
+
+    return { status: 200, message };
 }
+
+
 
 export async function messageEditHandler ( 
         params: MessageEditHandlerParams
@@ -156,9 +149,13 @@ export async function messageEditHandler (
 
     if (type === 'channel') {
         return channelEditHandler(params as ChannelEditHandlerParams);
-    } else if (type === 'conversation') {
-        return conversationEditHandler(params as ConversationEditHandlerParams);
+    } else if (type === 'userDm') {
+        return userDmEditHandler(params as UserDmEditHandlerParams);
+    } else if (type === 'personalBotDm') {
+        return personalBotDmEditHandler(params as PersonalBotDmEditHandlerParams);
     }
+
+    return { status: 400, error: 'Invalid message type for editing' };
 }
 
 async function channelEditHandler(params: ChannelEditHandlerParams) {
@@ -278,121 +275,12 @@ async function channelEditHandler(params: ChannelEditHandlerParams) {
     }
 }
 
-async function conversationEditHandler(params: ConversationEditHandlerParams) {
-    const { userId, messageId, conversationId, content, method } = params;
+async function userDmEditHandler(params: UserDmEditHandlerParams) {
+    // TODO: Implement userDm edit handler
+    return { status: 501, error: 'User DM editing not implemented yet' };
+}
 
-    if (!conversationId) return {status: 400, error: 'Conversation ID missing!'};
-    if (!userId) return {status: 400, error: 'User ID missing!'};
-    if (!content) return {status: 400, error: 'No content provided!'};
-
-    try {
-        const conversation = await db.conversation.findFirst({
-            where: {
-                id: conversationId as string,
-                OR: [
-                    {
-                        memberOne: {
-                            userId: userId,
-                        }
-                    },
-                    {
-                        memberTwo: {
-                            userId: userId,
-                        }
-                    }
-                ]
-            },
-            include: {
-                memberOne: {
-                    include: {
-                        user: true,
-                    }
-                },
-                memberTwo: {
-                    include: {
-                        user: true,
-                    }
-                }
-            }
-        })
-
-        if (!conversation) return {status: 404, error: 'Conversation not found!'};
-
-        const member = conversation.memberOne.userId === userId ? 
-        conversation.memberOne : conversation.memberTwo;
-
-        let message = await db.dm.findFirst({
-            where: {
-                id: messageId as string,
-                conversationId: conversationId as string,
-            },
-            include: {
-                member: {
-                    include: {
-                        user: true,
-                    }
-                }
-            }
-        })
-
-        if (!message || message.deleted) {
-            return {status: 404, error: 'Message not found!'};
-        }
-
-        const isMessageOwner = message.memberId === member.id;
-        const canModify = isMessageOwner;
-
-        if (!canModify) {
-            return {status: 401, error: 'Unauthorized!'}
-        };
-
-        if (method === 'DELETE') {
-            message = await db.dm.update({
-                where: {
-                    id: messageId as string,
-                }, 
-                data: {
-                    fileUrl: null,
-                    content: 'This message has been deleted',
-                    deleted: true,
-                },
-                include: {
-                    member: {
-                        include: {
-                            user: true,
-                        }
-                    }
-                }
-            })
-            // Note to self - tanstack requires you to return the updateKey to trigger rerenders/updates
-            return {status: 200, message};
-        }
-
-        if (method === 'EDIT') {
-            if (!isMessageOwner) return {status: 401, error: 'Unauthorized to edit message!'};
-
-            message = await db.dm.update({
-                where: {
-                    id: messageId as string,
-                }, 
-                data: {
-                    content,
-                },
-                include: {
-                    member: {
-                        include: {
-                            user: true,
-                        }
-                    }
-                }
-            })
-
-            return {status: 200, message};
-        }
-
-        return {status: 400, error: 'Invalid method'};
-    } catch (error) {
-        console.log('EDIT DM HANDLER ERROR', error);
-        return {status: 500, error: 'Internal server error'};
-    }
+async function personalBotDmEditHandler(params: PersonalBotDmEditHandlerParams) {
+    // TODO: Implement personalBotDm edit handler  
+    return { status: 501, error: 'Personal bot DM editing not implemented yet' };
 }

@@ -29,7 +29,7 @@ const MessageFileModal = () => {
     const router = useRouter();
 
     const isModalOpen = isOpen && type === 'messageFile';
-    const { apiUrl, query } = data;   
+    const { apiUrl, query, type: messageType } = data;   
 
     const form = useForm({
         resolver: zodResolver(MessageFileUploadSchema),
@@ -54,7 +54,7 @@ const MessageFileModal = () => {
             //TODO: Find better workaround for content field
             const values = { fileUrl: val.fileUrl, content: val.fileUrl}
             
-            socket.emit('message', { query, values })
+            socket.emit('message', { query, values, type: messageType })
             // Clearing 
             form.reset();
             router.refresh();
