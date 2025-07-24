@@ -1,9 +1,9 @@
 // ====================================================================================
 // ARCHITECTURAL NOTE:
 // This layout is a UNIFIED VIEW for ALL direct messages (DMs).
-// It fetches TWO distinct types of DMs and renders them in separate sidebars:
-// 1. Server-Context DMs (`Conversation` model): DMs with other users or bots
-//    that are members of a server. Rendered in <ServerDmSidebar />.
+// 1. Global User DMs (`UserConversation` model): Global user-to-user DMs
+//    that work across all servers. Rendered in <ServerDmSidebar />.
+// Later on, can also add PERSONAL BOT DMs to this layout.
 // 2. Personal Bot DMs (`PersonalBotConversation` model): Private, serverless DMs
 //    with a user's personal bots. Rendered in <PersonalBotDmSidebar />.
 // ====================================================================================
@@ -17,7 +17,6 @@ import { PersonalBot, PersonalBotConversation } from "@prisma/client";
 
 type ServerDmNode = {
     userId: string;
-    memberId: string;
     conversationId: string;
     username: string;
     image: string;
@@ -26,10 +25,6 @@ type ServerDmNode = {
 type PersonalBotConversationWithBot = PersonalBotConversation & {
     bot: PersonalBot;
 };
-
-// NOTE: THIS DATA AND STRUCTURAL PATTERN IS INTENDED TO ALLOW USERS TO 
-// HAVE CONVERSATIONS WITH THE "SAME" BOT, BUT WITH DIFFERENT SHARED SERVER CONTEXT, 
-// AS EACH CONversation IS OWNED BY A DIFFERENT SERVER MEMBERSHIP
 
 const UnifiedDmLayout = async ({ children }: {
     children: React.ReactNode;
@@ -45,16 +40,15 @@ const UnifiedDmLayout = async ({ children }: {
         personalBotDms = await getPersonalBotConversationsByUserId(user.id) as PersonalBotConversationWithBot[];
 
         serverDms = serverConversations.map(conv => {
-            const otherUser = user.id === conv.memberOne.user.id 
-                ? conv.memberTwo 
-                : conv.memberOne;
+            const otherUser = user.id === conv.userOne.id 
+                ? conv.userTwo 
+                : conv.userOne;
             
             return {
-                userId: otherUser.userId, 
-                memberId: otherUser.id,
+                userId: otherUser.id, 
                 conversationId: conv.id, 
-                username: otherUser.user.username, 
-                image: otherUser.user.image
+                username: otherUser.username, 
+                image: otherUser.image
             } as ServerDmNode;
         });
         

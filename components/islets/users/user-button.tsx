@@ -23,7 +23,7 @@ const UserButton = ({user}: UserButtonProps) => {
     return (
         <div>
             <NavTooltip side='right' align='center' label='Direct Messages'>
-                <Link href={`/chat/server/personal`}className='group relative flex items-center'>
+                <Link href={`/chat/personal`}className='group relative flex items-center'>
                 <div className={cn
                 ('absolute left-0 bg-white rounded-r-full transition-all',
                 pathname !== PERSONAL_ROOM_ROUTE && 'group-hover:h-[20px] group-hover:w-[4px]',

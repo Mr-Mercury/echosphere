@@ -8,7 +8,7 @@ export const ConversationHeader = () => {
     return(
         <div className='flex items-center justify-center py-2'>
             <p className='text-xs uppercase font-semibold text-secondary'>
-                Active Server Conversations
+                Direct Messages
             </p>
         </div>
     )

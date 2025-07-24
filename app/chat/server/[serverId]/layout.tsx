@@ -19,7 +19,7 @@ const ChannelSidebarLayout = async ({
     const server = await getServerById(params.serverId, user.id);
 
     if (!server) {
-        return redirect('/chat/server/personal')
+        return redirect('/chat/personal')
     }
 
     return (

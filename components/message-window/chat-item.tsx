@@ -140,7 +140,7 @@ const ChatItem = ({
             return
         }
 
-        router.push(`/chat/server/personal/dm/${member.id}`);
+        router.push(`/chat/personal/dm/${member.user.id}`);
 
     }
 

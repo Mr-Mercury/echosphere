@@ -40,7 +40,7 @@ export const ChannelSidebar = async (params: ChannelSidebarProps) => {
         return channel.type === ChannelType.AUDIO
     })
 
-    if (!server) return redirect('/chat/server/personal');
+    if (!server) return redirect('/chat/personal');
 
     const role = server.members.find((member) => member.userId === user.id)?.role;
 

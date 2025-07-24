@@ -12,7 +12,7 @@ const Home = async () => {
     const session = await auth();
 
     if (session?.user) {
-        redirect('/chat/server/personal');
+        redirect('/chat/personal');
     }
 
     return (

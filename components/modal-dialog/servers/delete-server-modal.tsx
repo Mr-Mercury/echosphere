@@ -32,7 +32,7 @@ const DeleteServerModal = () => {
             await axios.delete(`/api/servers/${server?.id}/delete`);
 
             onClose();
-            router.push('/chat/server/personal');
+            router.push('/chat/personal');
             router.refresh();
         } catch(error) {
             console.log(error);

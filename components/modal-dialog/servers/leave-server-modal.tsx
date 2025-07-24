@@ -32,7 +32,7 @@ const LeaveServerModal = () => {
             await axios.patch(`/api/servers/${server?.id}/leave`);
             onClose();
             router.refresh();
-            router.push('/chat/server/personal');
+            router.push('/chat/personal');
         } catch(error) {
             console.log(error);
         } finally {

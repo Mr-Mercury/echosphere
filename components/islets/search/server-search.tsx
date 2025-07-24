@@ -78,7 +78,7 @@ const ServerSearch = ({
 
     const onMemberClick = (id: string) => {
         setOpen(false);
-        router.push(`/chat/server/personal/dm/${id}`);
+        router.push(`/chat/personal/dm/${id}`);
     }
 
     return (

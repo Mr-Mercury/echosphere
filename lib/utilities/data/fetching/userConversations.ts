@@ -4,42 +4,26 @@ export const getConversationsByUserId = async (userId: string) => {
 
     console.log('Fetching conversations for user:', userId);
     
-    const conversations = await db.conversation.findMany({
+    const conversations = await db.userConversation.findMany({
         where: {
             OR: [
-                { 
-                    memberOne: {
-                        userId: userId
-                    }
-                },
-                { 
-                    memberTwo: {
-                        userId: userId
-                    }
-                }
+                { userOneId: userId },
+                { userTwoId: userId }
             ]
         },
         include: {
-            memberOne: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            image: true
-                        }
-                    }
+            userOne: {
+                select: {
+                    id: true,
+                    username: true,
+                    image: true
                 }
             },
-            memberTwo: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            image: true
-                        }
-                    }
+            userTwo: {
+                select: {
+                    id: true,
+                    username: true,
+                    image: true
                 }
             }
         }

@@ -29,7 +29,7 @@ const SetupPage = async () => {
     return (
         <div>
             <CreateServerDialogue />
-            <Link href='/chat/server/personal'>Go to Profile</Link>
+            <Link href='/chat/personal'>Go to Profile</Link>
         </div>
     )
 

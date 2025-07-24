@@ -33,7 +33,7 @@ const ChannelIdPage = async ({params}: ChannelIdPageProps) => {
         }
     });
 
-    if (!channel || !member) return redirect('/chat/server/personal')
+    if (!channel || !member) return redirect('/chat/personal')
     return (
         <div className='bg-[#313338] flex flex-col h-full'>
             <div className="fixed top-0 right-0 left-0 md:left-[312px] z-10">

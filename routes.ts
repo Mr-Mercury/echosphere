@@ -30,5 +30,5 @@ export const apiAuthPrefix = '/api/auth';
 // TODO: New solution for /setup kludge for user initialization (place on server to avoid redirect)
 export const DEFAULT_LOGIN_REDIRECT = '/setup';
 
-export const PERSONAL_ROOM_ROUTE = '/chat/server/personal';
+export const PERSONAL_ROOM_ROUTE = '/chat/personal';
 
