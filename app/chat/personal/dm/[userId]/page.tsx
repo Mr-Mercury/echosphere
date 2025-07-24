@@ -5,6 +5,7 @@ import { db } from "@/lib/db/db";
 import { globalConversationUtil } from "@/lib/utilities/global-conversation";
 import { currentUser } from "@/lib/utilities/data/fetching/currentUser";
 import { redirect } from "next/navigation";
+import { MemberRole } from "@prisma/client";
 
 interface UserIdPageProps {
     params: {
@@ -54,6 +55,15 @@ const UserDmPage = async ({params}: UserIdPageProps) => {
             />
             <ChatMessages 
                 name={otherUserInfo.username!}
+                member={{
+                    id: user.id,
+                    role: MemberRole.ADMIN,
+                    userId: user.id,
+                    serverId: '', // Not applicable for DMs
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: user
+                }}
                 chatId={conversation.id}
                 messageApiUrl={userDmApiUrl}
                 socketQuery={{ conversationId: conversation.id }}

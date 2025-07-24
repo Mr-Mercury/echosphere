@@ -4,7 +4,7 @@ import ChatItem from "./chat-item";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import ChatWelcome from "./chat-welcome";
 import { Loader2, ServerCrash } from "lucide-react";
-import { Member, Message, User } from "@prisma/client";
+import { Member, Message, User, MemberRole } from "@prisma/client";
 import { Fragment, useRef, ElementRef, useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useChatSocket } from "@/hooks/use-chat-socket";
@@ -25,7 +25,9 @@ const formatMessageDate = (date: Date | string | null) => {
 
 interface ChatMessagesProps {
     name: string;
-    member?: Member;
+    member?: Member & {
+        user: User;
+    };
     chatId: string;
     messageApiUrl: string;
     socketQuery: Record<string, string>;
@@ -278,6 +280,36 @@ const ChatMessages = ({
                                         botName={message.bot?.name}
                                         botImageUrl={message.bot?.imageUrl}
                                         fromBot={message.fromBot}
+                                    />
+                                );
+                            } else if (type === 'userDm') {
+                                // User DM messages have user data instead of member data
+                                // Create a mock member object for compatibility
+                                const mockMember = {
+                                    id: message.user.id,
+                                    role: MemberRole.ADMIN,
+                                    userId: message.user.id,
+                                    serverId: '', // Not applicable for DMs
+                                    createdAt: new Date(),
+                                    updatedAt: new Date(),
+                                    user: message.user
+                                } as Member & { user: User };
+                                
+                                return (
+                                    <ChatItem 
+                                        key={message.id}
+                                        id={message.id}
+                                        currentMember={member}
+                                        member={mockMember}
+                                        content={message.content}
+                                        fileUrl={message.fileUrl}
+                                        deleted={message.deleted}
+                                        timestamp={formatMessageDate(message.createdAt)}
+                                        isUpdated={message.updatedAt !== message.createdAt}
+                                        messageApiUrl={messageApiUrl}
+                                        socketQuery={socketQuery}
+                                        modelName={message.modelName}
+                                        type={type} 
                                     />
                                 );
                             } else {
