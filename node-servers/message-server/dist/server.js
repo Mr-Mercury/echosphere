@@ -283,7 +283,11 @@ io.on('connection', (socket) => {
             const result = await messagePostHandler(params);
             if (!channelKey)
                 return { status: 400, error: 'Channel key is undefined!' };
-            io.to(channelId).emit(channelKey, result.message);
+            // Emit to the correct room based on message type
+            const roomId = type === 'channel' ? channelId : conversationId;
+            if (!roomId)
+                return { status: 400, error: 'Room ID is undefined!' };
+            io.to(roomId).emit(channelKey, result.message);
         }
         catch (error) {
             console.log('SOCKET MESSAGE POST ERROR: ', error);
