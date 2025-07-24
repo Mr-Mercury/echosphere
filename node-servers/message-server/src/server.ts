@@ -337,24 +337,27 @@
                 const content = values.content;
                 let channelKey;
                 
-                if (type !== 'channel' && type !== 'personalBotDm' && type !== 'userDm') return { status: 400, error: 'Invalid message type!'};
-
-                if (type === 'channel') {
-                    if (!serverId) return { status: 400, error: 'Server Id missing!'};
-                    if (!channelId) return { status: 400, error: 'Channel Id missing!'};
-                    channelKey = `chat:${channelId}:messages`;
-                    // Join the channel room when sending a message
-                    socket.join(channelId);
-                }
-
-                if (type === 'personalBotDm') {
-                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
-                    channelKey = `bot-chat:${conversationId}:messages`;
-                }
-
-                if (type === 'userDm') {
-                    if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
-                    channelKey = `user-chat:${conversationId}:messages`;
+                switch (type) {
+                    case 'channel':
+                        if (!serverId) return { status: 400, error: 'Server Id missing!'};
+                        if (!channelId) return { status: 400, error: 'Channel Id missing!'};
+                        channelKey = `chat:${channelId}:messages`;
+                        // Join the channel room when sending a message
+                        socket.join(channelId);
+                        break;
+                    
+                    case 'personalBotDm':
+                        if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                        channelKey = `bot-chat:${conversationId}:messages`;
+                        break;
+                    
+                    case 'userDm':
+                        if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
+                        channelKey = `user-chat:${conversationId}:messages`;
+                        break;
+                    
+                    default:
+                        return { status: 400, error: 'Invalid message type!'};
                 }
 
                 const params = { 
@@ -398,9 +401,7 @@
                     if (!serverId) return { status: 400, error: 'Server Id missing!'};
                     if (!channelId) return { status: 400, error: 'Channel Id missing!'};
                     updateKey = `chat:${channelId}:messages:update`;
-                }
-
-                if (type === 'userDm') {
+                } else if (type === 'userDm') {
                     if (!conversationId) return { status: 400, error: 'Conversation Id missing!'};
                     updateKey = `user-chat:${conversationId}:messages:update`;
                     console.log('updateKey is: ' + updateKey);
